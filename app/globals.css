@@ -312,6 +312,14 @@ html[data-banner="off"] .banner {
   flex: 0 0 auto;
 }
 
+.statics-mark {
+  display: block;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  color: var(--text);
+}
+
 .brand-name {
   font-family: var(--mono);
   font-size: 13.5px;

@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { SearchDocs } from "@/components/search-docs";
+import { StaticsMark } from "@/components/statics-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { APP_URL } from "@/lib/site";
 
@@ -14,7 +14,7 @@ export function SiteHeader({ leading }: { leading?: ReactNode }) {
         {leading}
 
         <Link className="brand" href="/">
-          <Image src="/statics-logo.svg" alt="" width={26} height={26} className="brand-mark" priority />
+          <StaticsMark className="statics-mark" />
           <span className="brand-name">
             statics <span>/ docs</span>
           </span>
