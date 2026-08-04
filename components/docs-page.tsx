@@ -118,7 +118,7 @@ export function DocsPage({ page }: { page: DocPageType }) {
       </div>
 
       <footer className="docs-footer">
-        <div className="docs-footer-inner">© EqualFi Labs. All rights reserved.</div>
+        <div className="docs-footer-inner">© <a href="https://equalfi.org" target="_blank" rel="noreferrer">EqualFi Labs</a>. All rights reserved.</div>
       </footer>
     </div>
   );

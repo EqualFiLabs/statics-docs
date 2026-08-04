@@ -1165,6 +1165,19 @@ a.landing-card:hover {
   font-size: 11.5px;
 }
 
+.docs-footer a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: color 120ms ease, text-decoration-color 120ms ease;
+}
+
+.docs-footer a:hover {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+}
+
 /* ---------- mobile menu ---------- */
 .mobile-menu-button,
 .mobile-menu-close {
