@@ -1,0 +1,118 @@
+---
+id: position-nft
+slug: core/position-nft
+label: PositionNFT
+title: Shared PositionNFT
+description: One transferable ERC-721 position owns every Dollar leg, basket collateral, loan, reward selection, and staked liquidity position.
+updated: 2026-08-04
+order: 30
+---
+
+One PositionNFT can own several independent legs at once. The ERC-721
+collection is named `Statics Position` with symbol `STXPOS`, and the contract
+lives at the `StaticsDiamond` address.
+
+## What a position owns
+
+A single PositionNFT may bundle any of the following legs:
+
+- a global staking balance and accrued multi-asset reward claims;
+- deposited and locked BasketTokens used as lending collateral;
+- independent basket loan tranches;
+- immediately consumable Statics Dollar Risk Share liquidity, funded incentives,
+  fill proceeds, and series-migration credits;
+- pairing-vault state; and
+- voluntarily custodied full-range v4 LP NFTs and their hook-fee claims.
+
+ERC-721 ownership and approvals authorize every attached leg. Transferring the
+NFT transfers staking balance, reward claims, collateral, obligations, and
+control of voluntarily custodied LP NFTs in one move. Externally held Uniswap v4
+NFTs are not PositionNFT legs and do not move with a transfer.
+
+:::warning
+Integrators must inspect every active leg before accepting a PositionNFT
+transfer. A position carries obligations (loans, Dollar legs) as well as assets.
+:::
+
+## Creation and reuse
+
+Opening a PositionNFT requires the exact native amount returned by
+`positionCreationFee()`. The testnet fee is `0.001 ETH`. The Diamond owner may
+change the raw amount without an artificial cap, and zero means free creation.
+Direct creation and every atomic create-and-use path enforce the same fee and
+forward it immediately, in full, to the canonical treasury — the Diamond never
+retains it.
+
+Adding legs, collateral, stake, liquidity, or debt to an existing position does
+not pay the fee again. Closing a position and opening another creates a new NFT
+and pays the then-current fee.
+
+`closePosition` succeeds only after all balances, claims, collateral, loans,
+Dollar legs, custodied LP NFTs, and LP claims are empty.
+
+## Modular reporting interface
+
+`StaticsDiamond` implements the pre-ERC Modular Position NFT reporting interface
+(`0x212b8e93`):
+
+- `positionState` reports current existence, a structural nonce, active-leg
+  count, and unresolved-loan-obligation count;
+- `isLegActive` provides constant-time membership; and
+- `isPositionClosable` applies every aggregate check plus the
+  mint-initialization guard.
+
+The nonce starts at one on mint and increments for Leg attachment, Leg
+detachment, loan-obligation changes, and Closure. It does not change for
+transfer, approval, reward settlement, or loan extension.
+
+## Owner index
+
+An optional append-only owner index tracks every position by its current owner
+across mint, transfer, and burn. It is ERC-165 advertised through
+`IPositionOwnerIndex` (`0x7ef5913d`).
+
+| Method | Purpose |
+| --- | --- |
+| `positionCount(owner)` | Number of positions currently owned |
+| `positionsOfOwner(owner, cursor, limit)` | Bounded pagination returning `(positionIds, nextCursor)` |
+| `syncPositionOwnerIndex(positionId)` | Permissionless migration of a single legacy position into the index |
+
+Index writes emit `PositionOwnerIndexSynced` and the ERC-4906 metadata-update
+event (`0x49064906`). Migration removes only the requested position, leaving
+sibling positions indexed. The index lets integrators enumerate a wallet's
+positions without looping transfer events.
+
+## Onchain metadata
+
+Each valid PositionNFT exposes fully onchain metadata through `tokenURI`. Its
+immutable visual seed is:
+
+```text
+keccak256(abi.encodePacked(
+    bytes32("STATICS_AVATAR_V1"),
+    block.chainid,
+    address(StaticsDiamond),
+    positionId
+))
+```
+
+Transfers, approvals, balances, claims, legs, and obligations do not alter the
+avatar. The returned Base64 JSON contains a Base64 SVG and eight cosmetic visual
+attributes (Field, Boundary, Shell, Interface, Mantle, Telemetry, Sigil,
+Signal). It contains no live status, achievement, yield, debt, health, or rarity
+semantics.
+
+The Diamond stores one collection-wide renderer address. The owner may replace
+or clear it with `setPositionRenderer`; clearing it makes valid positions return
+an empty URI. The stateless renderer holds one immutable `StaticsAvatarSVG`
+helper so both contracts stay below the EIP-170 code-size limit without placing
+artwork in facets or protocol storage.
+
+## Reward eligibility at a glance
+
+| Reward rail | Weight | Eligibility | Exit behavior |
+| --- | --- | --- | --- |
+| Basket position rewards | Deposited BasketTokens in one basket | Immediate on deposit | Leg waits until the block after its latest deposit; locked loan collateral stays eligible |
+| Global Statics rewards | Configured stake selected into one reward asset | Stake, new selections, and top-ups mature at an hourly boundary 24–25 hours later | Stake always withdrawable; withdrawal consumes pending before eligible |
+| Canonical LP rewards | Full-range liquidity in a custodied v4 NFT | Initial and increased deltas activate next block | NFT can leave immediately in any lifecycle state; claims stay attached |
+| Dollar Risk liquidity | Supplied series Risk Shares | Staking makes shares immediately consumable | Unconsumed effective shares remain withdrawable |

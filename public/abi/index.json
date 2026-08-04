@@ -1,0 +1,36 @@
+{
+  "format": "viem human-readable ABI (array of signatures)",
+  "note": "Fetch the JSON array; each entry is one function/event/error signature.",
+  "abis": [
+    {
+      "abi": "staticsAbi",
+      "file": "statics-diamond.json",
+      "label": "StaticsDiamond — the single integration address",
+      "signatures": 190
+    },
+    {
+      "abi": "staticsSwapFeeHookAbi",
+      "file": "swap-fee-hook.json",
+      "label": "StaticsSwapFeeHook",
+      "signatures": 24
+    },
+    {
+      "abi": "staticsLiquidityManagerAbi",
+      "file": "liquidity-manager.json",
+      "label": "StaticsLiquidityManager",
+      "signatures": 10
+    },
+    {
+      "abi": "staticsTestnetFaucetAbi",
+      "file": "testnet-faucet.json",
+      "label": "StaticsFaucet (testnet)",
+      "signatures": 7
+    },
+    {
+      "abi": "basketTokenAbi",
+      "file": "basket-token.json",
+      "label": "BasketToken (per-basket ERC-20)",
+      "signatures": 10
+    }
+  ]
+}

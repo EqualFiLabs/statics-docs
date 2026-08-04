@@ -1,0 +1,66 @@
+---
+id: testnet-onboarding
+slug: reference/testnet-onboarding
+label: Testnet onboarding
+title: Faucet and testnet onboarding
+description: Fund a wallet from the Statics faucets and get started with Mock USDG, STATICS, and basket tokens on testnet.
+updated: 2026-08-04
+order: 760
+---
+
+The Robinhood Chain Testnet ships an ownerless faucet that distributes the
+fixtures you need to try Statics without production assets. This page covers what
+is available and the recommended first actions.
+
+## Faucet
+
+| Field | Value |
+| --- | --- |
+| Address | `0x6B3d3886feDFedCD7D39a601349E88DA64D74B6f` |
+| Cooldown | One day per wallet |
+| Inventory | Mock USDG, STATICS, TSLA, PLTR, AMD |
+
+The faucet is ownerless with a fixed inventory. Use the SDK helper
+`buildTestnetFaucetClaimCall()` to build the claim calldata.
+
+:::note
+The faucet, mock USDG, mock oracles, and owner-mintable STATICS token are
+testnet fixtures. They are deliberately not production defaults.
+:::
+
+## Fund a wallet
+
+1. Connect to Robinhood Chain Testnet (chain ID `46630`).
+2. Claim testnet assets from the faucet.
+3. Approve `StaticsDiamond` (`0xfb3Baf22daCADE66f7CF0356aC2E342235af74bf`) for
+   the asset you want to use.
+
+## Open a position and stake STATICS
+
+```solidity
+IERC20(staticsToken).approve(staticsDiamond, 100e18);
+
+uint256 positionId = globalRewards.createAndStake{value: creationFee}(
+    100e18,
+    msg.sender,
+    rewardAssets
+);
+```
+
+`creationFee` is `0.001 ETH` on testnet. See
+[Integration](/docs/reference/integration) for the full set of common flows.
+
+## Try the pegged Dollar
+
+The active pegged profile is Mock USDG profile `2` (5-BPS mint fee, 7-BPS
+redemption fee, `1,000,000 USDstx` debt ceiling). Approve the Diamond for Mock
+USDG and call `mintPegged` to mint `USDstx`, or use the permit variant
+`mintPeggedWithPermit`.
+
+## Trade the genesis basket
+
+TPA1 is a live three-constituent basket (`0.01` TSLA, `0.01` PLTR, `0.01` AMD per
+BasketToken) with three canonical pools. Mint or redeem via the basket interface,
+or swap on the canonical pools through the hook. See the full
+[deployment record](/docs/reference/robinhood-testnet-deployment) for all
+addresses.

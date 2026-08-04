@@ -1,0 +1,75 @@
+---
+id: solvency-and-recovery
+slug: dollar/solvency-and-recovery
+label: Solvency & recovery
+title: Solvency, transitions and recovery
+description: Core governs price bands, coverage, insurance, transitions, and recovery gates across every Dollar profile.
+updated: 2026-08-04
+order: 240
+---
+
+Core evaluates every configured profile independently and reports a single
+global health state. The system is designed so that a bad or unavailable profile
+cannot be hidden behind surplus in another profile, and so that collateral exits
+stay safe after impairment.
+
+## Profile and series lifecycle
+
+Dollar profile modes are `Inactive`, `Active`, `ReduceOnly`, and `Retired`.
+Governance activates configured profiles, may move an active profile into
+reduce-only runoff, and may permanently retire it only from `ReduceOnly`.
+Retirement is irreversible.
+
+Volatile profiles additionally manage series states:
+
+| Series state | Meaning |
+| --- | --- |
+| `Active` | Ordinary issuance and recombination |
+| `RecoveryPending` | Awaiting recovery eligibility |
+| `Recoverable` | Expired-risk recovery is permissionless |
+| `Retired` | Winding down |
+| `Closed` | Terminal |
+
+Successor creation and old-series recovery never make the claims of two series
+interchangeable.
+
+## Global health
+
+Core reports global health as one of:
+
+| State | Meaning |
+| --- | --- |
+| `Healthy` | Ordinary exits available |
+| `Impaired` | A profile is impaired; exits latch |
+| `Recovering` | Waiting out the continuous-healthy window |
+| `Unavailable` | A profile is unavailable |
+
+## The 48-hour latch
+
+Global collateral exits remain latched after impairment and require **48
+continuous healthy hours**, advanced by explicit checkpoints, before ordinary
+exits become available again. Any renewed failure resets the window. No
+background process advances the health machine — keepers or users must
+checkpoint.
+
+## Pegged redemption quarantine
+
+Pegged redemption layers its own quarantine on top of global health. Any
+unresolved downside series transition, unavailable health, or impaired profile
+blocks every pegged profile. Resolving the transition does not reopen redemption
+immediately; a checkpoint starts its own 48-hour continuous-health delay.
+`peggedRedemptionStatus` reads the state; `checkpointPeggedRedemption` advances
+it.
+
+## Expired-risk recovery
+
+Expired volatile-series risk recovery is permissionless. It burns the required
+senior and Risk Share claims, settles the expired recovery book, and may issue
+successor pairs according to the selected recovery mode.
+
+:::note
+Unlike basket-loan recovery, Dollar expired-risk recovery includes a positive
+quoted keeper bounty in the collateral paid to its caller. The managed
+periphery path forwards the same caller amount. Minimum keeper output remains
+caller-bounded.
+:::

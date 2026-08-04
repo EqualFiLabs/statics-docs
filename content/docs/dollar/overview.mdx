@@ -1,0 +1,61 @@
+---
+id: dollar-overview
+slug: dollar/overview
+label: Overview
+title: Statics Dollar
+description: The Statics Dollar (USDstx) is a senior dollar minted from volatile or pegged collateral, governed by the Dollar Core diamond.
+updated: 2026-08-04
+order: 210
+---
+
+The Statics Dollar is a collateralized dollar system with a fungible senior
+token (`USDstx`), series-scoped junior Risk Shares (`ethLEV`), and two families
+of collateral profiles. The Dollar's collateral, issuance, health, insurance,
+and recovery live in the separate `StaticsDollarCoreDiamond`; users reach them
+through typed gateway functions on `StaticsDiamond`.
+
+## Tokens
+
+| Token | Standard | Role |
+| --- | --- | --- |
+| `USDstx` | ERC-20 Permit | Fungible senior Dollar claim |
+| `ethLEV` | ERC-1155 | Series-specific residual Dollar risk for volatile profiles |
+
+Risk Shares are series-scoped: the claims of two series are never
+interchangeable, even across a successor migration.
+
+## Two profile families
+
+| Family | Mints | Risk Shares | Notes |
+| --- | --- | --- | --- |
+| Volatile | Equal nominal senior Dollar **and** series Risk Shares | Yes | e.g. WETH collateral; recombination returns collateral |
+| Pegged | Senior Dollar only | No | Direct collateral wrapper with independent mint/redeem fees |
+
+[Volatile profiles](/docs/dollar/volatile-profiles) issue equal nominal amounts of
+senior Dollar and series Risk Shares. Recombining equal senior and junior claims
+returns proportional collateral when health permits. Pegged profiles are direct
+collateral wrappers — minting pulls nominal collateral plus a fee; redemption
+burns Dollar and returns proportional collateral less its fee.
+
+## The gateway
+
+Users never call the Core diamond directly for ordinary actions. `StaticsDiamond`
+exposes a typed gateway: `depositETH`/`depositWETH`, `recombineToWETH`/
+`recombineToETH`, pegged mint and redeem, pairing vault redemption, and the
+atomic mint-and-recompose helpers. Each typed entrypoint carries its own permit
+variant.
+
+:::note
+Expired volatile-series risk recovery is separately permissionless. It burns the
+required senior and Risk Share claims, settles the expired recovery book, and may
+issue successor pairs. Unlike basket-loan recovery, this path includes a positive
+quoted keeper bounty paid to its caller.
+:::
+
+## Health gates the whole system
+
+Core evaluates every configured profile independently and reports global health
+as `Healthy`, `Impaired`, `Recovering`, or `Unavailable`. A bad or unavailable
+profile cannot be masked by surplus in another profile. Global collateral exits
+latch after impairment and require 48 continuous healthy hours before ordinary
+exits reopen. See [Solvency, transitions and recovery](/docs/dollar/solvency-and-recovery).

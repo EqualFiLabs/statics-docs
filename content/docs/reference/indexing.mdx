@@ -1,0 +1,63 @@
+---
+id: indexing
+slug: reference/indexing
+label: Indexing
+title: Indexing
+description: Events and read models for building reorg-safe indexers over Statics state.
+updated: 2026-08-04
+order: 730
+---
+
+Statics state is best indexed from events, then reconciled against current view
+calls. Because the chain may reorg, an indexer should treat events as hints and
+authoritative views as truth.
+
+## Event surface
+
+Each module emits events for its value-moving actions: basket creation, mint and
+redemption, collateral deposit and withdrawal, lending borrow/extend/repay/
+recovery, flash loans, global stake and reward opt-in/out, canonical LP stake/
+unstake, dollar mint/recombine/pegged mint/redeem, Risk liquidity and incentive
+funding, governance lifecycle transitions, and swap-fee hook settlement.
+
+:::note
+Use the generated ABIs in [`@statics-protocol/sdk`](/docs/reference/sdk) to
+decode event topics and payloads exactly. Event signatures must match the
+deployed facet bytecode; do not hand-encode them.
+:::
+
+## Suggested read models
+
+| Model | Keyed by | Backed by |
+| --- | --- | --- |
+| Position | `(chainId, StaticsDiamond, positionId)` | `positionState`, `isLegActive`, `IPositionOwnerIndex` enumeration |
+| Basket | `basketId` | basket config, supply, backing, reward state |
+| Loan tranche | `loanId` | stored principal vector, maturity, lock state |
+| Dollar series | `(profileId, seriesId)` | series state, Risk liquidity, incentive reserves |
+| Custody | `token` | `globalReservedByToken`, per-account reservations |
+
+The PositionNFT owner index (`positionCount`, `positionsOfOwner`) lets an indexer
+enumerate a wallet's current positions without scanning every transfer event;
+call `syncPositionOwnerIndex` for any legacy position not yet migrated.
+
+## Reorg-safe indexing
+
+1. Index events into a trailing window behind the chain head.
+2. On every update, reconcile derived state against the corresponding view call.
+3. Treat a view call as authoritative when an event and the view disagree.
+4. Re-run the affected read model after any reorg boundary.
+
+## Measured receipts matter
+
+Inbound accounting credits measured receipts, not requested amounts, and several
+flows route *actual* (measured) excess rather than quoted amounts — notably flash
+loans and extension payments. An indexer that assumes the quoted amount equals
+the moved amount will drift on fee-on-transfer tokens. Always reconcile against
+the view that reports the stored post-state.
+
+## No background execution
+
+No keeper runs automatically. Lifecycle transitions, recovery, compounding,
+treasury distribution, and ExitOnly unwind only advance when a transaction is
+submitted. An indexer should not assume time-based state changes; it should
+reflect state only after the confirming event is finalized.

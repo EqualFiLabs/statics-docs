@@ -1,0 +1,70 @@
+---
+id: canonical-lp-rewards
+slug: liquidity/canonical-lp-rewards
+label: Canonical LP rewards
+title: Canonical LP rewards
+description: Stake eligible full-range PositionManager NFTs to accrue next-block liquidity weight and claim canonical rewards.
+updated: 2026-08-04
+order: 440
+---
+
+Users can stake their own full-range PositionManager NFTs for active canonical
+pools into a PositionNFT and earn the hook's canonical-LP fee allocation. This
+is separate from the global Statics staking rail.
+
+## Staking a v4 NFT
+
+Any unsubscribed, nonzero, full-range PositionManager NFT for an active
+canonical pool may be attached to a PositionNFT and transferred into voluntary
+Diamond custody — but only when the LP NFT and PositionNFT have the **same
+current owner**. PositionNFT authorization or ERC-721 approval alone does not
+substitute for that ownership match.
+
+Eligibility does not depend on whether the NFT originated from
+`borrowAndProvideLiquidity`. Initial liquidity becomes reward eligible in the
+next block; an in-custody increase preserves the existing eligible weight and
+delays only the added liquidity until the next block.
+
+## No unstake cooldown
+
+There is no LP unstake cooldown. The PositionNFT owner may withdraw the NFT in
+the staking block or in any basket lifecycle state. Withdrawal settles earned
+rewards to the PositionNFT before returning the NFT, so a later reward-token
+failure cannot trap the external position.
+
+:::note
+Unclaimed rewards remain attached to the PositionNFT, and transferring that
+PositionNFT transfers claim and custody authority. Users must unstake before
+decreasing or burning the v4 NFT.
+:::
+
+## Borrow-to-liquidity
+
+Statics provides two typed convenience paths that combine an ordinary
+position-owned borrow with canonical LP creation.
+
+`borrowAndProvideLiquidity` performs an ordinary borrow, applies the origination
+fee, mints BasketTokens from retained principal, and creates one **user-owned**
+PositionManager NFT per supplied canonical pool. Those NFTs receive no automatic
+reward eligibility — the recipient may later stake them through the ordinary
+canonical LP reward entrypoint.
+
+`borrowAndStakeLiquidity` is the PositionNFT-owned alternative. It requires
+full-range positions, mints the NFTs directly to the Diamond, and records them as
+pending LP legs under the borrowing PositionNFT. LP weight activates in the next
+block, while the locked BasketToken collateral keeps earning basket rewards.
+
+For both paths the caller supplies one aligned entry per constituent with tick
+range, exact liquidity, per-currency maximums, and deadline. Every pool must be
+active, manager-synced, unique, and associated with the basket constituent. Any
+stale price, bad pool, cap, deadline, range, approval, or principal requirement
+reverts the loan, mint, and every LP creation atomically.
+
+| Path | NFT recipient | Reward eligibility |
+| --- | --- | --- |
+| `borrowAndProvideLiquidity` | caller-chosen `lpRecipient` | None automatic; stake later |
+| `borrowAndStakeLiquidity` | Diamond (LP leg under the position) | Next block |
+
+`borrowAndStakeLiquidity` has no caller-selected recipient: the current
+PositionNFT owner receives unused principal and PositionManager refunds even when
+an approved operator submits the call.

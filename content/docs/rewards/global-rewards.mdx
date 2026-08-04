@@ -1,0 +1,79 @@
+---
+id: global-rewards
+slug: rewards/global-rewards
+label: Global rewards
+title: Global multi-asset rewards
+description: Stake STATICS in a position and opt into up to 64 reward assets, with an eligibility delay that blocks capturing historical fees.
+updated: 2026-08-04
+order: 510
+---
+
+Statics has one global staking rail. Users stake the configured staking token
+(`STATICS` on testnet) in a PositionNFT and opt into selected reward assets. Each
+reward asset indexes rewards only across positions that selected it, so the
+denominator stays bounded and honest.
+
+## Staking token
+
+The staking-token address is immutable at initialization. The token must be a
+deployed contract and staking transfers must be exact — taxed or
+balance-changing staking tokens are rejected.
+
+## Entering stake
+
+| Method | Action |
+| --- | --- |
+| `createAndStake` | Create a PositionNFT, select initial reward assets, and stake in one call |
+| `stake` | Increase an existing authorized position |
+| `optInRewardAssets` / `optOutRewardAssets` | Manage the position's reward selections |
+
+Stake is always withdrawable.
+
+## The 24-hour eligibility delay
+
+Initial stake, new selections, and top-up deltas enter a per-asset pending
+tranche that matures at the next hourly boundary **at least 24 hours later** (a
+24–25 hour window). Mature stake remains eligible when a position is increased.
+
+Each matured bucket records its activation index, so pending stake cannot capture
+historical fees. Fee accrual and position interactions roll the affected asset's
+bounded maturity ring before updating its index.
+
+:::note
+This delay is the anti-fee-theft mechanism: a position that selects an asset
+right before a large fee distribution accrues only from its activation index
+onward, never retroactively.
+:::
+
+## Unstaking
+
+`unstake` removes pending stake before eligible stake and requires an exact
+outbound transfer. A full unstake clears the selection list while preserving
+already settled claims.
+
+## Non-swap fee routing
+
+Most protocol fees — mint and redemption fees, origination fee reclassification,
+extension payments, repayment excess, flash-loan excess, recovery penalties,
+pegged fees, and the global share of volatile-series fees — enter the same
+non-swap ledger. For a fee on asset `a` when `eligibleStake[a] > 0`:
+
+```text
+stakerAmount   = floor(grossFee * 9000 / 10000)   // 90%
+treasuryAmount = grossFee - stakerAmount           // 10%
+indexDelta[a]  = floor(stakerAmount * 1e27 / eligibleStake[a])
+```
+
+If `eligibleStake[a] == 0`, no staker liability is created and the entire fee
+accrues to treasury. Indexed whole-token value that never crystallizes to a
+position routes to treasury only when that asset's eligible stake returns to
+zero.
+
+## Claims and treasury
+
+Claims are pull-based, require PositionNFT authorization, and accept a per-asset
+minimum received amount. Claim settlement transfers from the global fee
+reservation and never reduces basket backing.
+
+Anyone may call `distributeTreasuryFees(asset)`, but the destination is always
+the configured treasury — the caller cannot choose a recipient.

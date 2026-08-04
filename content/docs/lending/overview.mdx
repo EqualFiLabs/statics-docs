@@ -1,0 +1,60 @@
+---
+id: lending-overview
+slug: lending/overview
+label: Overview
+title: Self-backed lending
+description: Deposit basket tokens as collateral and borrow their proportional constituent vector at a basket-defined loan-to-value.
+updated: 2026-08-04
+order: 310
+---
+
+Statics lending is self-backed: a borrower deposits BasketTokens as collateral
+and borrows the proportional constituent vector against them. There is no price
+oracle and no external liquidation. The loan is overcollateralized by its own
+deposited basket at a creator-chosen loan-to-value.
+
+## How it works
+
+Only BasketTokens deposited through the collateral interface can be locked for
+borrowing. Deposited and locked BasketTokens keep earning their basket's share of
+[canonical hook fees](/docs/liquidity/swap-fee-hook) in both the BasketToken and
+constituent assets — locking does not remove them from the reward denominator.
+
+`borrow` creates an independent tranche owned by the PositionNFT:
+
+1. the origination fee is taken as a BasketToken-share reduction whose
+   underlying backing is reclassified into the global fee ledger;
+2. the remaining locked shares determine debt shares at the configured LTV and a
+   creator-selected recovery penalty proportional to that debt; and
+3. debt plus penalty must fit inside collateral.
+
+```text Origination
+feeShares        = ceil(sharesIn * originationFeeBps / 10000)
+collateralShares = sharesIn - feeShares
+debtShares       = ceil(collateralShares * ltvBps / 10000)
+penaltyShares    = ceil(debtShares * recoveryPenaltyBps / 10000)
+```
+
+Creation and origination require `debtShares + penaltyShares <= collateralShares`.
+
+## No price-oracle liquidation
+
+Because principal is bounded by the self-backed collateral vector and LTV is at
+most 95%, an unpaid loan does not create bad debt or a claim on another basket.
+Only the configured debt-proportional penalty is charged on
+[recovery](/docs/lending/recovery). There is no socialized-loss waterfall.
+
+## The 95% protocol ceiling
+
+Each basket sets its own LTV at or below 9,500 BPS, capped by the immutable 95%
+protocol ceiling. At 95% LTV, an ideal zero-fee recursive mint, deposit, and
+borrow sequence converges below 20 times the initial deposited shares and 19
+times the initial debt. Routers must impose their own depth, quote-freshness,
+approval, and slippage limits.
+
+## Independent tranches
+
+Every loan is its own tranche with its own principal vector and maturity.
+Repayment unlocks only the repaid tranche; extension changes a tranche's maturity
+but not its principal, collateral, or global stake. See
+[Loan lifecycle](/docs/lending/loan-lifecycle).

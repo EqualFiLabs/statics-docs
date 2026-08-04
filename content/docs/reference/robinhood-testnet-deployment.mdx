@@ -1,0 +1,107 @@
+---
+id: robinhood-testnet-deployment
+slug: reference/robinhood-testnet-deployment
+label: Robinhood testnet
+title: Robinhood testnet deployment
+description: "The recorded Robinhood Chain Testnet integration-beta deployment: contracts, governance, genesis basket, faucets, and dependencies."
+updated: 2026-08-04
+order: 740
+---
+
+This page records the current Statics deployment on Robinhood Chain Testnet. It
+is an integration beta, not a production deployment. `deployment.md` in the
+source repository is the canonical record.
+
+## Release
+
+| Field | Value |
+| --- | --- |
+| Network | Robinhood Chain Testnet |
+| Chain ID | `46630` |
+| Explorer | https://explorer.testnet.chain.robinhood.com |
+| Source branch | master |
+| Source commit | `1c6351182c9ba8de04ebbf99aa4718d21885851c` |
+| Diamond shape | 21 facets / 193 selectors (Core 11 / 95) |
+
+A live Diamond loupe readback confirms the deployed `StaticsDiamond` exposes the
+current master source shape, including the three owner-index selectors routed to
+the PositionNFT facet.
+
+## Protocol contracts
+
+| Contract | Address |
+| --- | --- |
+| StaticsDiamond / PositionNFT (`STXPOS`) | `0xfb3Baf22daCADE66f7CF0356aC2E342235af74bf` |
+| StaticsDollarCoreDiamond | `0xB142E9c8f80Fe67a96c8B3e152BfB7fF546312CC` |
+| Statics Dollar (`USDstx`) | `0x2bDE36A981353fb31a1237013e460Cac7AeAeA85` |
+| Dollar risk shares (`ethLEV`) | `0x3D17519DD5280eDE9aCB027563fAF9343C41969e` |
+| Statics token (`STATICS`) | `0x210aa4E724C9173819054eec630D323d9De33494` |
+| Statics Dollar oracle | `0xdfFDd9DbF8b5207D834Bea05af0C7C68008545f4` |
+| Swap-fee hook | `0xD358C79d23BA23B773BF6b71bAC54d3bF07aD0cc` |
+| Liquidity manager | `0xb1B6470A40E082C31BDe4499152890a2E58fd13b` |
+| Position renderer | `0xa735dD169e7E13C638eB7544556a14f8c3DFD470` |
+| Avatar SVG | `0x287188A08D9BF9421f5B089e95d40d2a2d649C31` |
+| Statics faucet | `0x6B3d3886feDFedCD7D39a601349E88DA64D74B6f` |
+
+## Governance
+
+| Field | Value |
+| --- | --- |
+| Timelock | `0x13aC9D28B149a57019EDa9fed48E5523b253699b` |
+| Minimum delay | `120` seconds |
+| Diamond owners | Timelock |
+| Proposer / canceller | Deployer |
+| Executor | Open (`address(0)`) |
+| Guardian / treasury | Deployer |
+| Basket creation fee | `0` |
+| Position creation fee | `0.001 ETH` |
+
+The deployer is `0x6Ae2aD9905FEDC8270b828294D4b9CEC7CBBE316`.
+
+## Testnet collateral and oracle fixtures
+
+| Contract | Address |
+| --- | --- |
+| Mock USDG | `0xBF85818cf213868c7aAE46d527b747e720B93054` |
+| Mock USDG oracle | `0x75bCB3bf9DA6C70Fb9F4d9873Df7a22b24F07FfF` |
+| ETH/USD feed | `0xA04cd33dfb1847D99f1157223e229B9636A8B275` |
+| Sequencer uptime feed | `0x6cF7375Eb718a529820CBCC9FAD0E04397980B06` |
+
+The active pegged profile is Mock USDG profile `2`: 6 decimals, a `0.95–1.05`
+peg band, 5-BPS mint fee, 7-BPS redemption fee, and a `1,000,000 USDstx` debt
+ceiling.
+
+## Genesis basket
+
+The genesis basket is live immediately upon creation — there is no warmup,
+checkpoint, or separate activation transaction.
+
+| Field | Value |
+| --- | --- |
+| Basket ID | `0` |
+| Name | Tesla-Palantir-AMD-1 |
+| Symbol | `TPA1` |
+| Basket token | `0xa52A77b8301dE7FE54F854177Cf4266F25cD24e2` |
+| TSLA | `0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E` |
+| PLTR | `0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0` |
+| AMD | `0x71178BAc73cBeb415514eB542a8995b82669778d` |
+
+Each canonical pool was created with full-range protocol-owned liquidity and is
+registered with the swap-fee hook and liquidity manager.
+
+## Reused chain dependencies
+
+| Contract | Address |
+| --- | --- |
+| WETH | `0x33e4191705c386532ba27cBF171Db86919200B94` |
+| Uniswap v4 PoolManager | `0x8366a39CC670B4001A1121B8F6A443A643e40951` |
+| Uniswap v4 PositionManager | `0x58DaEC3116AAe6D93017BaaEA7749052E8a04fa7` |
+| Permit2 | `0x000000000022D473030F116dDEE9F6B43aC78BA3` |
+
+## Not production
+
+This deployment is an integration beta. Production must replace the mock USDG
+and oracle fixtures, choose a reviewed staking-token policy rather than the
+uncapped owner-mintable test token, verify the chain-selected governance delay,
+select production roles and parameters, and qualify a single exact release
+revision. See [Security model](/docs/reference/security-model).

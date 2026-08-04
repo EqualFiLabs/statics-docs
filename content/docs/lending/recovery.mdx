@@ -1,0 +1,57 @@
+---
+id: recovery
+slug: lending/recovery
+label: Recovery
+title: Recovery
+description: After maturity and a one-hour grace period, anyone can permissionlessly recover an expired tranche and claim a recovery bounty.
+updated: 2026-08-04
+order: 330
+---
+
+When a loan tranche matures and its one-hour grace period lapses, recovery
+becomes permissionless. Recovery settles the expired tranche only — sibling
+tranches and other positions are untouched.
+
+## When recovery opens
+
+Recovery is available only after **maturity plus one hour**. Before that window,
+no one — including the borrower — can seize the tranche. The borrower can always
+repay or extend in the meantime.
+
+## What recovery does
+
+Recovery burns debt plus penalty shares, clears the stored principal vector, and
+unlocks all remaining collateral. For each constituent:
+
+```text
+burnShares      = debtShares + penaltyShares
+backingRemoved  = B_i(S) - B_i(S - burnShares)
+penaltyBacking  = backingRemoved - storedPrincipal
+callerBounty    = floor(penaltyBacking * 2000 / 10000)   // 20%
+protocolAmount  = penaltyBacking - callerBounty           // 80%
+```
+
+The caller bounty is paid from the penalty backing; the remaining 80% enters the
+ordinary global non-swap fee route (90% to eligible stakers, 10% to treasury, or
+100% to treasury with no eligible stake).
+
+## Why this never creates bad debt
+
+Principal is bounded by the self-backed collateral vector and LTV is at most 95%,
+so debt plus penalty always fits inside the locked collateral. Recovery removes
+only the burned debt-plus-penalty shares from the basket reward denominator and
+preserves already-crystallized claims.
+
+:::note
+Recovery is the only basket-loan path that pays a caller bounty. Other basket
+and liquidity maintenance (claims, LP activation, compounding, treasury
+distribution, ExitOnly unwind) pays no protocol bounty — its liveness depends on
+users, integrators, or externally motivated keepers.
+:::
+
+## Distinct from Dollar recovery
+
+Basket-loan recovery is separate from Statics Dollar expired-risk recovery.
+Basket recovery pays a fixed 20% of configured penalty backing; Dollar
+expired-risk recovery includes its own quoted keeper bounty in the collateral
+paid to its caller. The two paths must not be confused.

@@ -1,0 +1,74 @@
+---
+id: pegged-profiles
+slug: dollar/pegged-profiles
+label: Pegged profiles
+title: Pegged profiles
+description: Pegged profiles mint only USDstx, create no Risk Shares, and charge independent collateral-denominated mint and redemption fees.
+updated: 2026-08-04
+order: 230
+---
+
+Pegged profiles are direct collateral wrappers. They mint only senior Dollar,
+create no Risk Shares, and charge independent collateral-denominated mint and
+redemption fees. Any fungible Statics Dollar can redeem against available
+proportional profile capacity.
+
+## Mint and redemption fees
+
+Minting pulls nominal collateral plus a configured fee; redemption burns Dollar
+and returns proportional collateral less its fee. Both fees are
+collateral-denominated and route entirely to the global non-swap fee ledger.
+
+```text
+mint:    pull nominalCollateral + mintFee
+redeem:  burn Dollar, return nominalCollateral - redemptionFee
+```
+
+The active testnet profile is Mock USDG profile `2`: 6 decimals, a `0.95–1.05`
+peg band, a 5-BPS mint fee, a 7-BPS redemption fee, and a `1,000,000 USDstx`
+debt ceiling.
+
+## Debt ceiling and profile capacity
+
+Each pegged profile has a debt ceiling that bounds total issuance. Redemption
+draws against available proportional profile capacity, subject to global health
+and recovery gates. Any fungible USDstx — regardless of which profile minted it
+— may redeem against any pegged profile with available capacity.
+
+## Atomic pegged mint and recombination
+
+A Risk Share holder may exit an active volatile series without first sourcing
+Statics Dollar externally. `quoteMintPeggedAndRecombine` returns an executable
+quote when `eligible == true` and `exitStatus == Available`; it identifies both
+collateral tokens and returns the temporary Dollar amount, pegged principal and
+mint fee, total pegged input, volatile output, and recombination fee.
+
+Before allowance-backed execution:
+
+1. approve `StaticsDiamond` for at least `totalPeggedCollateralIn` of the quoted
+   pegged token;
+2. call `setApprovalForAll(StaticsDiamond, true)` on Risk Shares; and
+3. call `mintPeggedAndRecombine` with a fresh maximum pegged input, minimum
+   volatile output, and receiver.
+
+The gateway mints the exact Dollar amount directly to the Diamond, pulls the
+caller's matching Risk Shares, and burns both claims through ordinary Core
+recombination in the same transaction. The caller never receives the temporary
+Dollar. `mintPeggedAndRecombineWithPermit` replaces only the pegged-token
+approval if that collateral implements EIP-2612.
+
+:::note
+The selected series must be `Active`. Recoverable and retired series are
+deliberately excluded — this typed route uses ordinary recombination only and
+never enters managed or expired-risk recovery.
+:::
+
+## Pegged redemption quarantine
+
+Pegged redemption has an additional global quarantine. Any unresolved downside
+series transition, unavailable health, or impaired profile blocks every pegged
+profile from becoming an alternate exit around unhealthy collateral. Resolving
+the old transition does not reopen pegged redemption immediately: a checkpoint
+starts its own 48-hour continuous-health delay, and any renewed failure resets
+it. `peggedRedemptionStatus` is the read surface and `checkpointPeggedRedemption`
+advances the latch.

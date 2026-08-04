@@ -1,0 +1,94 @@
+---
+id: creation
+slug: baskets/creation
+label: Creation
+title: Basket creation
+description: Basket creators define the immutable constituent vector, bundle amounts, fee tiers, and lending parameters, then launch permissionless or genesis baskets.
+updated: 2026-08-04
+order: 120
+---
+
+Basket creation is a single atomic call that defines the basket, deploys its
+BasketToken, launches every canonical pool, and seeds permanent liquidity. The
+creator chooses every economic parameter up front; after creation the
+constituent vector and bundle amounts are immutable.
+
+## Permissionless vs genesis
+
+The `creationFee()` value is both the public admission switch and the required
+payment:
+
+- **zero fee** — public creation is closed; only the Diamond owner may create a
+  basket with zero native value (a controlled genesis basket); and
+- **positive fee** — any caller that pays the exact native amount may create a
+  basket.
+
+:::warning
+Zero never means free public creation. When the fee is zero, creation is
+owner-only.
+:::
+
+The creation fee is forwarded immediately, in full, to the configured treasury;
+creation reverts if the exact fee cannot be forwarded. Creation records the
+creator for discovery but gives that address no administrative authority.
+
+## Configuration parameters
+
+The creator defines the basket's complete economic shape at creation:
+
+| Parameter | Meaning |
+| --- | --- |
+| Assets and bundle amounts | One to sixteen unique constituents with nonzero static bundle amounts |
+| Mint / redemption fee tiers | Flat BasketToken-denominated tiers selected by action size |
+| Flash fee | Percentage fee on constituent-vector flash loans |
+| Origination fee | Percentage fee charged at loan creation |
+| Extension fee | Percentage fee charged when extending a tranche |
+| Loan-to-value | At or below 9,500 BPS, capped by the 95% protocol ceiling |
+| Recovery penalty | Debt-proportional, must fit inside remaining collateral |
+| Loan duration | Per-tranche maturity |
+
+Percentage fees are capped at 10,000 BPS. The recovery penalty's maximum rounded
+charge must still fit inside the remaining collateral so an unpaid loan never
+creates bad debt.
+
+## Atomic launch
+
+The single creation call performs, atomically:
+
+1. deploys the permit-enabled BasketToken;
+2. registers and initializes every canonical PoolKey;
+3. registers every pool with the installed liquidity manager;
+4. mints the aggregate pool BasketTokens through ordinary backing and fee
+   accounting; and
+5. seeds hook-owned full-range permanent liquidity.
+
+The owner uses exactly the same funded path for a controlled genesis basket. If
+any constituent fails, the native creation fee, token deployment, pool state,
+backing, reservations, and permanent liquidity all roll back. There is no valid
+unseeded or partially launched basket state.
+
+## Launch price and budgets
+
+Creation requires one launch-price and paired-asset budget per constituent. The
+price is expressed semantically as the square root of constituent units per
+BasketToken, independent of Uniswap currency ordering. The aligned `maxAmountsIn`
+value caps the creator's complete debit for that constituent: the paired-asset
+amount plus the backing and ordinary mint fee required for the aggregate
+BasketTokens placed across all canonical pools.
+
+```text Per-constituent creator debit
+maxAmountsIn[i] >= pairedAsset[i] + backingIncrease[i] + mintFee[i]
+```
+
+The creator must approve and fund each constituent for both the paired pool side
+and the ordinary mint backing plus fee. Launch requires the hook and liquidity
+manager to be installed, exact minimum receipts for every seed, a fresh deadline,
+and aggregate per-asset debit caps.
+
+## Launch helpers are internal
+
+`launchBasketPools` and `mintBasketLaunch` are Diamond-self-only implementation
+helpers used by `createBasket`; they are not alternative public launch routes.
+`IStaticsBasketLaunchModule` is an internal composition boundary between
+`BasketFacet` and `BasketLiquidityFacet` — its selectors reject every caller
+except the Diamond itself and must not be exposed as user launch actions.

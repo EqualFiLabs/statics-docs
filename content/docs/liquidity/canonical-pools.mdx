@@ -1,0 +1,56 @@
+---
+id: canonical-pools
+slug: liquidity/canonical-pools
+label: Canonical pools
+title: Canonical v4 pools
+description: Each basket constituent gets one canonical Uniswap v4 pool with zero native LP fee, created with protocol-owned liquidity.
+updated: 2026-08-04
+order: 410
+---
+
+Every basket constituent gets exactly one canonical Uniswap v4 pool, paired
+against the BasketToken. Canonical pools are created atomically during
+[basket creation](/docs/baskets/creation) and seeded with permanent
+protocol-owned liquidity.
+
+## Pool parameters
+
+| Parameter | Value |
+| --- | --- |
+| Currencies | BasketToken / constituent |
+| Native v4 LP fee | 0 |
+| Tick spacing | 10 |
+
+The installed hook rejects native currency and nonzero native LP fees for
+registered canonical pools. Unregistered pools are not canonical.
+
+## Immediate swappability
+
+A successful basket creation makes every canonical pool immediately swappable
+and available to the typed borrow-to-liquidity and canonical LP reward paths.
+There is no standalone initialization, activation, checkpoint, or manager-sync
+action — pools are live the moment the basket exists.
+
+:::note
+Revenue on a canonical pool comes entirely from the [swap-fee hook](/docs/liquidity/swap-fee-hook),
+not from native v4 LP fees. User v4 positions therefore do not earn ordinary
+native LP fees; their swaps still pay the hook's configured input and output
+fees.
+:::
+
+## Liquidity entry
+
+Liquidity entry uses current pool state and stays bounded by caller-supplied
+token caps and deadlines. The canonical paths are:
+
+- ordinary full-range PositionManager NFT creation through the liquidity manager
+  (optionally staked for [canonical LP rewards](/docs/liquidity/canonical-lp-rewards));
+- typed [borrow-to-liquidity](/docs/liquidity/canonical-lp-rewards#borrow-to-liquidity)
+  convenience paths; and
+- hook-owned permanent liquidity seeded at launch and compounded from swap fees.
+
+## Exit-only unwind
+
+After a basket enters `ExitOnly`, anyone may call `unwindBasketLiquidity` once
+per constituent. See [Permanent liquidity](/docs/liquidity/permanent-liquidity)
+for the unwind flow.

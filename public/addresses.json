@@ -1,0 +1,135 @@
+{
+  "name": "Statics",
+  "summary": "Onchain multi-asset protocol: fixed-bundle baskets, a self-backed Statics Dollar, a shared PositionNFT, global multi-asset rewards, self-backed lending, constituent flash loans, and canonical Uniswap v4 liquidity with bilateral hook fees.",
+  "docs": "https://docs.statics.dev",
+  "source": {
+    "branch": "master",
+    "commit": "1c6351182c9ba8de04ebbf99aa4718d21885851c",
+    "repository": "https://github.com/EqualFiLabs/statics"
+  },
+  "network": {
+    "name": "Robinhood Chain Testnet",
+    "chainId": 46630,
+    "explorer": "https://explorer.testnet.chain.robinhood.com",
+    "status": "integration-beta"
+  },
+  "integrationAddress": "0xfb3Baf22daCADE66f7CF0356aC2E342235af74bf",
+  "contracts": {
+    "StaticsDiamond": {
+      "address": "0xfb3Baf22daCADE66f7CF0356aC2E342235af74bf",
+      "alias": "PositionNFT (STXPOS), basket action surface, Dollar gateway, fee receiver",
+      "shape": "21 facets / 193 selectors",
+      "abi": "/abi/statics-diamond.json"
+    },
+    "StaticsDollarCoreDiamond": {
+      "address": "0xB142E9c8f80Fe67a96c8B3e152BfB7fF546312CC",
+      "alias": "Dollar collateral, issuance, health, insurance, recovery",
+      "owner": "StaticsTimelock"
+    },
+    "StaticsSwapFeeHook": {
+      "address": "0xD358C79d23BA23B773BF6b71bAC54d3bF07aD0cc",
+      "alias": "bilateral swap fees + hook-owned permanent liquidity",
+      "abi": "/abi/swap-fee-hook.json"
+    },
+    "StaticsLiquidityManager": {
+      "address": "0xb1B6470A40E082C31BDe4499152890a2E58fd13b",
+      "alias": "typed user PositionManager NFT creation",
+      "abi": "/abi/liquidity-manager.json"
+    },
+    "StaticsTimelock": {
+      "address": "0x13aC9D28B149a57019EDa9fed48E5523b253699b",
+      "alias": "governance timelock owning both diamonds",
+      "minimumDelaySeconds": 120
+    },
+    "StaticsDollarOracle": {
+      "address": "0xdfFDd9DbF8b5207D834Bea05af0C7C68008545f4"
+    },
+    "PositionRenderer": {
+      "address": "0xa735dD169e7E13C638eB7544556a14f8c3DFD470"
+    },
+    "AvatarSVG": {
+      "address": "0x287188A08D9BF9421f5B089e95d40d2a2d649C31"
+    },
+    "StaticsFaucet": {
+      "address": "0x6B3d3886feDFedCD7D39a601349E88DA64D74B6f",
+      "abi": "/abi/testnet-faucet.json"
+    }
+  },
+  "tokens": {
+    "USDstx": {
+      "address": "0x2bDE36A981353fb31a1237013e460Cac7AeAeA85",
+      "standard": "ERC-20 Permit",
+      "role": "Statics Dollar (senior)"
+    },
+    "ethLEV": {
+      "address": "0x3D17519DD5280eDE9aCB027563fAF9343C41969e",
+      "standard": "ERC-1155",
+      "role": "Dollar Risk Shares (series-scoped)"
+    },
+    "STATICS": {
+      "address": "0x210aa4E724C9173819054eec630D323d9De33494",
+      "standard": "ERC-20 Permit",
+      "role": "global staking token (testnet, owner-mintable fixture)"
+    },
+    "TPA1": {
+      "address": "0xa52A77b8301dE7FE54F854177Cf4266F25cD24e2",
+      "standard": "ERC-20 Permit",
+      "role": "genesis basket token"
+    }
+  },
+  "roles": {
+    "proposer": "0x6Ae2aD9905FEDC8270b828294D4b9CEC7CBBE316",
+    "canceller": "0x6Ae2aD9905FEDC8270b828294D4b9CEC7CBBE316",
+    "executor": "0x0000000000000000000000000000000000000000",
+    "guardian": "0x6Ae2aD9905FEDC8270b828294D4b9CEC7CBBE316",
+    "treasury": "0x6Ae2aD9905FEDC8270b828294D4b9CEC7CBBE316"
+  },
+  "genesisBasket": {
+    "basketId": 0,
+    "name": "Tesla-Palantir-AMD-1",
+    "symbol": "TPA1",
+    "token": "0xa52A77b8301dE7FE54F854177Cf4266F25cD24e2",
+    "constituents": {
+      "TSLA": "0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E",
+      "PLTR": "0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0",
+      "AMD": "0x71178BAc73cBeb415514eB542a8995b82669778d"
+    },
+    "bundlePerShare": { "TSLA": "0.01", "PLTR": "0.01", "AMD": "0.01" }
+  },
+  "testnetFixtures": {
+    "MockUSDG": "0xBF85818cf213868c7aAE46d527b747e720B93054",
+    "MockUSDGOracle": "0x75bCB3bf9DA6C70Fb9F4d9873Df7a22b24F07FfF",
+    "EthUsdFeed": "0xA04cd33dfb1847D99f1157223e229B9636A8B275",
+    "SequencerUptimeFeed": "0x6cF7375Eb718a529820CBCC9FAD0E04397980B06"
+  },
+  "dependencies": {
+    "WETH": "0x33e4191705c386532ba27cBF171Db86919200B94",
+    "UniswapV4PoolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+    "UniswapV4PositionManager": "0x58DaEC3116AAe6D93017BaaEA7749052E8a04fa7",
+    "Permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+  },
+  "configuration": {
+    "basketCreationFeeWei": "0",
+    "permissionlessBasketCreationEnabled": false,
+    "positionCreationFeeEther": "0.001",
+    "swapFee": {
+      "inputFeeBps": 50,
+      "outputFeeBps": 50,
+      "split": { "pol": 1000, "canonicalLP": 2500, "basketStakers": 2500, "staticsStakers": 1500, "treasury": 2500 }
+    },
+    "peggedUsdgProfile": {
+      "profileId": 2,
+      "collateral": "MockUSDG",
+      "pegBand": "0.95-1.05",
+      "mintFeeBps": 5,
+      "redemptionFeeBps": 7,
+      "debtCeilingUSDstx": "1000000000000000000000000"
+    }
+  },
+  "interfaces": {
+    "IModularPositionNFT": "0x212b8e93",
+    "IPositionOwnerIndex": "0x7ef5913d",
+    "ERC4906": "0x49064906"
+  },
+  "disclaimer": "Integration beta on Robinhood Chain Testnet. Mock collateral, owner-mintable staking token, faucets, and the two-minute timelock are testnet fixtures, not production defaults."
+}

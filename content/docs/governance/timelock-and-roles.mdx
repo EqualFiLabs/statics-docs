@@ -1,0 +1,68 @@
+---
+id: timelock-and-roles
+slug: governance/timelock-and-roles
+label: Timelock & roles
+title: Timelock and roles
+description: A shared Statics timelock owns both diamonds and defines proposer, canceller, executor, guardian, and treasury roles.
+updated: 2026-08-04
+order: 610
+---
+
+One `StaticsTimelock` owns both `StaticsDiamond` and `StaticsDollarCoreDiamond`.
+It is the single governance root for the protocol: every Diamond cut, economic
+configuration change, lifecycle release, hook fee change, and treasury or
+guardian change flows through it.
+
+## Delay
+
+The timelock constructor selects a two-minute minimum delay for Robinhood testnet
+and local development. Robinhood mainnet and other chains default to **seven
+days**.
+
+:::warning
+The two-minute testnet delay is a fixture, not a production default. Production
+must verify the chain-selected governance delay.
+:::
+
+## Roles
+
+| Role | Held by | Power |
+| --- | --- | --- |
+| Proposer | Configured multisig | Schedule timelocked operations |
+| Canceller | Configured multisig | Cancel scheduled operations |
+| Executor | Open (`address(0)`) | Execute once delay elapses |
+| Guardian | Emergency role | Pause exposure-increasing actions and quarantine baskets |
+| Treasury | Configured | Receives terminal fee distributions |
+
+The emergency guardian is **not** a timelock canceller. The testnet timelock is
+its own admin.
+
+## What the timelock controls
+
+The timelock currently controls Diamond cuts, economic configuration, lifecycle
+release and decommissioning, hook fee configuration, and treasury or guardian
+changes. Reward-asset selection is a PositionNFT owner action and requires no
+governance admission or retirement.
+
+## Diamond cuts are the only upgrade path
+
+Diamond cuts are the sole implementation upgrade mechanism. Facets share the
+common OpenZeppelin persistent reentrancy slot under delegatecall; flash loans
+add a separate transient guard domain and acquire the persistent slot only for
+their transfer/accounting phases. Selector routing and ERC-165 declarations must
+be updated together.
+
+Core bootstrap finalization validates wiring, pins the periphery as the initial
+managed recovery holder, and clears bootstrap authority. The Core owner may
+explicitly add or revoke other managed recovery holders; revocation returns the
+holder's expired positions to ordinary permissionless recovery. Finalization
+does **not** make either Diamond immutable.
+
+## Toward final immutability
+
+The intended release lifecycle is upgradeable development followed by an
+independent contract and governance audit, reduction of retained powers, transfer
+to final governance, and a final reviewed cut that removes Diamond-cut authority
+from both diamonds. After that, "immutable" means facet routing and
+implementation code are fixed; any deliberately retained parameter or emergency
+powers must be enumerated separately.

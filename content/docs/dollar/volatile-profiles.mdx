@@ -1,0 +1,70 @@
+---
+id: volatile-profiles
+slug: dollar/volatile-profiles
+label: Volatile profiles
+title: Volatile profiles
+description: Volatile profiles accept collateral like WETH and mint equal senior USDstx plus series-scoped Risk Shares.
+updated: 2026-08-04
+order: 220
+---
+
+Volatile profiles are the Risk Share-bearing side of the Statics Dollar. A
+volatile profile accepts a volatile collateral (the initial profile uses WETH)
+and mints **equal nominal amounts** of senior Dollar and series-scoped Risk
+Shares.
+
+## Collateral and issuance
+
+The initial volatile profile uses configured WETH and a Chainlink-compatible
+ETH/USD adapter with explicit staleness, range, and sequencer checks (see
+[Oracle model](/docs/dollar/oracle-model)). Depositing collateral mints:
+
+```text
+senior Dollar out == series Risk Shares out   (equal nominal)
+```
+
+The senior Dollar is fungible across the whole system. The Risk Shares are
+series-specific: they represent the residual risk of that series' collateral and
+are not interchangeable with any other series.
+
+## Recombination
+
+Recombining equal senior and junior claims returns proportional collateral when
+the health state permits. This is how a Risk Share holder exits a series without
+an external Dollar source — pair one senior Dollar with one Risk Share and burn
+both.
+
+```text
+recombine(1 USDstx + 1 RiskShare) -> proportional collateral
+```
+
+The typed gateway exposes `recombineToWETH` and `recombineToETH`. Volatile
+recombination additionally requires the caller's ERC-1155 Risk Share operator
+approval.
+
+## Price bands, coverage, and ceilings
+
+Each volatile profile is governed by:
+
+- a price band controlling transitions;
+- coverage and insurance parameters;
+- a per-profile debt ceiling; and
+- series lifecycle state.
+
+Governance activates configured profiles, may move an active profile into
+reduce-only runoff, and may permanently retire it only from `ReduceOnly`.
+Volatile profiles additionally manage series states `Active`, `RecoveryPending`,
+`Recoverable`, `Retired`, and `Closed`.
+
+## Reward and insurance routing
+
+For an active volatile series in an eligible profile mode, the configured
+insurance portion routes to insurance and the complete remaining reward share
+enters the global Statics non-swap fee ledger. The current launcher initializes
+this active-series split to **70% global non-swap rewards and 30% insurance**.
+
+:::note
+Risk Share positions receive no mint-fee, ordinary-recombination-fee, donation,
+or passive allocation. When the series or profile mode is ineligible, the
+would-be global reward share routes to insurance instead.
+:::

@@ -1,0 +1,126 @@
+---
+id: integration
+slug: reference/integration
+label: Integration
+title: Integration guide
+description: The single StaticsDiamond address, the approvals and interfaces to call, and the common flows with their failure conditions.
+updated: 2026-08-04
+order: 710
+---
+
+Statics is integrated through a single address — `StaticsDiamond`. It is the
+basket action surface, the PositionNFT contract, the Dollar gateway, the Core
+periphery, the fee receiver, and the managed recovery holder. There is no
+separate user router.
+
+## Disciplines
+
+- **Quote immediately before submission.** Quotes reflect current supply, pool
+  state, and health.
+- **Pass explicit maximums and minimums** on every value-moving call.
+- **Scope approvals to the typed next action.** Reusable allowances are tolerated
+  by the permit paths but not required.
+- **Reconcile indexed events against current views** after reorgs.
+
+## Create a PositionNFT and stake STATICS
+
+```solidity
+address[] memory rewardAssets = new address[](2);
+rewardAssets[0] = usdg;
+rewardAssets[1] = basketToken;
+
+IERC20(staticsToken).approve(staticsDiamond, 100e18);
+
+uint256 positionId = globalRewards.createAndStake{value: creationFee}(
+    100e18,
+    msg.sender,
+    rewardAssets
+);
+```
+
+`creationFee` is the exact native amount returned by `positionCreationFee()`
+(`0.001 ETH` on testnet). The fee forwards immediately to the treasury.
+
+## Mint and redeem a basket
+
+```solidity
+uint256 shares = 10e18;
+uint256[] memory maxIn = basket.quoteMint(basketId, shares);
+
+for (uint256 i; i < assets.length; ++i) {
+    IERC20(assets[i]).approve(staticsDiamond, maxIn[i]);
+}
+basket.mint(basketId, shares, msg.sender, maxIn);
+
+IERC20(basketToken).approve(staticsDiamond, shares);
+uint256[] memory minOut = basket.quoteRedeem(basketId, shares);
+basket.redeem(basketId, shares, msg.sender, minOut);
+```
+
+## Deposit basket collateral and borrow
+
+```solidity
+IERC20(basketToken).approve(staticsDiamond, collateralShares);
+basketCollateral.depositBasketCollateral(positionId, basketId, collateralShares);
+
+(uint256 loanId, uint256[] memory principals) = lending.borrow(
+    positionId,
+    basketId,
+    collateralShares,
+    msg.sender
+);
+
+// Approve the exact stored principal for each constituent before repayment.
+lending.repay(loanId);
+```
+
+## Mint Statics Dollar from native ETH
+
+```solidity
+(uint256 seriesId, uint256 dollarOut, uint256 riskSharesOut) =
+    dollarGateway.depositETH{value: 1 ether}(
+        msg.sender,
+        msg.sender,
+        minimumDollarOut,
+        minimumRiskSharesOut
+    );
+```
+
+## Flash-loan a constituent vector
+
+```solidity
+(address[] memory assets, uint256[] memory amounts, uint256[] memory fees) =
+    flashLender.quoteFlashLoan(basketId, shares);
+
+flashLender.flashLoan(basketId, shares, address(receiver), routeData);
+// receiver.onStaticsFlashLoan(...) must return
+// keccak256("IStaticsFlashBorrower.onStaticsFlashLoan") and restore principal + fees.
+```
+
+## Canonical interfaces
+
+| Surface | Interface |
+| --- | --- |
+| Baskets | `IStaticsBasket`, `IStaticsBasketAdmin`, `IStaticsBasketCollateral`, `IStaticsBasketRewards` |
+| Global staking and rewards | `IStaticsGlobalRewards` |
+| Lending | `IStaticsLending` |
+| Flash loans | `IStaticsFlashLoan`, `IStaticsFlashBorrower` |
+| PositionNFT | `IStaticsPosition`, ERC-721, `IStaticsPositionMetadata`, `IPositionOwnerIndex` |
+| Governance / custody | `IStaticsGovernance`, `IStaticsCustody` |
+| Liquidity | `IStaticsBasketLiquidity`, `IStaticsLiquidityRewards`, `IStaticsBorrowLiquidity` |
+| Hook / manager | `IStaticsSwapFeeHook`, `IStaticsLiquidityManager` |
+| Dollar | `IStaticsDollarGateway`, `IStaticsDollarRiskLiquidity`, `IStaticsDollarRiskIncentives`, `IStaticsDollarCore` |
+
+:::note
+`IStaticsBasketLaunchModule` is an internal composition boundary. Its selectors
+reject every caller except the Diamond itself and must not be exposed as user
+launch actions.
+:::
+
+## Failure conditions
+
+The flows above are illustrative. Read the live interfaces for complete structs,
+approvals, return values, and failure conditions. Common revert causes include:
+stale quotes, exceeded per-asset bounds, missing or insufficient approvals,
+deferred health exits, lifecycle restrictions (Quarantined / ExitOnly), and
+inbound/outbound tax on incompatible tokens.

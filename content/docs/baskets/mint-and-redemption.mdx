@@ -1,0 +1,78 @@
+---
+id: mint-and-redemption
+slug: baskets/mint-and-redemption
+label: Mint & redemption
+title: Mint and redemption
+description: Minting deposits the configured bundle plus a fee; redemption burns basket tokens and returns the same vector less the fee.
+updated: 2026-08-04
+order: 130
+---
+
+Minting and redemption move the fixed constituent vector in and out of the
+basket vault against BasketToken supply. Both measure real token deltas and route
+fees to the global non-swap ledger.
+
+## Quoting
+
+`quoteMint` returns each asset's backing increase plus the selected flat fee.
+`quoteRedeem` returns each asset's backing reduction less the selected flat fee.
+Callers should always quote immediately before submission and pass the quote as
+explicit per-asset maximums (mint) or minimums (redeem).
+
+```text Per-constituent quote
+mint input_i    = backingIncrease_i + flatFee_i
+redeem output_i = backingDecrease_i - flatFee_i
+```
+
+The flat fee tier is selected by scanning the basket's tier array for the
+greatest threshold not exceeding the action size.
+
+## Minting
+
+The caller supplies per-asset maximums. The Diamond measures inbound receipts,
+credits only the backing increase to the basket vault, moves the measured fee to
+the global fee account, and mints the requested BasketTokens.
+
+```solidity Mint from a wallet
+uint256 shares = 10e18;
+uint256[] memory maxIn = basket.quoteMint(basketId, shares);
+
+for (uint256 i; i < assets.length; ++i) {
+    IERC20(assets[i]).approve(staticsDiamond, maxIn[i]);
+}
+
+basket.mint(basketId, shares, recipient, maxIn);
+```
+
+The position collateral paths `createAndMintBasketCollateral` and
+`mintBasketCollateral` apply the same quote and fee rules but mint directly into
+a PositionNFT as [basket collateral](/docs/lending/overview).
+
+## Redemption
+
+The Diamond burns BasketTokens, reduces basket backing, transfers the receiver's
+net assets subject to per-asset minimums, and moves the fee to the global fee
+account. The position path is `redeemBasketCollateral`. Locked collateral cannot
+be withdrawn or redeemed.
+
+```solidity Redeem to a wallet
+IERC20(basketToken).approve(staticsDiamond, shares);
+uint256[] memory minOut = basket.quoteRedeem(basketId, shares);
+
+basket.redeem(basketId, shares, recipient, minOut);
+```
+
+## Where fees go
+
+Primary mint and redemption fees enter the same global non-swap ledger as all
+other non-swap fees. If the asset has nonzero matured eligible selected stake,
+90% accrues to stakers and 10% to treasury; otherwise 100% accrues to treasury.
+These fees never create basket-specific holder claims — only the configured
+canonical hook basket-staker allocation enters basket position indexes.
+
+:::note
+Loose BasketToken ownership alone earns no protocol fees. Deposit BasketTokens
+into a PositionNFT to earn that basket's canonical swap-fee allocation, or stake
+the global staking token and select reward assets to enter their eligible-stake
+denominators.
+:::

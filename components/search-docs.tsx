@@ -1,0 +1,200 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+
+type SearchHit = {
+  url: string;
+  title: string;
+  section?: string;
+  excerpt: string;
+};
+
+type PagefindModule = {
+  debouncedSearch: (query: string) => Promise<{ results: PagefindResult[] } | null>;
+};
+
+type PagefindResult = {
+  data: () => Promise<{
+    url: string;
+    excerpt: string;
+    meta: { title?: string };
+    sub_results: { url: string; title: string; excerpt: string }[];
+  }>;
+};
+
+function normalizeUrl(url: string) {
+  return url.replace(/index\.html$/, "");
+}
+
+let pagefindPromise: Promise<PagefindModule | null> | null = null;
+
+function loadPagefind(): Promise<PagefindModule | null> {
+  // The index only exists in the built site; in `next dev` this import fails
+  // and the dialog explains that instead of crashing.
+  pagefindPromise ??= import(/* webpackIgnore: true */ `${window.location.origin}/pagefind/pagefind.js`).catch(
+    () => null,
+  );
+  return pagefindPromise;
+}
+
+export function SearchDocs() {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [hits, setHits] = useState<SearchHit[]>([]);
+  const [selected, setSelected] = useState(0);
+  const [unavailable, setUnavailable] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const close = useCallback(() => {
+    setOpen(false);
+    setQuery("");
+    setHits([]);
+    setSelected(0);
+  }, []);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setOpen((current) => !current);
+        return;
+      }
+      if (event.key === "Escape") {
+        close();
+        return;
+      }
+      if (event.key === "/" && !open) {
+        const target = event.target as HTMLElement;
+        if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA") {
+          event.preventDefault();
+          setOpen(true);
+        }
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [close, open]);
+
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !query.trim()) {
+      setHits([]);
+      setSelected(0);
+      return;
+    }
+    let cancelled = false;
+
+    loadPagefind().then(async (pagefind) => {
+      if (cancelled) {
+        return;
+      }
+      if (!pagefind) {
+        setUnavailable(true);
+        return;
+      }
+      const response = await pagefind.debouncedSearch(query);
+      if (cancelled || response === null) {
+        return;
+      }
+      const top = await Promise.all(response.results.slice(0, 8).map((result) => result.data()));
+      if (cancelled) {
+        return;
+      }
+      setHits(
+        top.map((data) => {
+          const pageTitle = data.meta.title ?? "Untitled";
+          const best = data.sub_results[0];
+          const useSub = best && best.title !== pageTitle;
+          return {
+            url: normalizeUrl(useSub ? best.url : data.url),
+            title: pageTitle,
+            section: useSub ? best.title : undefined,
+            excerpt: (useSub ? best.excerpt : data.excerpt) ?? "",
+          };
+        }),
+      );
+      setSelected(0);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, query]);
+
+  function onInputKeyDown(event: React.KeyboardEvent) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setSelected((current) => Math.min(current + 1, hits.length - 1));
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setSelected((current) => Math.max(current - 1, 0));
+    } else if (event.key === "Enter" && hits[selected]) {
+      window.location.href = hits[selected].url;
+    }
+  }
+
+  return (
+    <>
+      <button className="searchbtn" type="button" onClick={() => setOpen(true)} aria-label="Search docs">
+        <span className="searchbtn-label">Search docs…</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      {open ? (
+        <div
+          className="search-overlay"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              close();
+            }
+          }}
+        >
+          <div className="search-panel" role="dialog" aria-label="Search docs" aria-modal="true">
+            <input
+              ref={inputRef}
+              className="search-input"
+              placeholder="Search pages, functions, addresses…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={onInputKeyDown}
+            />
+            <div className="search-hits">
+              {unavailable ? (
+                <div className="search-empty">Search index unavailable — it is generated by the production build.</div>
+              ) : null}
+              {!unavailable && query.trim() && hits.length === 0 ? (
+                <div className="search-empty">No results for “{query}”.</div>
+              ) : null}
+              {hits.map((hit, index) => (
+                <a
+                  className={`search-hit${index === selected ? " sel" : ""}`}
+                  href={hit.url}
+                  key={`${hit.url}-${index}`}
+                  onMouseEnter={() => setSelected(index)}
+                >
+                  <span className="search-hit-main">
+                    <span className="search-hit-title">
+                      {hit.title}
+                      {hit.section ? <span className="search-hit-section"> § {hit.section}</span> : null}
+                    </span>
+                    <span className="search-hit-excerpt" dangerouslySetInnerHTML={{ __html: hit.excerpt }} />
+                  </span>
+                </a>
+              ))}
+            </div>
+            <div className="search-foot">↑↓ navigate · ↵ open · esc close</div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
+}

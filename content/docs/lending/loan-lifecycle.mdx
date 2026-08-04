@@ -1,0 +1,67 @@
+---
+id: loan-lifecycle
+slug: lending/loan-lifecycle
+label: Loan lifecycle
+title: Loan lifecycle
+description: Loans carry independent tranches with separate maturities, extension charges, and exact-principal repayment.
+updated: 2026-08-04
+order: 320
+---
+
+Every loan is an independent tranche owned by a PositionNFT. The tranche keeps
+its own stored principal vector and maturity; borrowing, extending, and repaying
+each act on a single tranche without touching others.
+
+## Borrow
+
+`borrow` locks deposited BasketToken collateral, takes the origination fee as
+burned shares, and releases the proportional constituent vector at the
+basket's configured LTV. The borrowed vector is measured exactly on the way out.
+
+```solidity
+IERC20(basketToken).approve(staticsDiamond, collateralShares);
+basketCollateral.depositBasketCollateral(positionId, basketId, collateralShares);
+
+(uint256 loanId, uint256[] memory principals) = lending.borrow(
+    positionId,
+    basketId,
+    collateralShares,
+    msg.sender
+);
+```
+
+The returned `principals` are stored on the tranche and must be repaid exactly.
+
+## Extend
+
+Extension is PositionNFT-authorized. It measures the full inbound vector,
+requires at least the extension quote, and routes the complete measured receipt
+through global non-swap fees. Extension changes the tranche maturity but not its
+principal or collateral.
+
+```text
+extension quote_i = ceil(storedPrincipal_i * extensionFeeBps / 10000)
+```
+
+## Repay
+
+Repayment is permissionless and pulls the stored principal vector for the
+tranche. Because principal is stored exactly, repayment restores the same vector
+regardless of intervening fee-on-transfer behavior on the inbound side.
+
+```solidity
+for (uint256 i; i < assets.length; ++i) {
+    IERC20(assets[i]).approve(staticsDiamond, principals[i]);
+}
+lending.repay(loanId);
+```
+
+Repayment changes lock state but not reward eligibility — locked collateral
+keeps earning basket rewards. Repayment unlocks only the repaid tranche.
+
+## What the lifecycle never does
+
+- never changes principal, collateral, or global stake on extension;
+- never lets one tranche consume another tranche's collateral; and
+- never requires a price feed — only the configured penalty applies on
+  [recovery](/docs/lending/recovery).

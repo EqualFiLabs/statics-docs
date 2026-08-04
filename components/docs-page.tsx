@@ -1,0 +1,125 @@
+import Link from "next/link";
+
+import { MdxContent } from "@/components/mdx-content";
+import { MobileDocsMenu } from "@/components/mobile-docs-menu";
+import { PageTools } from "@/components/page-tools";
+import { SiteHeader } from "@/components/site-header";
+import { TestnetBanner } from "@/components/testnet-banner";
+import { Toc } from "@/components/toc";
+import { type DocPage as DocPageType, getAllPages, getNavigationGroups, getPageHref } from "@/lib/docs";
+
+export function DocsPage({ page }: { page: DocPageType }) {
+  const allPages = getAllPages();
+  const navigationGroups = getNavigationGroups();
+  const pageIndex = allPages.findIndex((entry) => entry.id === page.id);
+  const previousPage = pageIndex > 0 ? allPages[pageIndex - 1] : null;
+  const nextPage = pageIndex >= 0 && pageIndex < allPages.length - 1 ? allPages[pageIndex + 1] : null;
+  const crumbSegments = page.slug.slice(0, -1);
+  const groupTitleFor = (pageId: string) =>
+    navigationGroups.find((group) => group.pages.some((entry) => entry.id === pageId))?.title;
+
+  // Slim the props crossing into the client component: passing full DocPage
+  // objects serializes every page's content into each page's RSC payload.
+  const mobileNavigationGroups = navigationGroups.map((group) => ({
+    title: group.title,
+    pages: group.pages.map((entry) => ({
+      id: entry.id,
+      label: entry.label,
+      slug: entry.slug,
+      badge: entry.badge,
+    })),
+  }));
+  const mobileSections = page.toc
+    .filter((entry) => entry.depth === 2)
+    .map((entry) => ({ id: entry.id, title: entry.title }));
+
+  return (
+    <div className="docs-app">
+      <a className="skip-link" href="#doc-content">
+        Skip to content
+      </a>
+      <TestnetBanner />
+
+      <SiteHeader
+        leading={
+          <MobileDocsMenu activePageId={page.id} navigationGroups={mobileNavigationGroups} sections={mobileSections} />
+        }
+      />
+
+      <div className="shell">
+        <nav className="sidebar" aria-label="Docs">
+          {navigationGroups.map((group) => (
+            <div className="nav-group" key={group.title}>
+              <div className="nav-group-title">{group.title}</div>
+              <div className="nav-links">
+                {group.pages.map((entry) => {
+                  const active = entry.id === page.id;
+                  return (
+                    <Link
+                      className={`nav-link${active ? " nav-link-active" : ""}`}
+                      href={getPageHref(entry)}
+                      key={entry.id}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      <span>{entry.label}</span>
+                      {entry.badge ? <span className="nav-badge">{entry.badge}</span> : null}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        <main className="article" id="doc-content" data-pagefind-body>
+          <div className="crumbs" data-pagefind-ignore>
+            <Link href="/docs/introduction">docs</Link>
+            {crumbSegments.map((segment) => (
+              <span key={segment}>
+                <span className="crumb-sep">/</span>
+                {segment}
+              </span>
+            ))}
+            <span>
+              <span className="crumb-sep">/</span>
+              <span className="crumb-here">{page.slug[page.slug.length - 1]}</span>
+            </span>
+          </div>
+
+          <h1>{page.title}</h1>
+          <p className="lede">{page.description}</p>
+          <div className="page-meta" data-pagefind-ignore>
+            <span>Updated {page.updated}</span>
+            <PageTools mdPath={`/raw/docs/${page.slug.join("/")}/`} />
+          </div>
+
+          <MdxContent source={page.body} />
+
+          <div className="pager" data-pagefind-ignore>
+            {previousPage ? (
+              <Link className="pager-card" href={getPageHref(previousPage)}>
+                <span className="pager-label">Previous · {groupTitleFor(previousPage.id)}</span>
+                <span className="pager-title">{previousPage.label}</span>
+              </Link>
+            ) : (
+              <div />
+            )}
+
+            {nextPage ? (
+              <Link className="pager-card pager-card-next" href={getPageHref(nextPage)}>
+                <span className="pager-label">Next · {groupTitleFor(nextPage.id)}</span>
+                <span className="pager-title">{nextPage.label}</span>
+              </Link>
+            ) : null}
+          </div>
+        </main>
+
+        <Toc entries={page.toc} />
+      </div>
+
+      <footer className="docs-footer">
+        <div className="docs-footer-inner">© EqualFi Labs. All rights reserved.</div>
+      </footer>
+    </div>
+  );
+}

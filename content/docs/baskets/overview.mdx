@@ -1,0 +1,77 @@
+---
+id: baskets-overview
+slug: baskets/overview
+label: Overview
+title: Static baskets
+description: A static basket is a fixed-bundle ERC-20 token of up to 16 assets with a deliberate non-ERC-4626 mint and redemption model.
+updated: 2026-08-04
+order: 110
+---
+
+A static basket is a fixed-composition multi-asset token. Each basket is defined
+once at creation by an immutable constituent vector, and every BasketToken
+represents the same fixed bundle of those constituents.
+
+## Fixed constituent vector
+
+A basket definition contains:
+
+- one to sixteen unique, nonzero ERC-20 asset addresses;
+- a nonzero static bundle amount for each asset;
+- independent flat mint and redemption fee-tier arrays;
+- flash, origination, and extension percentage fees;
+- a loan-to-value at or below 9,500 BPS; and
+- a debt-proportional recovery penalty plus a loan duration.
+
+The percentage fees are capped at 10,000 BPS. Bundle amounts and bundle-denominated
+fee tiers are quantities, not percentages.
+
+:::note
+Statics is deliberately not ERC-4626. Historical fees never change a basket
+conversion rate, and new minters do not purchase accrued yield. A basket is a
+fixed claim on a fixed bundle — nothing more.
+:::
+
+## The BasketToken
+
+Each basket gets its own transferable 18-decimal ERC-20 Permit token. The
+BasketToken trades on external venues and on the basket's [canonical Uniswap v4
+pools](/docs/liquidity/canonical-pools). Assets remain permissionless: inclusion
+in a basket is not an endorsement or compatibility certification.
+
+## Aggregate-supply backing
+
+BasketToken backing is derived from total supply, not per-action accounting. For
+constituent bundle amount `b[i]` and supply `S`, required backing per constituent
+is:
+
+```text
+backing[i](S) = ceil(b[i] * S / 1e18)
+```
+
+Mint and redemption use differences between aggregate backing values, so
+per-action rounding can never accumulate into an accounting deficit. Only basket
+vault balances back BasketToken supply — global fees, reward reserves, staking
+custody, Dollar books, and hook liquidity are all separate.
+
+## Fee tiers
+
+Flat mint and redemption fees are BasketToken-denominated and tiered by action
+size. Tier arrays may be empty, unordered, or contain duplicate thresholds.
+Selection scans every entry and uses the greatest threshold not exceeding the
+action size; a later entry wins when thresholds are equal. Clients should never
+assume sorted or unique tiers.
+
+## Reward-asset set
+
+Every basket has a separate position-reward denominator. The fixed reward-asset
+set is the BasketToken plus every constituent, so a sixteen-asset basket has at
+most seventeen reward books and needs no reward-asset opt-in loop. See
+[Basket position rewards](/docs/rewards/global-rewards).
+
+## What baskets are not
+
+- not an asset allowlist or compatibility certification;
+- not NAV accounting, oracle-priced minting, or ERC-4626 semantics;
+- not cross-basket — one basket cannot consume another basket's backing or debt;
+- and not a guarantee that arbitrary ERC-20 behavior is compatible.

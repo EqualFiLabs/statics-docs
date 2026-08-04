@@ -1,0 +1,49 @@
+---
+id: oracle-model
+slug: dollar/oracle-model
+label: Oracle model
+title: Oracle model
+description: Dollar profiles rely on Chainlink-compatible ETH/USD and sequencer-uptime feeds with enforced peg bands and grace periods.
+updated: 2026-08-04
+order: 250
+---
+
+Statics Dollar volatile profiles value collateral through a Chainlink-compatible
+ETH/USD adapter. The adapter applies explicit staleness, range, and sequencer
+checks before any price is used.
+
+## The ETH/USD feed
+
+The initial volatile profile uses a verified Chainlink-compatible ETH/USD price
+feed for collateral valuation. The adapter rejects stale or out-of-range answers
+rather than trusting them silently.
+
+## Sequencer uptime
+
+On L2 chains, a verified sequencer-uptime feed is required. A sequencer outage
+can cause stale prices that look valid, so the Dollar gates on sequencer liveness
+and enforces a recovery interval after restoration.
+
+```text
+sequencer down  -> volatile issuance blocked
+sequencer up    -> must wait SEQUENCER_GRACE_PERIOD before unblocking
+```
+
+## Peg bands
+
+Oracle-derived bands bound profile behavior and revision. The active pegged
+profile uses a `0.95–1.05` band; volatile profiles use a configured transition
+band that drives profile state changes under [solvency and recovery](/docs/dollar/solvency-and-recovery).
+
+## Grace period
+
+After a sequencer restoration, the configured grace period must elapse before
+issuance unblocks. This prevents acting on prices that lag the sequencer restart.
+The grace period is a deployment input (`SEQUENCER_GRACE_PERIOD`).
+
+:::warning
+Dollar safety depends on configured oracle, sequencer, collateral, health, and
+governance parameters. A misconfigured or manipulated feed can impair or halt a
+profile — by design, that impairment latches ordinary exits until 48 continuous
+healthy hours are checkpointed.
+:::

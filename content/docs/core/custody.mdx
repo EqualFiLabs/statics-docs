@@ -1,0 +1,93 @@
+---
+id: custody
+slug: core/custody
+label: Custody
+title: Custody and accounting
+description: Statics isolates logical reservations per module while LibCustody enforces global physical backing through measured, balance-delta transfers.
+updated: 2026-08-04
+order: 40
+---
+
+Shared custody is the backbone of `StaticsDiamond`. Every module keeps its own
+logical reservations, while a single library — `LibCustody` — enforces that the
+sum of those reservations never exceeds the Diamond's real token balance.
+
+## The reservation equation
+
+For each ERC-20 held at `StaticsDiamond`:
+
+```text Global reservation
+globalReserved(token)
+  = dollarAccount(token)
+  + feeAccount(token)
+  + stakingAccount(token)
+  + sum over all basketAccount(basketId, token)
+
+physical balance(token) >= globalReserved(token)
+```
+
+Each basket account covers that basket's vault backing, outstanding debt
+accounting, and recovery state. Moving a reservation between accounts (for
+example, reclassifying an origination fee into the fee ledger) does not change
+the global total — it only changes which sub-account claims it.
+
+## Measured transfers
+
+Every inbound transfer measures the Diamond's actual balance increase rather
+than trusting the requested amount. Every outbound transfer caps the Diamond's
+debit and, where the public function offers a minimum, separately checks the
+receiver's observed increase.
+
+```text Measured custody
+inbound credit  = balance_after - balance_before
+outbound debit  <= named reservation, bounded by caller-supplied minimums
+```
+
+This supports some fee-on-transfer assets without claiming universal
+compatibility. Outbound-tax and sender-extra-tax assets are incompatible and
+revert atomically where they would break exact accounting.
+
+## What is outside the equation
+
+Several physical locations are intentionally outside the Diamond reservation:
+
+| Location | Held under |
+| --- | --- |
+| `StaticsDollarCoreDiamond` | Core collateral and insurance |
+| `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
+| `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
+| Uniswap v4 `PoolManager` | Canonical pool liquidity under v4 accounting |
+
+Borrow-to-liquidity inventory cannot enter basket backing, global staking,
+permanent liquidity, or another user's accounting — it is scoped to the
+transaction.
+
+## Deficits are incidents, not policy
+
+Normal protocol operations, including unpaid self-backed loans, preserve full
+physical reservation backing. Statics defines no socialized-loss waterfall: one
+basket cannot debit another basket's reservation, and no claimant class is
+intended to absorb another class's loss during ordinary operation.
+
+A physical deficit is therefore an invariant violation and security incident.
+Custody checks fail closed where observed backing is insufficient.
+
+:::warning
+Negative rebases, arbitrary burns, deceptive `balanceOf`, blocklists, external
+custody failures, or compromised code or governance can nevertheless create a
+black-swan physical deficit or halt baskets sharing a token.
+:::
+
+## Monitoring and containment
+
+Offchain monitoring can compare real token balances with `globalReservedByToken`
+to detect a deficit early. The guardian can pause exposure-increasing actions and
+manually quarantine every affected basket that remains `Active`. Quarantine is
+containment, not recapitalization or claim adjudication:
+
+- only timelocked governance can release quarantine or enter `ExitOnly`; and
+- no claimant class is intended to absorb another class's loss during ordinary
+  operation.
+
+See [Basket lifecycle](/docs/governance/basket-lifecycle) for the `Active`,
+`Quarantined`, and `ExitOnly` states and what each permits.

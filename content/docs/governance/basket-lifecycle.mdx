@@ -1,0 +1,66 @@
+---
+id: basket-lifecycle
+slug: governance/basket-lifecycle
+label: Basket lifecycle
+title: Basket lifecycle
+description: Baskets move through Active, Quarantined, and ExitOnly, restricting new exposure while preserving repayment, recovery, and exit.
+updated: 2026-08-04
+order: 620
+---
+
+Every basket is in one of three states: `Active`, `Quarantined`, or `ExitOnly`.
+The state controls which exposure-increasing actions are allowed, while
+risk-reducing and exit paths stay available.
+
+## State action matrix
+
+| Action | Active | Quarantined | ExitOnly |
+| --- | --- | --- | --- |
+| Mint, borrow, extend, flash | Subject to action pause | No | No |
+| Redeem | Yes | Yes | Yes |
+| Repay | Yes | Yes | Yes |
+| Mature-loan recovery | Permissionless | Permissionless | Permissionless |
+| Hook swap and compounding | Until pool decommission | Until pool decommission | Until unwind decommissions pool |
+| Canonical LP NFT stake or increase | Subject to liquidity pause | No | No |
+| Pending LP reward activation | Permissionless until decommission | Permissionless until decommission | Until pool decommissioned |
+| LP reward claim or NFT unstake | Yes | Yes | Yes |
+| Permanent-liquidity unwind | No | No | Permissionless per constituent |
+| Treasury fee distribution | Permissionless trigger | Permissionless trigger | Permissionless trigger |
+
+## Guardian containment
+
+The guardian may pause exposure-increasing action groups and quarantine an active
+basket. Quarantine blocks new exposure immediately while preserving repayment,
+recovery, and exit paths. Only timelocked governance can release quarantine,
+unpause, or enter the `ExitOnly` state.
+
+:::note
+Redemption is **not** guardian-pausable. A quarantined basket still lets users
+redeem, repay, recover mature loans, and claim rewards.
+:::
+
+## ExitOnly is terminal under installed facets
+
+`ExitOnly` disables new risk in the installed facets. It is a governed software
+state — the Diamond remains upgradeable until final Diamond-cut authority is
+removed. Once a basket is `ExitOnly`, anyone may
+[unwind its permanent liquidity](/docs/liquidity/permanent-liquidity) per
+constituent.
+
+## No automatic keepers
+
+No keeper runs automatically and no maintenance caller is guaranteed. Claims,
+pending LP reward activation, basket-loan recovery, manual hook compounding,
+treasury distribution, and `ExitOnly` unwind can remain pending indefinitely
+until someone submits a transaction.
+
+| Maintenance | Caller incentive |
+| --- | --- |
+| Basket-loan recovery | 20% of configured penalty backing |
+| Dollar expired-risk recovery | Quoted keeper bounty |
+| Claims, LP activation, compounding, treasury distribution, ExitOnly unwind | No protocol bounty |
+
+Swap execution routes fees and attempts matched permanent-liquidity compounding
+atomically, but does not provide liveness when a pool has no swaps. Production
+operations must define monitoring, acceptable delays, escalation ownership, and
+guardian/governance fallbacks for inactive keepers.

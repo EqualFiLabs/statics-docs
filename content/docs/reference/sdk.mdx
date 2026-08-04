@@ -1,0 +1,95 @@
+---
+id: sdk
+slug: reference/sdk
+label: SDK
+title: SDK
+description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
+updated: 2026-08-04
+order: 720
+---
+
+The Statics SDK is a TypeScript package (`@statics-protocol/sdk`) that ships the
+onchain ABIs, chain bindings, math helpers, quote functions, decoders, and
+calldata builders needed to integrate without recomputing protocol math.
+
+## Package
+
+| Field | Value |
+| --- | --- |
+| Name | `@statics-protocol/sdk` |
+| Entry | `dist/index.js` |
+| Types | `dist/index.d.ts` |
+
+Build and test with `npm run build --prefix sdk` and `npm test --prefix sdk`.
+
+## Chain bindings
+
+The SDK ships generated per-chain address bindings. The tracked binding is
+`robinhoodChain`, exposing the verified contract addresses for the Robinhood
+deployment family.
+
+## Math and constants
+
+Protocol math is exact and uses fixed scales. The SDK exposes the constants and
+rounding helpers so integrators do not re-derive them:
+
+- `BPS`, `SHARE_SCALE` (`1e18`), `MAX_LTV_BPS` (`9500`),
+  `LOAN_RECOVERY_GRACE_PERIOD`, `RECOVERY_CALLER_SHARE_BPS` (`2000`);
+- v4 fixed-point: `Q96`, `Q128`, `Q192`, `MIN_TICK`, `MAX_TICK`, `MAX_UINT256`;
+- `mulDivDown` / `mulDivUp`;
+- `backingAtSupply`, `selectFeeShares`, `encodeSqrtPriceAssetPerBasketX96`;
+- hook fee math: `quoteHookFee`, `splitSwapFee`, `effectiveCanonicalFees`;
+- v4 liquidity math: `getSqrtPriceAtTick`, `quoteRangeAmounts`,
+  `maximumLiquidityForAmounts`, `pendingLpFees`.
+
+## Quote functions
+
+Quotes mirror the onchain quote functions and return the same per-asset legs:
+
+| Function | Returns |
+| --- | --- |
+| `quoteMint` | Per-constituent backing increase plus flat fee |
+| `quoteRedeem` | Per-constituent backing reduction less flat fee |
+| `quoteBorrow` | Origination fee, collateral shares, debt and penalty shares |
+| `quoteRecovery` | Caller bounty and protocol split per constituent |
+| `quoteExtension` | Per-constituent extension charge |
+| `quoteBorrowAndProvideLiquidity` | Combined borrow + LP construction quote |
+
+## Calldata builders
+
+Every ordinary user action has a `build*Call` / `build*Transaction` helper that
+returns signed-calldata-ready `Hex`:
+
+- baskets: `buildCreateBasketTransaction`, `buildMintCall`, `buildRedeemCall`,
+  collateral deposit/withdraw/redeem;
+- positions: `buildCreatePositionCall`, `buildClosePositionCall`,
+  `buildSetPositionRendererCall`;
+- rewards: `buildCreateAndStakeCall`, `buildStakeCall`, `buildUnstakeCall`,
+  `buildOptIn/OptOutRewardAssetsCall`, `buildClaimRewardsCall`;
+- lending: `buildBorrowCall`, `buildRepayCall`, `buildExtendCall`,
+  `buildRecoverCall`, `buildFlashLoanCall`;
+- liquidity: `buildBorrowAndProvideLiquidityCall`,
+  `buildBorrowAndStakeLiquidityCall`, `buildStakeLiquidityPositionCall`,
+  `buildUnstakeLiquidityPositionCall`, `buildClaimLiquidityRewardsCall`,
+  `buildUnwindBasketLiquidityCall`;
+- governance: `buildQuarantineBasketCall`, `buildReleaseBasketQuarantineCall`,
+  `buildDecommissionBasketCall`, fee configuration setters;
+- dollar: `buildDepositETHTransaction`, `buildDepositWETHCall`,
+  `buildRecombineToWETH/ETHCall` (and `*WithPermit`), pegged mint/redeem (and
+  `*WithPermit`), `buildMintPeggedAndRecombineCall`,
+  `buildClaimPeggedProtocolRevenueCall`.
+
+## Permits and swaps
+
+- `buildErc20PermitTypedData`, `buildPermit2PermitTypedData`,
+  `buildPermit2ApproveCall` — typed-data construction for the gateway permit
+  paths;
+- `buildQuoteV4ExactInputSingleCall`, `buildV4ExactInputSingleSwap`,
+  `buildMintV4PositionCall` — canonical v4 swap and position construction;
+- `decodePositionInfo`, `positionSalt` — decode stored position state and derive
+  the deterministic position salt.
+
+## Testnet faucet
+
+`buildTestnetFaucetClaimCall()` builds the claim calldata for the ownerless
+testnet faucet. See [Testnet onboarding](/docs/reference/testnet-onboarding).

@@ -1,0 +1,108 @@
+---
+id: architecture
+slug: core/architecture
+label: Architecture
+title: Architecture
+description: Statics is two coordinated EIP-2535 diamonds behind one ordinary user-action address, with custody and solvency split across clear boundaries.
+updated: 2026-08-04
+order: 20
+---
+
+Statics is built as two EIP-2535 diamonds that share one timelock but keep
+distinct custody and solvency boundaries. Most user actions route through a
+single address — `StaticsDiamond` — while the Statics Dollar's collateral and
+health machinery stay isolated in a separate `StaticsDollarCoreDiamond`.
+
+## Two coordinated diamonds
+
+| Diamond | Role | Holds |
+| --- | --- | --- |
+| `StaticsDiamond` | User gateway, PositionNFT, baskets, rewards, lending, flash loans, canonical liquidity, and the Dollar gateway | Basket vaults, fee account, staking custody, voluntary LP custody |
+| `StaticsDollarCoreDiamond` | Dollar collateral, issuance, health, transitions, insurance, and recovery | Core collateral and insurance |
+
+`StaticsDiamond` is the ordinary integration address. It is simultaneously the
+basket action surface, the PositionNFT ERC-721 contract, the Dollar gateway, the
+Core periphery, the Core fee receiver, and the managed recovery holder. There is
+no separate user router or PositionNFT proxy.
+
+## Why two diamonds
+
+Dollar solvency is a separate custody and accounting boundary even though the
+user-facing gateway lives on `StaticsDiamond`. Keeping the Dollar's collateral,
+insurance, and recovery state inside `StaticsDollarCoreDiamond` means a Diamond
+cut or failure on the user surface cannot directly restate Dollar books, and
+vice versa. Both diamonds are owned by the same `StaticsTimelock`, so governance
+stays unified while custody stays separated.
+
+:::note
+This separation does not merge Dollar collateral held by Core with Diamond
+custody. Only fees explicitly transferred to the periphery enter shared
+reservations.
+:::
+
+## Topology
+
+```text Statics two-diamond layout
+Users and integrators
+        |
+        v
+StaticsDiamond
+├── EIP-2535 dispatch and governance
+├── PositionNFT ERC-721
+├── basket creation, mint, redeem, collateral, lending, and flash loans
+├── global staking, reward claims, and treasury fee distribution
+├── Statics Dollar typed gateway, Risk liquidity, and funded incentives
+├── shared custody reservations
+└── canonical pool lifecycle and borrow-to-liquidity
+        |
+        +-------------------------> StaticsDollarCoreDiamond
+        |                           ├── collateral and issuance
+        |                           ├── health and transitions
+        |                           ├── insurance and recovery
+        |                           └── risk-series state
+        |
+        +-------------------------> StaticsSwapFeeHook
+        |                           ├── bilateral swap fees
+        |                           └── hook-owned permanent liquidity
+        |
+        +-------------------------> StaticsLiquidityManager
+                                    └── typed user PositionManager NFT creation
+```
+
+## What lives where
+
+Physical token locations are intentionally split across contracts so each
+accounting boundary can be verified independently:
+
+| Location | Holds |
+| --- | --- |
+| `StaticsDiamond` | Basket vault backing, the fee account, staking custody, and voluntarily custodied LP NFTs |
+| `StaticsDollarCoreDiamond` | Dollar collateral and insurance |
+| `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
+| `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
+| Uniswap v4 `PoolManager` | Canonical pool liquidity under v4 accounting |
+
+Direct donations to the Diamond are unreserved and do not inflate backing, fee
+claims, or stake. See [Custody and accounting](/docs/core/custody) for the
+reservation equation and deficit handling.
+
+## Canonical deployment shape
+
+The launcher and deployment tests expect **21 facets / 193 selectors** on
+`StaticsDiamond` and **11 facets / 95 selectors** on `StaticsDollarCoreDiamond`.
+These counts are verified through deployment-test loupe enumeration and match
+the recorded Robinhood Chain testnet deployment, including the three owner-index
+selectors on the PositionNFT facet.
+
+## Upgradeability
+
+Both diamonds are pre-release EIP-2535 diamonds owned by one timelock. Diamond
+cuts are the sole implementation upgrade mechanism. The intended release
+lifecycle is upgradeable development followed by an independent audit, reduction
+of retained powers, and a final reviewed cut that removes Diamond-cut authority
+from both diamonds. See [Governance and lifecycle](/docs/governance/timelock-and-roles).
+
+The hook, PoolManager, PositionManager, Permit2, and liquidity-manager bindings
+are version-level dependencies. V1 does not implement live in-place replacement
+of those immutable integrations; before final immutability, an audited Diamond
+upgrade may correct integration logic.

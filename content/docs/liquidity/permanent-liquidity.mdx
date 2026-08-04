@@ -1,0 +1,61 @@
+---
+id: permanent-liquidity
+slug: liquidity/permanent-liquidity
+label: Permanent liquidity
+title: Permanent protocol liquidity
+description: Matched protocol-owned inventory becomes hook-owned full-range liquidity with no ordinary withdrawal path until ExitOnly.
+updated: 2026-08-04
+order: 430
+---
+
+Permanent liquidity is the protocol-owned side of every canonical pool. It is
+seeded by the basket creator at launch and expanded from swap-fee allocations.
+It is hook-owned, full-range, and intentionally non-withdrawable while its pool
+remains active.
+
+## Hook-owned and locked
+
+Matched protocol-owned inventory converts into the hook's own full-range
+position. It has:
+
+- no PositionManager token ID;
+- no 24-hour epoch, seven-day ramp, minimum epoch size, or primary basket-fee
+  reserve; and
+- no ordinary withdrawal path.
+
+:::warning
+Hook permanent liquidity cannot be released before pool decommissioning. It has
+no protocol PositionManager token ID, and no routine operation withdraws it.
+:::
+
+## Compounding from swap fees
+
+The [swap-fee hook's](/docs/liquidity/swap-fee-hook) permanent-liquidity share
+stays in the hook. During swap settlement, when both pool currencies are
+available, the hook compounds matched inventory into its full-range position.
+Unmatched amounts remain pending until someone calls
+`compoundPermanentLiquidity`. Fees earned by the hook's position are collected
+back into pending inventory and may be compounded again.
+
+## Exit-only unwind
+
+After a basket enters `ExitOnly`, anyone may call `unwindBasketLiquidity` once
+per constituent. The flow:
+
+1. marks the pool decommissioned;
+2. releases full-range hook liquidity and pending inventory to the Diamond;
+3. burns returned BasketTokens and reduces their represented backing; and
+4. accrues the released constituent and backing reclassification to global
+   treasury fees.
+
+User-owned PositionManager NFTs are untouched. No position, LP, or staker claim
+is created by the unwind — released value accrues to global treasury.
+
+## Dependency and recovery
+
+The hook, PoolManager, PositionManager, Permit2, and liquidity-manager bindings
+are version-level dependencies. V1 does not implement live in-place replacement
+of those immutable integrations. A critical dependency failure after final
+immutability is handled by guardian containment, terminal V1 `ExitOnly`
+wind-down and liability settlement where executable, followed by a separately
+deployed and governed V2. Users and external LPs are not force-migrated.

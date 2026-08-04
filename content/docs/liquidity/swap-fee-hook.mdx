@@ -1,0 +1,79 @@
+---
+id: swap-fee-hook
+slug: liquidity/swap-fee-hook
+label: Swap-fee hook
+title: Swap-fee hook
+description: The Statics swap-fee hook charges bilateral input and output fees and allocates them across POL, LPs, baskets, stakers, and treasury.
+updated: 2026-08-04
+order: 420
+---
+
+`StaticsSwapFeeHook` charges fees on both realized legs of a canonical swap and
+allocates them across five destinations. It is the sole revenue surface for
+canonical pools, which carry zero native v4 LP fee.
+
+## Bilateral fees
+
+The hook charges separately against the realized input and output legs. The
+launch manifest configures **50 BPS on each leg**. Governance may update both
+rates and the split, constrained by:
+
+```text
+f_in + f_out <= 200 BPS            // combined rate cap
+pol + lp + basket + statics + treasury == 10000   // split totals 10000
+```
+
+## The five-way split
+
+For each charged leg, the launch split is:
+
+```text Launch allocation
+10%   permanent liquidity        (POL)
+25%   eligible canonical LPs
+25%   deposited BasketTokens     (basket stakers)
+15%   global Statics stakers
+25%   treasury
+```
+
+Treasury receives all rounding dust. LP, basket-staker, Statics-staker, and
+treasury shares transfer immediately to the Diamond's fee ledger; the
+permanent-liquidity share stays in the hook.
+
+## Fallbacks to POL
+
+If a pool has no activated staked liquidity, its LP share redirects to permanent
+liquidity. If either basket or Statics staking cannot accept the reward asset,
+that share independently redirects to permanent liquidity too.
+
+```text Unavailable-share routing
+no activated LP          -> LP share added to POL
+basket cannot accept     -> basket-staker share added to POL
+Statics cannot accept    -> Statics-staker share added to POL
+```
+
+The same fallbacks apply under both the global configuration and any per-pool
+override.
+
+## Compounding
+
+When both pool currencies are available, the hook compounds matched inventory
+into its own full-range position during swap settlement. Unmatched amounts
+remain pending; anyone may call `compoundPermanentLiquidity` later. Fees earned
+by the hook's position are collected back into pending inventory and may be
+compounded again.
+
+## Per-pool overrides
+
+The global fee configuration is the default, not an immutable pool policy.
+Timelocked Diamond governance may set a complete seven-field canonical-pool
+override: input rate, output rate, and the five-way POL / canonical-LP /
+basket-staker / Statics-staker / treasury allocation. The two rates must still
+total at most 200 BPS and the five shares must total 10,000 BPS. Clearing an
+override restores the latest global rates and split.
+
+:::note
+Overrides change only future charges and allocation. Pending POL is not released
+or reclassified, hook-owned liquidity stays permanent, and existing two-sided
+pending inventory remains eligible for compounding. No threshold, volume,
+liquidity, or oracle rule changes an override automatically.
+:::

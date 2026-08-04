@@ -1,0 +1,84 @@
+---
+id: flash-composition
+slug: lending/flash-composition
+label: Flash composition
+title: Flash composition
+description: Borrow a basket's constituent vector atomically through a typed callback that restores principal plus fees in the same transaction.
+updated: 2026-08-04
+order: 340
+---
+
+Basket flash loans borrow the basket's configured constituent vector for a
+BasketToken-equivalent share amount. They are typed and atomic: the receiver
+gets a callback, does its work, and must restore principal plus a fee before the
+transaction ends.
+
+## Quoting
+
+`quoteFlashLoan` returns the principal vector and a quoted fee for every
+constituent.
+
+```text
+principal_i   = floor(bundle_i * flashShares / 1e18)
+quotedFee_i   = ceil(principal_i * flashFeeBps / 10000)
+requested_i   = principal_i + quotedFee_i
+```
+
+## The typed callback
+
+The receiver must implement `IStaticsFlashBorrower` and return
+`keccak256("IStaticsFlashBorrower.onStaticsFlashLoan")` from its callback. The
+Diamond uses OpenZeppelin `ReentrancyGuardTransient`: short persistent guard
+phases protect disbursement and repayment accounting, while the receiver callback
+runs outside the common persistent guard.
+
+```solidity
+function onStaticsFlashLoan(
+    uint256 basketId,
+    uint256 shares,
+    address feeReceiver,
+    bytes calldata data
+) external returns (bytes4) {
+    // ... searcher logic ...
+    return IStaticsFlashBorrower.onStaticsFlashLoan.selector;
+}
+```
+
+Because the callback runs outside the persistent guard, **a callback may call the
+ordinary public `mint` and `redeem` entrypoints**. Those calls receive no
+privilege and pay all normal basket and hook fees. The transient guard still
+rejects nested `flashLoan` calls.
+
+## Exact principal, measured fee
+
+Outbound disbursement debits the Diamond and credits the receiver by exactly the
+quoted principal. Outbound-tax and sender-extra-tax assets are incompatible and
+revert atomically.
+
+After the callback returns the required hash, the Diamond requests principal plus
+quoted fee and measures its actual receipt:
+
+```text
+success requires: measuredReceipt_i >= principal_i
+actualFee_i = measuredReceipt_i - principal_i
+```
+
+The basket vault is restored by exactly the principal. Actual excess — which may
+differ from the quote for an inbound-tax token — enters the global non-swap fee
+ledger. A callback revert, invalid return hash, nested flash attempt, or
+insufficient measured principal reverts the entire transaction.
+
+## Optional arbitrage receiver
+
+Statics ships a narrow optional `StaticsFlashArbitrageReceiver` for the
+overpriced mint-and-sell direction. A caller supplies a complete allocation
+across canonical pools, per-asset net profit floors, and a deadline. The receiver
+pulls only static-mint top-ups, uses ordinary fee-paying entrypoints, approves
+exact repayment, returns every net profit asset to the caller, and retains no
+route balances.
+
+:::warning
+Statics provides no receiver allowlist, generic router, callback privilege, or
+fee exemption. Receivers must defend their own pools, approvals, slippage, and
+minimum profit. Cancun transient storage (EIP-1153) is a deployment prerequisite.
+:::
