@@ -6,7 +6,7 @@
       "abi": "staticsAbi",
       "file": "statics-diamond.json",
       "label": "StaticsDiamond — the single integration address",
-      "signatures": 190
+      "signatures": 197
     },
     {
       "abi": "staticsSwapFeeHookAbi",

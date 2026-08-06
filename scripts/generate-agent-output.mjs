@@ -12,7 +12,7 @@ import path from "node:path";
 
 import matter from "gray-matter";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.statics.dev";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.staticsprotocol.com";
 const SITE_NAME = "Statics Protocol Docs";
 const SITE_DESCRIPTION =
   "Documentation for Statics — post-launch financial infrastructure for redeemable asset baskets, connected liquidity, self-backed credit, and the Statics Dollar. Starts with curated baskets; creation expands over time.";

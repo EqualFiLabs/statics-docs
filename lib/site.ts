@@ -1,6 +1,6 @@
-// Set NEXT_PUBLIC_SITE_URL at build time once the production domain is final;
-// the default only affects absolute URLs in sitemap/OpenGraph output.
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.statics.dev";
+// Canonical production domain. Drives absolute URLs in sitemap/OpenGraph output,
+// so it must match the host actually serving the site.
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.staticsprotocol.com";
 
 export const SITE_NAME = "Statics Protocol Docs";
 

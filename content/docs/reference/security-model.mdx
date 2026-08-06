@@ -17,9 +17,9 @@ about the chain (liveness).
 - One `StaticsTimelock` owns both diamonds. All Diamond cuts, economic
   configuration, lifecycle release, hook fee configuration, and treasury or
   guardian changes flow through it after delay.
-- Basket creation is owner-only while `creationFee()` is zero and exact-fee
-  open creation while it is positive. Neither state constitutes token
-  certification. Current deployment status is on [Rollout](/docs/rollout).
+- Basket creation is owner-only while `creationFee()` is zero, and open to any
+  caller paying the exact fee while it is positive. Neither state constitutes
+  token certification. Current deployment status is on [Rollout](/docs/rollout).
 - Diamond cuts are the sole implementation upgrade mechanism. The intended final
   release removes Diamond-cut authority from both diamonds; until then,
   timelocked upgradeability can change protocol behavior after delay.
@@ -76,6 +76,6 @@ about the chain (liveness).
 ## Testnet fixtures are not production trust assumptions
 
 The public testnet's owner-mintable STATICS token, mock USDG and oracles, faucet,
-and two-minute timelock are fixtures. Historical internal audits, release-QA
-notes, and X-Ray reports cover earlier commits and are not independent
-production assurance for the reviewed revision.
+and two-minute timelock are fixtures. This revision has not undergone an
+independent third-party security review, and no review of an earlier commit
+constitutes production assurance for the code deployed here.
