@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
 import { TestnetBanner } from "@/components/testnet-banner";
-import { APP_URL, SITE_DESCRIPTION } from "@/lib/site";
+import { PROTOCOL_SOURCE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
@@ -11,87 +11,87 @@ export const metadata: Metadata = {
 
 const capabilities = [
   {
-    title: "Static baskets",
-    body: "Fixed-bundle ERC-20 basket tokens of up to 16 assets, with action-size fee tiers, measured custody, and a deliberate non-ERC-4626 redemption model.",
+    title: "Redeemable baskets",
+    body: "Fixed-bundle tokens of up to 16 assets. Mint and redeem the same constituent vector — deliberately not ERC-4626 yield vaults.",
     href: "/docs/baskets/overview",
   },
   {
-    title: "Statics Dollar",
-    body: "USDstx senior dollar minted from volatile or pegged collateral, paired with series-scoped Risk Shares, solvency gates, and recovery paths.",
-    href: "/docs/dollar/overview",
-  },
-  {
-    title: "Shared PositionNFT",
-    body: "One transferable ERC-721 owns dollar legs, basket collateral, loans, reward selections, and staked canonical-liquidity positions.",
-    href: "/docs/core/position-nft",
-  },
-  {
-    title: "Global multi-asset rewards",
-    body: "Stake STATICS and opt into up to 64 reward assets; new selections cannot capture historical fees, and unsupported shares route to governed accounting.",
-    href: "/docs/rewards/global-rewards",
-  },
-  {
-    title: "Self-backed lending",
-    body: "Deposit basket collateral and borrow its proportional constituent vector at a basket-defined LTV, with independent tranches, extension, and recovery.",
-    href: "/docs/lending/overview",
-  },
-  {
-    title: "Constituent flash loans",
-    body: "Borrow a basket's constituent vector atomically through a typed callback, while nested flash loans are blocked.",
-    href: "/docs/lending/flash-composition",
-  },
-  {
-    title: "Canonical v4 liquidity",
-    body: "One zero-native-fee Uniswap v4 pool per basket constituent, with a Statics swap-fee hook that charges bilateral input and output fees.",
+    title: "Connected liquidity",
+    body: "One canonical Uniswap v4 pool per constituent at launch, with bilateral hook fees and paths that arbitrageurs may use when prices diverge.",
     href: "/docs/liquidity/canonical-pools",
   },
   {
     title: "Permanent protocol liquidity",
-    body: "Matched protocol-owned inventory converts into hook-owned full-range liquidity with no ordinary withdrawal path until a basket enters ExitOnly.",
+    body: "Seeded full-range POL can compound from matched fee inventory. Growth depends on activity; there is no ordinary withdraw until ExitOnly.",
     href: "/docs/liquidity/permanent-liquidity",
   },
   {
+    title: "Self-backed credit",
+    body: "Deposit BasketTokens and borrow the proportional constituent vector at the basket LTV — no price-oracle liquidation model.",
+    href: "/docs/lending/overview",
+  },
+  {
+    title: "Statics Dollar",
+    body: "Senior USDstx from volatile or pegged collateral, with series-scoped Risk Shares on volatile paths and explicit solvency gates.",
+    href: "/docs/dollar/overview",
+  },
+  {
+    title: "Shared PositionNFT",
+    body: "One transferable ERC-721 account for deposits, loans, Dollar legs, reward selections, and staked canonical LP positions.",
+    href: "/docs/core/position-nft",
+  },
+  {
+    title: "Fee participation",
+    body: "Routed swap and non-swap fees can accrue to deposited baskets, eligible LPs, STATICS stakers, POL, and treasury when activity occurs.",
+    href: "/docs/rewards/global-rewards",
+  },
+  {
+    title: "Staged creation access",
+    body: "Protocol-curated baskets first, optional partner deployments while owner-gated, then fee-gated open creation when readiness allows.",
+    href: "/docs/rollout",
+  },
+  {
     title: "Governed lifecycle",
-    body: "A shared timelock owns both diamonds; guardians can restrict exposure while repayment, recovery, and exit paths remain available.",
+    body: "Shared timelock ownership, guardian quarantine, and ExitOnly wind-down while repayment and recovery paths stay available.",
     href: "/docs/governance/basket-lifecycle",
   },
 ];
 
 const personas = [
   {
-    title: "Basket creators",
-    body: "Define constituent vectors, fee tiers, flash and lending fees, LTV, recovery penalty, and loan duration, then launch permissionless or genesis baskets.",
+    title: "Users on testnet",
+    body: "Claim faucet assets, stake STATICS, mint pegged USDstx, and use the live genesis basket — without creating a new market.",
     links: [
-      { label: "Static baskets", href: "/docs/baskets/overview" },
-      { label: "Basket creation", href: "/docs/baskets/creation" },
-      { label: "Source on GitHub", href: APP_URL },
+      { label: "Testnet onboarding", href: "/docs/start/testnet-onboarding" },
+      { label: "Deployment addresses", href: "/docs/reference/robinhood-testnet-deployment" },
+      { label: "Rollout status", href: "/docs/rollout" },
     ],
   },
   {
-    title: "Lenders & borrowers",
-    body: "Deposit basket tokens as collateral, borrow the constituent vector at the configured LTV, extend tranches, repay principal, or recover after expiry.",
+    title: "Token projects & partners",
+    body: "After launching elsewhere, inventory or treasury capital can seed a Statics basket when creation access allows. Creators get discovery attribution, not admin rights or a fee cut.",
+    links: [
+      { label: "How Statics helps tokens", href: "/docs/introduction#already-launched-tokens" },
+      { label: "Basket creation policy", href: "/docs/baskets/creation" },
+      { label: "Rollout phases", href: "/docs/rollout" },
+    ],
+  },
+  {
+    title: "Lenders, LPs & Dollar users",
+    body: "Deposit baskets for self-backed credit, provide or stake canonical liquidity, and mint or redeem Statics Dollar within profile limits.",
     links: [
       { label: "Self-backed lending", href: "/docs/lending/overview" },
-      { label: "Loan lifecycle", href: "/docs/lending/loan-lifecycle" },
-      { label: "Flash composition", href: "/docs/lending/flash-composition" },
-    ],
-  },
-  {
-    title: "Dollar users",
-    body: "Mint USDstx from volatile or pegged collateral, hold fungible senior dollar, recombine equal senior and junior claims, and redeem against profile capacity.",
-    links: [
+      { label: "Canonical pools", href: "/docs/liquidity/canonical-pools" },
       { label: "Statics Dollar", href: "/docs/dollar/overview" },
-      { label: "Volatile profiles", href: "/docs/dollar/volatile-profiles" },
-      { label: "Pegged profiles", href: "/docs/dollar/pegged-profiles" },
     ],
   },
   {
     title: "Builders & indexers",
-    body: "Integrate against the single StaticsDiamond address, read the PositionNFT and custody model, and follow the measured-custody and approval conventions.",
+    body: "Integrate against StaticsDiamond, follow measured-custody approvals, and index PositionNFT and basket state from the published surfaces.",
     links: [
       { label: "Integration", href: "/docs/reference/integration" },
-      { label: "Architecture", href: "/docs/core/architecture" },
-      { label: "Source on GitHub", href: APP_URL },
+      { label: "SDK", href: "/docs/reference/sdk" },
+      { label: "Protocol code", href: PROTOCOL_SOURCE_URL },
     ],
   },
 ];
@@ -110,19 +110,24 @@ export default function HomePage() {
           <div className="crumbs">
             <span className="crumb-here">protocol docs</span>
           </div>
-          <h1>Multi-asset baskets, a self-backed dollar, and permanent protocol-owned liquidity.</h1>
+          <h1>Build lasting utility around onchain assets.</h1>
           <p className="lede">
-            Statics is an onchain multi-asset protocol built as two coordinated EIP-2535 diamonds. It combines
-            fixed-bundle basket tokens, a senior/junior Statics Dollar, a shared PositionNFT, global multi-asset rewards,
-            proportional self-backed lending, constituent flash loans, and canonical Uniswap v4 liquidity with bilateral
-            hook fees.
+            Statics turns existing assets into redeemable, productive markets. Each basket connects spot
+            trading, protocol fees, permanent protocol-owned liquidity, self-backed credit, and access to
+            the Statics Dollar within a single Position NFT. Rather than launching new assets, Statics gives
+            established assets and communities durable financial infrastructure after launch. Creation
+            begins with curated baskets, expands through approved partners, and ultimately opens through
+            permissionless, fee-gated deployment.
           </p>
           <div className="landing-actions">
-            <Link className="cta" href="/docs/introduction">
-              Read the introduction
+            <Link className="cta" href="/docs/baskets/overview">
+              Explore curated baskets
             </Link>
-            <Link className="cta-secondary" href="/docs/core/architecture">
-              Architecture
+            <Link className="cta-secondary" href="/docs/introduction">
+              How Statics works
+            </Link>
+            <Link className="cta-secondary" href="/docs/rollout">
+              View rollout
             </Link>
           </div>
         </section>
@@ -147,11 +152,17 @@ export default function HomePage() {
                 <div className="landing-card-title">{persona.title}</div>
                 <p>{persona.body}</p>
                 <div className="persona-links">
-                  {persona.links.map((link) => (
-                    <Link href={link.href} key={link.label}>
-                      {link.label} →
-                    </Link>
-                  ))}
+                  {persona.links.map((link) =>
+                    link.href.startsWith("http") ? (
+                      <a href={link.href} key={link.label} target="_blank" rel="noreferrer">
+                        {link.label} →
+                      </a>
+                    ) : (
+                      <Link href={link.href} key={link.label}>
+                        {link.label} →
+                      </Link>
+                    ),
+                  )}
                 </div>
               </div>
             ))}
@@ -160,7 +171,13 @@ export default function HomePage() {
       </main>
 
       <footer className="docs-footer">
-        <div className="docs-footer-inner">© <a href="https://equalfi.org" target="_blank" rel="noreferrer">EqualFi Labs</a>. All rights reserved.</div>
+        <div className="docs-footer-inner">
+          ©{" "}
+          <a href="https://equalfi.org" target="_blank" rel="noreferrer">
+            EqualFi Labs
+          </a>
+          . All rights reserved.
+        </div>
       </footer>
     </div>
   );

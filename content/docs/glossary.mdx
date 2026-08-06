@@ -1,0 +1,68 @@
+---
+id: glossary
+slug: glossary
+label: Glossary
+title: Glossary
+description: Plain-language definitions for Statics terms used across the protocol docs.
+updated: 2026-08-05
+order: 25
+---
+
+Short definitions for terms that appear throughout the docs. Linked pages carry the full mechanics.
+
+## Basket and market terms
+
+| Term | Meaning |
+| --- | --- |
+| **Basket / static basket** | A fixed-composition multi-asset market. Constituents and per-unit bundle amounts are set at creation and do not change. |
+| **BasketToken** | The ERC-20 that represents one unit of a basket's fixed bundle. Minting deposits the bundle; redemption returns it (less fees). Not ERC-4626. |
+| **Constituent** | One ERC-20 asset inside a basket's immutable vector (up to 16). |
+| **Bundle amount** | How many units of a constituent back one full BasketToken (scaled to 18 decimals in accounting). |
+| **Genesis basket** | A basket created by the Diamond owner while public creation is closed (`creationFee = 0`). |
+| **Canonical pool** | The single Uniswap v4 BasketToken/constituent pool registered for each constituent at basket creation. |
+| **Permanent liquidity / POL** | Hook-owned full-range liquidity seeded at creation and compounded from matched fee inventory. No ordinary withdrawal until ExitOnly unwind. |
+| **Bilateral hook fee** | Swap fee charged on both input and output by `StaticsSwapFeeHook`, separate from Uniswap's native LP fee (canonical pools use zero native fee). |
+
+## Accounts and credit
+
+| Term | Meaning |
+| --- | --- |
+| **PositionNFT (`STXPOS`)** | The shared ERC-721 account on `StaticsDiamond`. It can hold basket deposits, loans, Dollar legs, reward selections, and staked LP positions. Transfer moves the whole economic bundle. |
+| **Self-backed lending / basket credit** | Borrowing a basket's proportional constituent vector against deposited BasketTokens at the basket LTV. No price-oracle liquidation; unpaid debt does not create bad debt on other baskets. |
+| **Tranche** | An independent loan slice on a position with its own principal vector and maturity. |
+| **Recovery** | After maturity and grace, anyone may settle an expired tranche, applying the recovery penalty and splitting a bounty with protocol fees. |
+| **Flash composition** | Atomic borrow of a basket's full constituent vector through a typed callback; principal plus fees must return in the same transaction. |
+
+## Statics Dollar
+
+| Term | Meaning |
+| --- | --- |
+| **Statics Dollar (`USDstx`)** | Senior fungible dollar token minted from configured collateral profiles. |
+| **Risk Shares (`ethLEV`)** | Junior, series-scoped claims issued with volatile-profile minting. Recombining equal senior and junior claims returns collateral. |
+| **Volatile profile** | Dollar path that mints equal USDstx + Risk Shares against assets such as WETH. |
+| **Pegged profile** | Dollar path that mints only USDstx against a pegged collateral (for example Mock USDG on testnet), with separate mint/redeem fees and no Risk Shares. |
+| **Senior claim** | The USDstx side of a volatile mint — priority claim relative to Risk Shares under solvency rules. |
+| **Core Diamond** | `StaticsDollarCoreDiamond` — separate custody and solvency boundary for Dollar collateral. |
+
+## Lifecycle and governance
+
+| Term | Meaning |
+| --- | --- |
+| **Active** | Normal basket mode: mint, redeem, borrow, and related flows allowed per facet rules. |
+| **Quarantined** | Guardian-restricted mode that blocks new exposure while preserving repay, recover, and exit paths. |
+| **ExitOnly** | Wind-down mode that disables new risk in installed facets; required before permanent liquidity can unwind to treasury. |
+| **Creation fee switch** | `creationFee() == 0` closes public basket creation (owner-only); a positive fee opens fee-gated public creation. |
+| **Asset permissionless** | There is no asset allowlist: creators may name arbitrary ERC-20 addresses. This is **not** the same as open basket creation. Inclusion is not an endorsement. |
+| **Timelock** | `StaticsTimelock` owns both diamonds and delays privileged admin actions. |
+
+## Rewards
+
+| Term | Meaning |
+| --- | --- |
+| **STATICS** | The configured staking token used for global multi-asset reward eligibility (testnet uses an owner-mintable fixture). |
+| **Global rewards** | Fee shares claimable by positions that stake STATICS and opt into selected reward assets after the eligibility delay. |
+| **Canonical LP rewards** | Separate rewards for staking eligible full-range PositionManager NFTs on active Statics pools. |
+
+## Reading tip
+
+When a page describes the **final vision**, check [Rollout](/docs/rollout) for what is enabled on the current deployment and which outcomes remain conditional on activity.

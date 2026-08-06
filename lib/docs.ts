@@ -25,6 +25,65 @@ export type DocPage = {
 
 const docsDirectory = path.join(process.cwd(), "content", "docs");
 
+/** Sidebar groups by page id so journey pages can sit outside module folders. */
+const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
+  {
+    title: "Start here",
+    pageIds: ["introduction", "rollout", "testnet-onboarding", "glossary"],
+  },
+  {
+    title: "Core",
+    pageIds: ["architecture", "position-nft", "custody"],
+  },
+  {
+    title: "Baskets",
+    pageIds: ["baskets-overview", "creation", "mint-and-redemption"],
+  },
+  {
+    title: "Dollar",
+    pageIds: [
+      "dollar-overview",
+      "volatile-profiles",
+      "pegged-profiles",
+      "solvency-and-recovery",
+      "oracle-model",
+    ],
+  },
+  {
+    title: "Lending",
+    pageIds: ["lending-overview", "loan-lifecycle", "recovery", "flash-composition"],
+  },
+  {
+    title: "Liquidity",
+    pageIds: [
+      "canonical-pools",
+      "swap-fee-hook",
+      "permanent-liquidity",
+      "canonical-lp-rewards",
+    ],
+  },
+  {
+    title: "Rewards",
+    pageIds: ["global-rewards"],
+  },
+  {
+    title: "Governance",
+    pageIds: ["timelock-and-roles", "basket-lifecycle"],
+  },
+  {
+    title: "Build",
+    pageIds: ["integration", "sdk", "indexing"],
+  },
+  {
+    title: "Security",
+    pageIds: ["security-model"],
+  },
+  {
+    title: "Reference",
+    pageIds: ["robinhood-testnet-deployment"],
+  },
+];
+
 function findMdxFiles(directory: string): string[] {
   if (!fs.existsSync(directory)) {
     return [];
@@ -147,15 +206,12 @@ export function getPageHref(page: Pick<DocPage, "slug">) {
 }
 
 export function getNavigationGroups() {
-  const groups = ["Core", "Baskets", "Dollar", "Lending", "Liquidity", "Rewards", "Governance", "Reference"];
-  const pages = getAllPages();
+  const pagesById = new Map(getAllPages().map((page) => [page.id, page]));
 
-  return groups
-    .map((title) => ({
-      title,
-      pages: pages.filter(
-        (page) => page.slug[0] === title.toLowerCase() || (title === "Core" && page.slug[0] === "introduction"),
-      ),
-    }))
-    .filter((group) => group.pages.length > 0);
+  return NAVIGATION_GROUPS.map((group) => ({
+    title: group.title,
+    pages: group.pageIds
+      .map((pageId) => pagesById.get(pageId))
+      .filter((page): page is DocPage => page !== undefined),
+  })).filter((group) => group.pages.length > 0);
 }

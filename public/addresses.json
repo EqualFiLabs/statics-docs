@@ -1,6 +1,6 @@
 {
   "name": "Statics",
-  "summary": "Onchain multi-asset protocol: fixed-bundle baskets, a self-backed Statics Dollar, a shared PositionNFT, global multi-asset rewards, self-backed lending, constituent flash loans, and canonical Uniswap v4 liquidity with bilateral hook fees.",
+  "summary": "Post-launch financial infrastructure: fixed-bundle baskets, Statics Dollar (USDstx), shared PositionNFT, global multi-asset rewards, self-backed lending, constituent flash loans, and canonical Uniswap v4 liquidity with bilateral hook fees. Basket creation is protocol-only while creationFee is zero.",
   "docs": "https://docs.statics.dev",
   "source": {
     "branch": "master",

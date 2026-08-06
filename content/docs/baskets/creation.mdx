@@ -3,38 +3,66 @@ id: creation
 slug: baskets/creation
 label: Creation
 title: Basket creation
-description: Basket creators define the immutable constituent vector, bundle amounts, fee tiers, and lending parameters, then launch permissionless or genesis baskets.
-updated: 2026-08-04
+description: How basket creation works onchain, what is enabled now, how partner baskets fit while creation is owner-only, and the technical atomic launch path.
+updated: 2026-08-05
 order: 120
 ---
 
+:::warning Not permissionless at initial launch
+Basket creation is currently restricted to the protocol. On the Robinhood Chain Testnet integration beta, `creationFee = 0`, so only the Diamond owner can create baskets. Access may expand through owner-created partner baskets, then to fee-gated open creation when governance raises the fee. See [Rollout](/docs/rollout).
+:::
+
 Basket creation is a single atomic call that defines the basket, deploys its
 BasketToken, launches every canonical pool, and seeds permanent liquidity. The
-creator chooses every economic parameter up front; after creation the
+creating caller chooses every economic parameter up front; after creation the
 constituent vector and bundle amounts are immutable.
 
-## Permissionless vs genesis
+## Current creation policy
 
-The `creationFee()` value is both the public admission switch and the required
-payment:
-
-- **zero fee** — public creation is closed; only the Diamond owner may create a
-  basket with zero native value (a controlled genesis basket); and
-- **positive fee** — any caller that pays the exact native amount may create a
-  basket.
+| Deployment | `creationFee()` | Who can create |
+| --- | --- | --- |
+| Robinhood testnet beta | `0` | Diamond owner only (genesis) |
+| Future open mode | Positive native amount | Any caller paying the exact fee |
 
 :::warning
 Zero never means free public creation. When the fee is zero, creation is
 owner-only.
 :::
 
-The creation fee is forwarded immediately, in full, to the configured treasury;
-creation reverts if the exact fee cannot be forwarded. Creation records the
-creator for discovery but gives that address no administrative authority.
+The creation fee (when positive) is forwarded immediately, in full, to the
+configured treasury; creation reverts if the exact fee cannot be forwarded.
+Creation records the creator for discovery but gives that address **no
+administrative authority** and **no ongoing protocol fee share**.
+
+## Approved-partner creation
+
+There is no onchain partner role. While public creation is closed, the protocol
+can still deploy baskets for approved partners by using the owner-only genesis
+path. That is an operational arrangement:
+
+- the protocol owner submits creation;
+- partner inventory or treasury capital can fund backing and seed liquidity;
+- post-create admin and fee routing follow the same rules as any other basket.
+
+Do not describe partner creation as a separate contract feature. When the
+creation fee becomes positive, partners and other callers use the same public
+path.
+
+## Future open creation
+
+Open creation is enabled by setting a positive `creationFee()` under governance.
+Any caller that pays the exact native amount may then create a basket, subject to:
+
+- protocol parameter bounds (asset count, LTV ceiling, fee caps, and related checks);
+- ordinary ERC-20 transfer and Uniswap v4 pool requirements;
+- the general risk that arbitrary tokens may be incompatible — inclusion is not certification.
+
+Readiness conditions for flipping the switch are listed on [Rollout](/docs/rollout).
+No calendar date is committed here.
 
 ## Configuration parameters
 
-The creator defines the basket's complete economic shape at creation:
+The creating caller defines the basket's complete economic shape at creation:
 
 | Parameter | Meaning |
 | --- | --- |
@@ -51,7 +79,9 @@ Percentage fees are capped at 10,000 BPS. The recovery penalty's maximum rounded
 charge must still fit inside the remaining collateral so an unpaid loan never
 creates bad debt.
 
-## Atomic launch
+## Technical creation process
+
+### Atomic launch
 
 The single creation call performs, atomically:
 
@@ -67,7 +97,7 @@ any constituent fails, the native creation fee, token deployment, pool state,
 backing, reservations, and permanent liquidity all roll back. There is no valid
 unseeded or partially launched basket state.
 
-## Launch price and budgets
+### Launch price and budgets
 
 Creation requires one launch-price and paired-asset budget per constituent. The
 price is expressed semantically as the square root of constituent units per
@@ -80,12 +110,12 @@ BasketTokens placed across all canonical pools.
 maxAmountsIn[i] >= pairedAsset[i] + backingIncrease[i] + mintFee[i]
 ```
 
-The creator must approve and fund each constituent for both the paired pool side
-and the ordinary mint backing plus fee. Launch requires the hook and liquidity
-manager to be installed, exact minimum receipts for every seed, a fresh deadline,
-and aggregate per-asset debit caps.
+The creating caller must approve and fund each constituent for both the paired
+pool side and the ordinary mint backing plus fee. Launch requires the hook and
+liquidity manager to be installed, exact minimum receipts for every seed, a fresh
+deadline, and aggregate per-asset debit caps.
 
-## Launch helpers are internal
+### Launch helpers are internal
 
 `launchBasketPools` and `mintBasketLaunch` are Diamond-self-only implementation
 helpers used by `createBasket`; they are not alternative public launch routes.

@@ -4,30 +4,106 @@ slug: introduction
 label: Introduction
 eyebrow: Protocol docs
 title: Statics Protocol
-description: Onchain multi-asset protocol combining fixed-bundle basket tokens, a senior/junior Statics Dollar, a shared PositionNFT, global multi-asset rewards, proportional self-backed lending, constituent flash loans, and canonical Uniswap v4 liquidity with bilateral hook fees.
+description: Statics turns onchain assets into redeemable baskets with connected liquidity, fee earning, self-backed credit, and the Statics Dollar — post-launch financial infrastructure, staged from curated baskets toward open creation.
 status: Protocol docs
-updated: 2026-08-04
+updated: 2026-08-05
 order: 10
 ---
 
-## What Statics provides
+## What Statics does
 
-Statics is an onchain multi-asset protocol implemented as two coordinated EIP-2535 diamonds. Rather than a single primitive, it bundles several composable surfaces behind one ordinary user-action address: `StaticsDiamond`.
+Statics is **post-launch financial infrastructure**, not a launchpad.
 
-| Surface | Purpose |
+Launchpads help tokens launch. Statics helps make onchain assets useful afterward: redeemable multi-asset baskets, connected trading pools, self-backed credit, fee sharing, permanent protocol-owned liquidity, and a senior/junior Statics Dollar system.
+
+> Statics turns onchain assets into redeemable financial markets with connected liquidity, arbitrage paths, fee earning, and self-backed credit. It begins with curated baskets and can expand into utility infrastructure for token projects before open creation is enabled.
+
+Volume, fees, rewards, and liquidity growth are **possible outcomes of real activity**, not guarantees.
+
+## How a basket works
+
+A **static basket** is a fixed bundle of one to sixteen ERC-20 constituents. Each basket has its own BasketToken:
+
+- **Mint** — deposit the fixed constituent bundle (plus any mint fee) and receive BasketTokens.
+- **Redeem** — burn BasketTokens and receive the same bundle back (less any redemption fee).
+- **Trade** — swap BasketToken against each constituent on canonical Uniswap v4 pools created at launch.
+- **Hold productively** — deposit BasketTokens into a PositionNFT to earn routed basket fee shares and to borrow self-backed credit.
+
+Baskets are deliberately **not ERC-4626**. Historical fees do not change the conversion rate, and new minters do not buy accrued yield. One BasketToken is always a claim on the same fixed bundle.
+
+### Example (testnet fixture)
+
+On Robinhood Chain Testnet, the genesis basket **TPA1** is a tokenized-stock-style example:
+
+| Per BasketToken | Asset |
 | --- | --- |
-| Static baskets | Fixed-bundle ERC-20 basket tokens of up to 16 assets with action-size fee tiers. |
-| Statics Dollar | A senior dollar (`USDstx`) minted from volatile or pegged collateral, plus series-scoped Risk Shares. |
-| Shared PositionNFT | One transferable ERC-721 that owns dollar legs, basket collateral, loans, rewards, and staked liquidity. |
-| Global rewards | Stake `STATICS` and opt into up to 64 reward assets per position. |
-| Self-backed lending | Borrow a basket's constituent vector against deposited basket collateral. |
-| Flash composition | Borrow a basket's constituents atomically through a typed callback. |
-| Canonical v4 liquidity | One zero-native-fee Uniswap v4 pool per constituent with a bilateral swap-fee hook. |
-| Permanent liquidity | Matched protocol-owned inventory becomes hook-owned full-range liquidity. |
+| 0.01 | TSLA |
+| 0.01 | PLTR |
+| 0.01 | AMD |
 
-## Architecture
+Treat live launch compositions as **TBD until finalized**. Statics itself is asset-generic: any compatible ERC-20 set can define a basket when creation is allowed.
 
-`StaticsDiamond` is the ordinary integration address, the PositionNFT ERC-721 contract, and the custody boundary for basket and Dollar periphery assets. The `StaticsDollarCoreDiamond` remains a separate custody and solvency boundary. Both diamonds are owned by the same `StaticsTimelock`.
+## What users can do
+
+| You want to… | Start here |
+| --- | --- |
+| Try the live beta | [Testnet onboarding](/docs/start/testnet-onboarding) |
+| Understand availability | [Rollout](/docs/rollout) |
+| Hold or trade a basket | [Mint & redemption](/docs/baskets/mint-and-redemption), [Canonical pools](/docs/liquidity/canonical-pools) |
+| Borrow against a basket | [Self-backed lending](/docs/lending/overview) |
+| Use Statics Dollar | [Dollar overview](/docs/dollar/overview) |
+| Earn fee shares | [Global rewards](/docs/rewards/global-rewards), [LP rewards](/docs/liquidity/canonical-lp-rewards) |
+| Integrate contracts | [Integration](/docs/reference/integration) |
+
+All of these flows run through a shared **PositionNFT** account when you deposit, borrow, stake, or hold Dollar legs. See the [glossary](/docs/glossary) for term definitions.
+
+## Already-launched tokens
+
+Statics is not where a token has to launch. After a token exists elsewhere, a project can put **token inventory or treasury capital** to work by seeding a basket and its pools (when creation access allows).
+
+A basket can add:
+
+- redeemable multi-asset utility;
+- connected canonical liquidity;
+- additional mint/redeem and pool paths that arbitrageurs may use;
+- fee-earning participation for depositors, LPs, and stakers;
+- self-backed constituent credit against deposited BasketTokens.
+
+:::note Creator economics
+Creation records a creator address for discovery only. Creators receive **no admin power** after create and **no protocol fee cut** by default. Ongoing fees route to permanent liquidity, eligible LPs, deposited BasketTokens, STATICS stakers, and treasury. Creators benefit by holding, providing liquidity, or staking like any other participant.
+:::
+
+On the current beta, public creation is closed. Partner baskets, if any, are an operational choice while the protocol retains owner-only creation. Details: [Rollout](/docs/rollout) and [Basket creation](/docs/baskets/creation).
+
+## Fees and permanent liquidity
+
+When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the protocol can charge configured fees. Swap fees on canonical pools are bilateral hook fees. A share of eligible fees can accumulate as protocol-owned inventory and **may** compound into more full-range permanent liquidity when sides match.
+
+None of that is automatic depth: seed liquidity bootstraps markets; **activity** determines whether fees and POL grow.
+
+## Staged rollout and current availability
+
+Statics is permissionless by design and staged in deployment:
+
+1. **Now (integration beta)** — protocol-curated/genesis baskets; users trade and use live markets; creation fee is zero (owner-only).
+2. **Partner operations** — protocol may create baskets for approved partners while creation remains owner-gated onchain.
+3. **Open creation** — governance sets a positive creation fee so anyone who pays it can create.
+
+See [Rollout](/docs/rollout) for the live matrix. Do not describe permissionless basket creation as live while the creation fee is zero.
+
+## Risks and limitations
+
+- **Beta software** on testnet: addresses and parameters can change; not production-qualified.
+- **Token compatibility** is not certified by inclusion in a basket.
+- **No guaranteed** volume, arb profit, reward APY, peg, or liquidity growth.
+- **Self-backed credit** is not oracle-liquidated cross-margin; read lending and recovery rules before borrowing.
+- **Upgradeability** remains until a final immutability ceremony; ExitOnly is a governed software state on upgradeable diamonds.
+
+Read the [security model](/docs/reference/security-model) before integrating or depositing value.
+
+## Technical architecture
+
+Statics is implemented as two coordinated EIP-2535 diamonds:
 
 ```text Statics two-diamond layout
 ETH / WETH / pegged collateral
@@ -44,53 +120,25 @@ StaticsDiamond (EIP-2535)  user gateway + PositionNFT + shared custody
 Uniswap v4 PoolManager + StaticsSwapFeeHook + LiquidityManager
 ```
 
-Each basket has its own transferable ERC-20 token. Module accounting and physical-token reservations stay isolated inside the diamond while `LibCustody` enforces global backing.
+| Surface | Purpose |
+| --- | --- |
+| Static baskets | Fixed-bundle ERC-20 basket tokens of up to 16 assets with action-size fee tiers. |
+| Statics Dollar | Senior dollar (`USDstx`) from volatile or pegged collateral, plus series-scoped Risk Shares (`ethLEV`). |
+| Shared PositionNFT | One transferable ERC-721 for dollar legs, basket collateral, loans, rewards, and staked liquidity. |
+| Global rewards | Stake `STATICS` and opt into up to 64 reward assets per position. |
+| Self-backed lending | Borrow a basket's constituent vector against deposited basket collateral. |
+| Flash composition | Borrow a basket's constituents atomically through a typed callback. |
+| Canonical v4 liquidity | One zero-native-fee Uniswap v4 pool per constituent with a bilateral swap-fee hook. |
+| Permanent liquidity | Matched protocol-owned inventory becomes hook-owned full-range liquidity. |
 
-## Static baskets
+`StaticsDiamond` is the ordinary integration address, the PositionNFT contract, and the custody boundary for basket and Dollar periphery assets. `StaticsDollarCoreDiamond` is a separate custody and solvency boundary. Both are owned by the same `StaticsTimelock`.
 
-A `StaticsBasketToken` represents a fixed constituent vector. Minting deposits the configured bundle plus the selected flat fee; redemption burns basket tokens and returns the same vector less the selected fee. Statics is deliberately not ERC-4626: historical fees do not change a basket conversion rate, and new minters do not purchase accrued yield.
+Deeper module docs:
 
-Basket creators choose the immutable assets, bundle amounts, action-size fee tiers, flash fee, lending fees, LTV, recovery penalty, and loan duration.
-
-## Statics Dollar
-
-Volatile profiles accept collateral such as WETH and mint equal senior Statics Dollar plus series-scoped Risk Shares. The Core governs price bands, coverage, insurance, transitions, recovery, oracle revision, and debt ceilings. Recombining equal senior and junior claims returns proportional collateral.
-
-Pegged profiles mint only Statics Dollar, create no Risk Shares, and charge independent collateral-denominated mint and redemption fees. Any fungible Statics Dollar can redeem against available proportional profile capacity, subject to global health and recovery gates.
-
-## Shared PositionNFT
-
-`StaticsDiamond` is the ERC-721 PositionNFT contract. A position owns all attached basket collateral, Dollar series legs, reward selections, loans, and custodied canonical-liquidity positions. ERC-721 transfer moves authority over the complete economic position, and a position cannot close while any module leg remains active.
-
-Every valid PositionNFT has deterministic, fully onchain Base64 JSON and SVG metadata. The visual seed is the stable `(chain ID, StaticsDiamond, position ID)` identity, so transfers and activity do not change the avatar.
-
-## Global rewards
-
-Users stake the configured `STATICS` ERC-20 in a PositionNFT and opt into selected reward assets. Each asset indexes rewards only across positions that selected it. Eligibility begins after the configured delay, so a new selection cannot capture historical fees. Unsupported or temporarily ineligible fee shares fall through to the governed accounting destination rather than remaining unbooked.
-
-Canonical LP rewards are separate: users may stake eligible full-range PositionManager NFTs for active Statics pools, accrue next-block liquidity weight, claim rewards, and unstake without a cooldown.
-
-## Lending and recovery
-
-Basket lending locks deposited basket tokens and releases the proportional constituent vector at the basket's configured LTV, capped by the immutable 95% protocol ceiling. Independent tranches preserve separate maturities. Repayment restores the exact stored principal; extension charges each outstanding constituent; permissionless recovery becomes available only after maturity and grace.
-
-Basket constituents can also be borrowed atomically through a typed flash callback. The receiver must restore principal plus fees in the same transaction, and nested flash loans are blocked.
-
-## Canonical liquidity and bilateral fees
-
-Each basket has one canonical BasketToken/constituent Uniswap v4 pool per asset. The pool uses zero native LP fee. `StaticsSwapFeeHook` charges configured fees on both input and output, then allocates them across permanent protocol-owned liquidity, eligible canonical LP positions, deposited basket tokens, global Statics stakers, and treasury.
-
-Matched protocol-owned inventory is converted into hook-owned full-range liquidity. It has no normal withdrawal path and can unwind only after the basket enters `ExitOnly` and its canonical pool is decommissioned.
-
-## Governed lifecycle
-
-Baskets transition through `Active`, `Quarantined`, and `ExitOnly`. Quarantine blocks new exposure immediately while preserving repayment, recovery, and exit paths. `ExitOnly` disables new risk in the installed facets but remains a governed software state because the diamond is upgradeable.
-
-Every module maintains isolated logical reservations while `LibCustody` enforces global physical backing. Transfers use observed balance deltas and caller-provided bounds.
-
-## Choose your path
-
-- Basket creators should start with static baskets, architecture, and the governed lifecycle.
-- Lenders and borrowers should read lending and recovery, static baskets, and flash composition.
-- Dollar users should read the Statics Dollar profiles, the introduction, and the deployment snapshot.
-- Builders and indexers should read architecture, the shared PositionNFT model, and the integration guidance.
+- [Architecture](/docs/core/architecture)
+- [PositionNFT](/docs/core/position-nft)
+- [Custody](/docs/core/custody)
+- [Baskets](/docs/baskets/overview)
+- [Dollar](/docs/dollar/overview)
+- [Lending](/docs/lending/overview)
+- [Liquidity](/docs/liquidity/canonical-pools)

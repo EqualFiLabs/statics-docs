@@ -16,8 +16,12 @@ export function TestnetBanner() {
     <div className="banner" role="status">
       <span className="banner-dot" aria-hidden />
       <span>
-        Integration beta — contracts run on Robinhood Chain Testnet and addresses can change.{" "}
-        <Link href="/docs/reference/robinhood-testnet-deployment">Deployment snapshot</Link>
+        Integration beta on Robinhood Chain Testnet — basket creation is protocol-only.{" "}
+        <Link href="/docs/rollout">Rollout</Link>
+        {" · "}
+        <Link href="/docs/start/testnet-onboarding">Get started</Link>
+        {" · "}
+        <Link href="/docs/reference/robinhood-testnet-deployment">Addresses</Link>
       </span>
       <button className="banner-dismiss" type="button" onClick={dismiss} aria-label="Dismiss testnet notice">
         ✕

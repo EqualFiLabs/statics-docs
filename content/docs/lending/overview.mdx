@@ -8,6 +8,10 @@ updated: 2026-08-04
 order: 310
 ---
 
+**In plain language:** lock BasketTokens, borrow a slice of the same assets that
+back them, and repay those assets later. There is no oracle liquidation bot —
+risk is bounded by the basket LTV and recovery rules after maturity.
+
 Statics lending is self-backed: a borrower deposits BasketTokens as collateral
 and borrows the proportional constituent vector against them. There is no price
 oracle and no external liquidation. The loan is overcollateralized by its own

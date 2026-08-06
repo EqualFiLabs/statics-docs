@@ -4,7 +4,7 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-04
+updated: 2026-08-05
 order: 720
 ---
 
@@ -17,10 +17,30 @@ calldata builders needed to integrate without recomputing protocol math.
 | Field | Value |
 | --- | --- |
 | Name | `@statics-protocol/sdk` |
+| Repository | [EqualFiLabs/statics-sdk](https://github.com/EqualFiLabs/statics-sdk) |
 | Entry | `dist/index.js` |
 | Types | `dist/index.d.ts` |
+| Peer dependency | `viem` `>=2` |
 
-Build and test with `npm run build --prefix sdk` and `npm test --prefix sdk`.
+Install from GitHub (not npm registry):
+
+```bash
+npm install github:EqualFiLabs/statics-sdk
+```
+
+Equivalent forms:
+
+```bash
+npm install git+https://github.com/EqualFiLabs/statics-sdk.git
+# or pin a commit / tag
+npm install github:EqualFiLabs/statics-sdk#master
+```
+
+```ts
+import { /* builders, quotes, ABIs */ } from "@statics-protocol/sdk";
+```
+
+Source, issues, and local build live in that repository (`npm run build`, `npm test`).
 
 ## Chain bindings
 
@@ -92,4 +112,4 @@ returns signed-calldata-ready `Hex`:
 ## Testnet faucet
 
 `buildTestnetFaucetClaimCall()` builds the claim calldata for the ownerless
-testnet faucet. See [Testnet onboarding](/docs/reference/testnet-onboarding).
+testnet faucet. See [Testnet onboarding](/docs/start/testnet-onboarding).

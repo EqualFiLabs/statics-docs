@@ -8,6 +8,10 @@ updated: 2026-08-04
 order: 20
 ---
 
+**In plain language:** users talk to one main contract for baskets, positions,
+lending, and swaps; Dollar collateral and solvency live in a second contract so
+those books stay isolated.
+
 Statics is built as two EIP-2535 diamonds that share one timelock but keep
 distinct custody and solvency boundaries. Most user actions route through a
 single address — `StaticsDiamond` — while the Statics Dollar's collateral and

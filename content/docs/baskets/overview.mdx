@@ -4,13 +4,17 @@ slug: baskets/overview
 label: Overview
 title: Static baskets
 description: A static basket is a fixed-bundle ERC-20 token of up to 16 assets with a deliberate non-ERC-4626 mint and redemption model.
-updated: 2026-08-04
+updated: 2026-08-05
 order: 110
 ---
 
 A static basket is a fixed-composition multi-asset token. Each basket is defined
 once at creation by an immutable constituent vector, and every BasketToken
 represents the same fixed bundle of those constituents.
+
+On the current integration beta, users interact with **protocol-created genesis
+baskets** (for example TPA1). Public basket creation is closed while
+`creationFee = 0`. See [Rollout](/docs/rollout) and [Creation](/docs/baskets/creation).
 
 ## Fixed constituent vector
 
@@ -36,8 +40,11 @@ fixed claim on a fixed bundle — nothing more.
 
 Each basket gets its own transferable 18-decimal ERC-20 Permit token. The
 BasketToken trades on external venues and on the basket's [canonical Uniswap v4
-pools](/docs/liquidity/canonical-pools). Assets remain permissionless: inclusion
-in a basket is not an endorsement or compatibility certification.
+pools](/docs/liquidity/canonical-pools). There is no asset allowlist: when
+creation is allowed, callers may name arbitrary ERC-20 addresses. **Asset
+selection is uncurated; basket creation access is separate** and is currently
+owner-only on testnet. Inclusion in a basket is not an endorsement or
+compatibility certification.
 
 ## Aggregate-supply backing
 

@@ -8,6 +8,11 @@ updated: 2026-08-04
 order: 410
 ---
 
+**In plain language:** each basket launches with one trading pool per
+constituent so BasketTokens can be bought and sold against the underlying
+assets immediately. Protocol-owned liquidity seeds the pool; extra depth depends
+on later activity and LP participation.
+
 Every basket constituent gets exactly one canonical Uniswap v4 pool, paired
 against the BasketToken. Canonical pools are created atomically during
 [basket creation](/docs/baskets/creation) and seeded with permanent

@@ -15,7 +15,7 @@ import matter from "gray-matter";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.statics.dev";
 const SITE_NAME = "Statics Protocol Docs";
 const SITE_DESCRIPTION =
-  "Public documentation for Statics — onchain multi-asset baskets, the self-backed Statics Dollar, a shared PositionNFT, global multi-asset rewards, self-backed lending, flash composition, and canonical Uniswap v4 liquidity.";
+  "Documentation for Statics — post-launch financial infrastructure for redeemable asset baskets, connected liquidity, self-backed credit, and the Statics Dollar. Starts with curated baskets; creation expands over time.";
 
 const ROOT = process.cwd();
 const contentDir = path.join(ROOT, "content", "docs");
@@ -25,6 +25,9 @@ const rawDir = path.join(outDir, "raw", "docs");
 // Slugs included in the condensed small corpus (orientation-critical only).
 const SMALL_SLUGS = new Set([
   "introduction",
+  "rollout",
+  "glossary",
+  "start/testnet-onboarding",
   "core/architecture",
   "core/position-nft",
   "reference/integration",

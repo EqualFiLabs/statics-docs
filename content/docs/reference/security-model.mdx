@@ -18,8 +18,8 @@ about the chain (liveness).
   configuration, lifecycle release, hook fee configuration, and treasury or
   guardian changes flow through it after delay.
 - Basket creation is owner-only while `creationFee()` is zero and exact-fee
-  permissionless while it is positive. Neither state constitutes token
-  certification.
+  open creation while it is positive. Neither state constitutes token
+  certification. Current deployment status is on [Rollout](/docs/rollout).
 - Diamond cuts are the sole implementation upgrade mechanism. The intended final
   release removes Diamond-cut authority from both diamonds; until then,
   timelocked upgradeability can change protocol behavior after delay.

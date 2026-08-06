@@ -1,16 +1,22 @@
 ---
 id: testnet-onboarding
-slug: reference/testnet-onboarding
+slug: start/testnet-onboarding
 label: Testnet onboarding
-title: Faucet and testnet onboarding
-description: Fund a wallet from the Statics faucets and get started with Mock USDG, STATICS, and basket tokens on testnet.
-updated: 2026-08-04
-order: 760
+title: Get started on testnet
+description: Fund a wallet from the Statics faucet and try staking, the pegged Dollar, and the live genesis basket on Robinhood Chain Testnet.
+updated: 2026-08-05
+order: 20
+badge: Beta
 ---
 
-The Robinhood Chain Testnet ships an ownerless faucet that distributes the
-fixtures you need to try Statics without production assets. This page covers what
-is available and the recommended first actions.
+The Robinhood Chain Testnet ships an ownerless faucet and a live genesis basket so you can try Statics without production assets. Basket **creation** stays protocol-only on this deployment — see [Rollout](/docs/rollout).
+
+## What you can do in this guide
+
+1. Connect to testnet and claim faucet fixtures.
+2. Open a PositionNFT and stake `STATICS`.
+3. Mint pegged Statics Dollar (`USDstx`).
+4. Mint, redeem, or trade the genesis basket **TPA1**.
 
 ## Faucet
 
@@ -23,7 +29,7 @@ is available and the recommended first actions.
 The faucet is ownerless with a fixed inventory. Use the SDK helper
 `buildTestnetFaucetClaimCall()` to build the claim calldata.
 
-:::note
+:::note Testnet fixtures
 The faucet, mock USDG, mock oracles, and owner-mintable STATICS token are
 testnet fixtures. They are deliberately not production defaults.
 :::
@@ -34,6 +40,8 @@ testnet fixtures. They are deliberately not production defaults.
 2. Claim testnet assets from the faucet.
 3. Approve `StaticsDiamond` (`0xfb3Baf22daCADE66f7CF0356aC2E342235af74bf`) for
    the asset you want to use.
+
+Full addresses live on the [deployment snapshot](/docs/reference/robinhood-testnet-deployment).
 
 ## Open a position and stake STATICS
 
@@ -60,7 +68,18 @@ USDG and call `mintPegged` to mint `USDstx`, or use the permit variant
 ## Trade the genesis basket
 
 TPA1 is a live three-constituent basket (`0.01` TSLA, `0.01` PLTR, `0.01` AMD per
-BasketToken) with three canonical pools. Mint or redeem via the basket interface,
-or swap on the canonical pools through the hook. See the full
-[deployment record](/docs/reference/robinhood-testnet-deployment) for all
-addresses.
+BasketToken) with three canonical pools. Composition is a **testnet fixture
+example** — launch compositions on later networks may differ and should be treated
+as TBD until finalized.
+
+Mint or redeem via the basket interface, or swap on the canonical pools through
+the hook. You can also deposit TPA1 into a position and borrow self-backed
+constituent credit within the basket LTV.
+
+## Builders
+
+Contract calls, SDK helpers, and indexing notes:
+
+- [Integration](/docs/reference/integration)
+- [SDK](/docs/reference/sdk)
+- [Indexing](/docs/reference/indexing)

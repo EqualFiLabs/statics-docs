@@ -26,6 +26,9 @@ export default function NotFound() {
             <Link className="cta" href="/docs/introduction">
               Read the introduction
             </Link>
+            <Link className="cta-secondary" href="/docs/rollout">
+              View rollout
+            </Link>
             <Link className="cta-secondary" href="/">
               Docs home
             </Link>
