@@ -4,7 +4,7 @@ slug: governance/basket-lifecycle
 label: Basket lifecycle
 title: Basket lifecycle
 description: Baskets move through Active, Quarantined, and ExitOnly, restricting new exposure while preserving repayment, recovery, and exit.
-updated: 2026-08-04
+updated: 2026-08-25
 order: 620
 ---
 
@@ -59,6 +59,7 @@ until someone submits a transaction.
 | Basket-loan recovery | 20% of configured penalty backing |
 | Dollar expired-risk recovery | Quoted keeper bounty |
 | Claims, LP activation, compounding, treasury distribution, ExitOnly unwind | No protocol bounty |
+| Genesis-credit recovery | Configured share of the fixed Genesis recovery residual |
 
 Swap execution routes fees and attempts matched permanent-liquidity compounding
 atomically, but does not provide liveness when a pool has no swaps. Production

@@ -4,7 +4,7 @@ slug: reference/security-model
 label: Security model
 title: Security model
 description: Authority, custody, and liveness assumptions for the Statics protocol.
-updated: 2026-08-04
+updated: 2026-08-25
 order: 750
 ---
 
@@ -36,6 +36,14 @@ about the chain (liveness).
   socialized-loss waterfall. No claimant class is intended to absorb another
   class's loss during ordinary operation.
 - PositionNFT transfer moves all attached protocol rights and obligations.
+- A linked Genesis NFT and PositionNFT are mutually transfer-locked. The link
+  requires the same actual owner on both NFTs; ERC-721 approvals do not bypass
+  the owner check.
+- Genesis secured credit is post-epoch, fixed-term, and bounded by the Genesis
+  backing. Its extension fee is read at execution time, and its recovery path
+  settles reward books, clears only the recovered Genesis boost/link, preserves
+  the PositionNFT's unrelated ledger state, and returns the NFT to vault
+  inventory.
 - Dollar Core collateral remains outside Diamond custody reservations — only fees
   explicitly transferred to the periphery enter shared reservations.
 
@@ -72,6 +80,10 @@ about the chain (liveness).
 - Basket-loan recovery and Dollar expired-risk recovery have distinct
   caller-incentive formulas; other basket and liquidity maintenance has no
   guaranteed caller or protocol bounty.
+- Genesis-credit recovery is a third, distinct path. It becomes permissionless
+  only after maturity plus grace and pays a configured share of the fixed
+  recovery residual to the caller while distributing the remainder through the
+  existing Genesis reward books.
 
 ## Testnet fixtures are not production trust assumptions
 

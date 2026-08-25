@@ -4,7 +4,7 @@ slug: reference/indexing
 label: Indexing
 title: Indexing
 description: Events and read models for building reorg-safe indexers over Statics state.
-updated: 2026-08-04
+updated: 2026-08-25
 order: 730
 ---
 
@@ -35,6 +35,7 @@ deployed facet bytecode; do not hand-encode them.
 | Loan tranche | `loanId` | stored principal vector, maturity, lock state |
 | Dollar series | `(profileId, seriesId)` | series state, Risk liquidity, incentive reserves |
 | Custody | `token` | `globalReservedByToken`, per-account reservations |
+| Genesis | `(chainId, StaticsGenesis, genesisId)` | ownership/lock state, registration, activation, direct reward views, and `genesisOwnerClaimable` |
 
 The PositionNFT owner index (`positionCount`, `positionsOfOwner`) lets an indexer
 enumerate a wallet's current positions without scanning every transfer event;
@@ -61,3 +62,21 @@ No keeper runs automatically. Lifecycle transitions, recovery, compounding,
 treasury distribution, and ExitOnly unwind only advance when a transaction is
 submitted. An indexer should not assume time-based state changes; it should
 reflect state only after the confirming event is finalized.
+
+## Genesis event and claim handling
+
+Index `GenesisRegistered`, `GenesisLinked`, `GenesisUnlinked`,
+`GenesisWeightChanged`, `GenesisActivated`, `GenesisActivationReset`,
+`GenesisPurchased`, `GenesisRedeemed`, `GenesisCreditOpened`,
+`GenesisCreditExtended`, `GenesisCreditRepaid`, `GenesisCreditRecovered`,
+`RevenueAccrued`, `GenesisRevenueAccrued`, `GenesisRewardsClaimed`,
+`GenesisOwnerRewardsClaimed`, and `GenesisTreasuryRewardsClaimed`. A batch claim
+is caller-supplied and does not imply owner-wide enumeration. Reconcile emitted
+per-token claims against the batch return values and the current reward views;
+duplicate IDs are safe but should not be counted twice by an offchain aggregate.
+
+Genesis reward books are distinct from global PositionNFT reward books. On an
+owner-changing transfer, settle the previous owner's attributed reward credit,
+reset activation, and follow future direct weight under the new owner. Recovery
+has the same settlement boundary while also removing the recovered Genesis link
+and boost.

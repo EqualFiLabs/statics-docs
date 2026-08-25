@@ -4,7 +4,7 @@ slug: lending/overview
 label: Overview
 title: Self-backed lending
 description: Deposit basket tokens as collateral and borrow their proportional constituent vector at a basket-defined loan-to-value.
-updated: 2026-08-04
+updated: 2026-08-25
 order: 310
 ---
 
@@ -16,6 +16,12 @@ Statics lending is self-backed: a borrower deposits BasketTokens as collateral
 and borrows the proportional constituent vector against them. There is no price
 oracle and no external liquidation. The loan is overcollateralized by its own
 deposited basket at a creator-chosen loan-to-value.
+
+This module documents BasketToken lending. Genesis secured credit is a separate
+post-epoch facility against a fixed Genesis NFT's STATICS backing; it uses flat
+native service fees and its own recovery accounting. See
+[Genesis secured credit](/docs/genesis/secured-credit) before treating the
+BasketToken fee formulas below as universal lending rules.
 
 ## How it works
 

@@ -4,7 +4,7 @@ slug: reference/integration
 label: Integration
 title: Integration guide
 description: The single StaticsDiamond address, the approvals and interfaces to call, and the common flows with their failure conditions.
-updated: 2026-08-04
+updated: 2026-08-25
 order: 710
 ---
 
@@ -97,12 +97,56 @@ flashLender.flashLoan(basketId, shares, address(receiver), routeData);
 // keccak256("IStaticsFlashBorrower.onStaticsFlashLoan") and restore principal + fees.
 ```
 
+## Integrate Genesis
+
+Genesis has a standalone NFT/vault lifecycle and a permanent integration at
+`StaticsDiamond`. Applications should discover the `StaticsGenesis`,
+`StaticsGenesisVault`, `GenesisActivationRegistry`, and
+`GenesisLaunchDistributor` addresses from the matching deployment manifest,
+then use `StaticsDiamond` for permanent registration, linkage, rewards, and
+the Genesis integration boundary. Use `StaticsGenesisVault` for opening,
+extending, repaying, and recovering secured credit; recovery invokes the
+permanent integration boundary as part of settlement.
+
+After `genesisIntegrationReady()` is true, an owner can call
+`registerGenesis(genesisId)` once. Registration follows ordinary owner-changing
+transfers; activation resets on transfer and is distinct from registration.
+`linkGenesis(positionId, genesisId)` requires the same actual owner for both
+NFTs. While linked, both NFTs are transfer-locked. Approvals do not authorize
+linking or unlinking.
+
+Genesis direct rewards remain separate from global PositionNFT rewards. The
+single-token and treasury claim paths remain available, and the batch paths are:
+
+```solidity
+claimAllGenesisRewards(uint256[] calldata genesisIds, address receiver)
+claimAllGenesisTreasuryRewards(address receiver)
+```
+
+The owner batch claims both STATICS and WETH for the caller-supplied Genesis IDs
+and crystallized prior-owner credits. The caller must own every supplied ID; an
+empty array claims only prior-owner credits. It does not enumerate wallet NFTs.
+While the launch distributor is active, every claim path lazily harvests before
+settlement, and a batch harvests once before transferring each asset at most
+once.
+
+For the separate secured-credit flow, use `quoteGenesisCredit`,
+`quoteGenesisCreditExtension`, and `quoteGenesisCreditRecovery` immediately
+before `openGenesisCredit`, `extendGenesisCredit`, or
+`recoverGenesisCredit`. Origination and extension fees are flat native service
+fees; the current governed split sends 10% to permanent Genesis reserve backing
+and 90% to treasury. See [Genesis secured credit](/docs/genesis/secured-credit)
+for lock, repayment, and recovery semantics.
+
 ## Canonical interfaces
 
 | Surface | Interface |
 | --- | --- |
 | Baskets | `IStaticsBasket`, `IStaticsBasketAdmin`, `IStaticsBasketCollateral`, `IStaticsBasketRewards` |
 | Global staking and rewards | `IStaticsGlobalRewards` |
+| Genesis NFT and vault | `IStaticsGenesis`, `IStaticsGenesisVault`, `IERC5192` |
+| Genesis activation and launch rewards | `IGenesisActivationRegistry`, `IGenesisLaunchDistributor` |
+| Permanent Genesis integration | `IStaticsGenesisIntegration` |
 | Lending | `IStaticsLending` |
 | Flash loans | `IStaticsFlashLoan`, `IStaticsFlashBorrower` |
 | PositionNFT | `IStaticsPosition`, ERC-721, `IStaticsPositionMetadata`, `IPositionOwnerIndex` |

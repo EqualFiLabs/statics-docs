@@ -3,8 +3,8 @@ id: position-nft
 slug: core/position-nft
 label: PositionNFT
 title: Shared PositionNFT
-description: One transferable ERC-721 position owns every Dollar leg, basket collateral, loan, reward selection, and staked liquidity position.
-updated: 2026-08-04
+description: One transferable ERC-721 position owns every Dollar leg, basket collateral, loan, reward selection, staked liquidity position, and optional Genesis link.
+updated: 2026-08-25
 order: 30
 ---
 
@@ -24,10 +24,17 @@ A single PositionNFT may bundle any of the following legs:
 - pairing-vault state; and
 - voluntarily custodied full-range v4 LP NFTs and their hook-fee claims.
 
+A position may also be linked to one registered Genesis NFT. The link applies
+the Genesis activation multiplier to the position's global STATICS reward weight
+and creates a mutual transfer lock while it exists. Direct Genesis rewards,
+Genesis registration, and Genesis ownership remain separate ledger state.
+
 ERC-721 ownership and approvals authorize every attached leg. Transferring the
 NFT transfers staking balance, reward claims, collateral, obligations, and
-control of voluntarily custodied LP NFTs in one move. Externally held Uniswap v4
-NFTs are not PositionNFT legs and do not move with a transfer.
+control of voluntarily custodied LP NFTs in one move. An actively linked
+Genesis NFT cannot be transferred until it is unlinked; approvals do not bypass
+that lock. Externally held Uniswap v4 NFTs are not PositionNFT legs and do not
+move with a transfer.
 
 :::warning
 Integrators must inspect every active leg before accepting a PositionNFT
@@ -116,3 +123,4 @@ artwork in facets or protocol storage.
 | Global Statics rewards | Configured stake selected into one reward asset | Stake, new selections, and top-ups mature at an hourly boundary 24–25 hours later | Stake always withdrawable; withdrawal consumes pending before eligible |
 | Canonical LP rewards | Full-range liquidity in a custodied v4 NFT | Initial and increased deltas activate next block | NFT can leave immediately in any lifecycle state; claims stay attached |
 | Dollar Risk liquidity | Supplied series Risk Shares | Staking makes shares immediately consumable | Unconsumed effective shares remain withdrawable |
+| Genesis boost | Activation multiplier on a linked Genesis NFT | Link and activation state determine effective global STATICS weight | Credit recovery clears only the Genesis boost and link; the PositionNFT and unrelated legs remain |

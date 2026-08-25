@@ -36,6 +36,10 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
     pageIds: ["architecture", "position-nft", "custody"],
   },
   {
+    title: "Genesis",
+    pageIds: ["genesis-overview", "genesis-rewards", "genesis-secured-credit"],
+  },
+  {
     title: "Baskets",
     pageIds: ["baskets-overview", "creation", "mint-and-redemption"],
   },

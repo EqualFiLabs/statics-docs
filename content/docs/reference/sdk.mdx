@@ -4,7 +4,7 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-05
+updated: 2026-08-25
 order: 720
 ---
 
@@ -73,6 +73,8 @@ Quotes mirror the onchain quote functions and return the same per-asset legs:
 | `quoteBorrow` | Origination fee, collateral shares, debt and penalty shares |
 | `quoteRecovery` | Caller bounty and protocol split per constituent |
 | `quoteExtension` | Per-constituent extension charge |
+| `quoteGenesisCredit` / `quoteGenesisCreditExtension` | Current native Genesis service fee and reserve/treasury split |
+| `quoteGenesisCreditRecovery` | Unused credit, recovery residual, caller incentive, and Genesis distribution |
 | `quoteBorrowAndProvideLiquidity` | Combined borrow + LP construction quote |
 
 ## Calldata builders
@@ -85,7 +87,16 @@ returns signed-calldata-ready `Hex`:
 - positions: `buildCreatePositionCall`, `buildClosePositionCall`,
   `buildSetPositionRendererCall`;
 - rewards: `buildCreateAndStakeCall`, `buildStakeCall`, `buildUnstakeCall`,
-  `buildOptIn/OptOutRewardAssetsCall`, `buildClaimRewardsCall`;
+  `buildOptIn/OptOutRewardAssetsCall`, `buildClaimRewardsCall`, plus Genesis
+  registration, activation, launch/permanent accrual, single-token claims,
+  owner-credit claims, `buildClaimAllGenesisLaunchRewardsCall` /
+  `buildClaimAllGenesisLaunchTreasuryRewardsCall`, and
+  `buildClaimAllGenesisRewardsCall` /
+  `buildClaimAllGenesisTreasuryRewardsCall`;
+- Genesis linkage: `buildLinkGenesisCall` and `buildUnlinkGenesisCall`;
+- Genesis credit: `buildOpenGenesisCreditTransaction`,
+  `buildExtendGenesisCreditTransaction`, `buildRepayGenesisCreditCall`, and
+  `buildRecoverGenesisCreditCall`;
 - lending: `buildBorrowCall`, `buildRepayCall`, `buildExtendCall`,
   `buildRecoverCall`, `buildFlashLoanCall`;
 - liquidity: `buildBorrowAndProvideLiquidityCall`,
@@ -113,3 +124,9 @@ returns signed-calldata-ready `Hex`:
 
 `buildTestnetFaucetClaimCall()` builds the claim calldata for the ownerless
 testnet faucet. See [Testnet onboarding](/docs/start/testnet-onboarding).
+
+Genesis batch claims accept caller-supplied token IDs rather than enumerating a
+wallet. The owner batch settles both STATICS and WETH, accepts an empty list for
+prior-owner credits only, and lazily harvests the active launch distributor
+before settlement. Onchain quotes and the deployed ABI remain authoritative;
+the SDK does not make an unreleased PR branch a live deployment.

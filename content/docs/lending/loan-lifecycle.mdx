@@ -4,7 +4,7 @@ slug: lending/loan-lifecycle
 label: Loan lifecycle
 title: Loan lifecycle
 description: Loans carry independent tranches with separate maturities, extension charges, and exact-principal repayment.
-updated: 2026-08-04
+updated: 2026-08-25
 order: 320
 ---
 
@@ -38,6 +38,11 @@ Extension is PositionNFT-authorized. It measures the full inbound vector,
 requires at least the extension quote, and routes the complete measured receipt
 through global non-swap fees. Extension changes the tranche maturity but not its
 principal or collateral.
+
+This percentage-of-principal extension quote applies only to BasketToken loans.
+Genesis secured credit reads a flat native renewal fee at extension execution;
+future fee changes affect only that later renewal. See
+[Genesis secured credit](/docs/genesis/secured-credit).
 
 ```text
 extension quote_i = ceil(storedPrincipal_i * extensionFeeBps / 10000)

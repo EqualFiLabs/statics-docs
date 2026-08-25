@@ -1,0 +1,84 @@
+---
+id: genesis-secured-credit
+slug: genesis/secured-credit
+label: Secured credit
+title: Genesis secured credit
+description: A post-epoch, fixed-term release of isolated Genesis backing with native service fees and permissionless recovery.
+updated: 2026-08-25
+order: 270
+---
+
+Genesis secured credit is a separate facility from BasketToken lending. It is
+available only after the Genesis Epoch and releases a bounded portion of the
+fixed STATICS backing represented by a Genesis NFT. It does not use an oracle,
+price-based liquidation, or a percentage fee over the released principal.
+
+## Opening a facility
+
+The maximum principal is 171,000 STATICS against 180,000 STATICS of gross
+Genesis backing. The owner calls `openGenesisCredit(genesisId, principal)` with
+the exact current native origination service fee from
+`quoteGenesisCredit(principal)`.
+
+The service fee is flat, native, and intentionally unbounded. It is paid for a
+secured-access term, not added to STATICS principal. The governed split is:
+
+```text
+10% -> permanent Genesis ETH reserve backing
+90% -> canonical Statics treasury
+```
+
+The reserve and treasury percentages are configuration, not a promise that a
+future deployment will retain these defaults.
+
+## Lock and beneficial ownership
+
+An active facility makes the Genesis NFT non-transferable, but the borrower
+retains beneficial ownership. The owner may continue normal Genesis activation
+while credit is active, and opening or repaying credit does not reset activation,
+remove rewards, or remove the activation multiplier.
+
+If the Genesis is linked to a PositionNFT, the existing link is respected while
+the facility is active. The lock prevents an owner-changing transfer; it does
+not move registration or erase the PositionNFT's other ledger items.
+
+## Extension
+
+`quoteGenesisCreditExtension(genesisId)` returns the current native extension
+fee and its reserve/treasury split. `extendGenesisCredit(genesisId)` reads that
+fee at execution time and purchases another full service term.
+
+The extension fee is a renewal offer, not a term fixed at origination. A future
+fee or split change affects only a later extension payment. It does not alter a
+term already purchased, repayment, or the recovery grace period. Repayment does
+not refund previously paid service fees.
+
+## Repayment and recovery
+
+Anyone may call `repayGenesisCredit(genesisId)` before recovery executes because
+repayment only reduces risk and benefits the recorded Genesis owner. Repayment
+restores the released backing, clears the facility, preserves Genesis activation
+and rewards, and unlocks the NFT.
+
+After maturity plus the configured recovery grace period, anyone may call
+`recoverGenesisCredit(genesisId)`. Recovery:
+
+1. restores unused credit and the fixed recovery residual;
+2. settles direct Genesis rewards through the recovery boundary;
+3. removes the recovered Genesis weight and PositionNFT boost;
+4. severs only the recovered Genesis/PositionNFT link;
+5. preserves the PositionNFT and unrelated position state;
+6. returns the Genesis NFT to vault inventory; and
+7. pays the configured caller incentive while indexing the remaining residual
+   through the existing Genesis reward books.
+
+The fixed recovery residual is 9,000 STATICS. Its caller share is governed, but
+must leave a positive Genesis-holder distribution so a permissionless recovery
+caller has an incentive without discarding the remaining reward liability.
+
+## SDK and views
+
+The SDK exposes typed builders for `openGenesisCredit`,
+`extendGenesisCredit`, `repayGenesisCredit`, and `recoverGenesisCredit`, plus
+quotes for opening, extending, and recovering. Onchain quotes remain
+authoritative; clients should not cache native fees across transactions.

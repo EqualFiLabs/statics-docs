@@ -4,7 +4,7 @@ slug: glossary
 label: Glossary
 title: Glossary
 description: Plain-language definitions for Statics terms used across the protocol docs.
-updated: 2026-08-05
+updated: 2026-08-25
 order: 25
 ---
 
@@ -29,6 +29,8 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | --- | --- |
 | **PositionNFT (`STXPOS`)** | The shared ERC-721 account on `StaticsDiamond`. It can hold basket deposits, loans, Dollar legs, reward selections, and staked LP positions. Transfer moves the whole economic bundle. |
 | **Self-backed lending / basket credit** | Borrowing a basket's proportional constituent vector against deposited BasketTokens at the basket LTV. No price-oracle liquidation; unpaid debt does not create bad debt on other baskets. |
+| **Genesis NFT** | One of the fixed 5,555 Genesis ERC-721 tokens. After the Genesis Epoch it can be registered for direct rewards, activated for a global STATICS multiplier, linked to a PositionNFT, or used for secured credit. |
+| **Genesis secured credit** | A post-epoch, fixed-term release of bounded STATICS backing represented by a Genesis NFT. It charges flat native origination and extension service fees and uses permissionless, incentivized recovery after maturity plus grace. |
 | **Tranche** | An independent loan slice on a position with its own principal vector and maturity. |
 | **Recovery** | After maturity and grace, anyone may settle an expired tranche, applying the recovery penalty and splitting a bounty with protocol fees. |
 | **Flash composition** | Atomic borrow of a basket's full constituent vector through a typed callback; principal plus fees must return in the same transaction. |
