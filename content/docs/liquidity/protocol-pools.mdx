@@ -1,0 +1,101 @@
+---
+id: protocol-pools
+slug: liquidity/protocol-pools
+label: General protocol pools
+title: Permissionless general protocol pools
+description: Current source lets users register zero-native-fee Statics-hook pools between compatible ERC-20s without granting those markets basket or Dollar privileges.
+updated: 2026-08-27
+order: 415
+---
+
+Current `statics` master recognizes two protocol-pool classes:
+
+- **basket canonical pools**, created atomically with a basket and associated
+  with one constituent; and
+- **general pools**, created independently between any two compatible ERC-20s
+  with no basket association.
+
+Both use the installed Statics hook, zero native Uniswap v4 LP fee, bilateral
+Statics fees, full-range protocol-owned liquidity, and the same optional LP
+reward custody. A normalized PoolId registry lets the hook, liquidity manager,
+and reward system validate either class through one bounded lookup.
+
+:::warning Not deployed at the recorded testnet addresses
+The Robinhood testnet deployment currently exposes the earlier
+governance-created protocol-pool model. Permissionless general pools, creator
+authorization, and the APIs on this page are current source behavior awaiting a
+matching deployment.
+:::
+
+## Creation switch
+
+`poolCreationFee()` is independent from basket and PositionNFT creation fees.
+It is also the permissionless-creation switch:
+
+| Value | Who may call `createPool` |
+| --- | --- |
+| `0` | Diamond owner only, with zero `msg.value` |
+| Positive | Any caller paying the exact amount, forwarded to treasury |
+
+Zero therefore means disabled public creation, not free public creation.
+
+Call `quotePool(params)` before `createPool(params, creatorAuthorization)`. The
+quote returns the sorted PoolKey, PoolId, normalized initial price, bilateral
+fee rate, exact creation fee, and EIP-712 authorization digest. General-pool
+creation selects:
+
+- two distinct non-native compatible ERC-20s;
+- tick spacing from 1 through 32,767;
+- an initial raw-unit B-per-A square-root price;
+- PoolId-local input and output hook fees totaling at most 200 BPS;
+- an immutable creator, unordered nonce, and deadline.
+
+The PoolKey always has native v4 fee zero and the installed Statics hook.
+Different tick spacings create different PoolIds; price or hook-fee changes
+alone do not.
+
+## Creator authorization
+
+The named creator can create directly without a signature. A relayer needs an
+EIP-712 authorization validated for EOAs or ERC-1271 contract wallets. The
+signature binds the PoolId, normalized price, both fee rates, creator, nonce,
+deadline, chain ID, and Diamond address. It does not bind the fee-paying
+relayer, so copying a transaction cannot substitute a different creator or
+market configuration.
+
+Cancel unused signed intents with `invalidatePoolCreationNonce` and inspect
+them with `isPoolCreationNonceUsed`.
+
+## Creation is not liquidity provision
+
+`createPool` registers and initializes the market but does not require an
+initial liquidity seed. A general pool may begin with zero liquidity. Users can
+then create ordinary PositionManager NFTs through the installed manager; fee
+activity can form the pool's first hook-owned permanent-liquidity position.
+
+Registration does **not** make either token basket backing, Dollar collateral,
+or a borrowable asset. Pool price, TWAP, and liquidity are not Statics solvency
+inputs. General pools receive no basket-staker allocation and cannot use the
+basket borrow-to-liquidity paths.
+
+## Fees and creator revenue
+
+Each PoolId has its own input/output hook-fee rate. General pools share the
+global general-pool allocation profile. The creator always receives the fixed
+500-BPS share of collected bilateral fees in each pool currency, claimed
+through `claimCreatorRevenue`. Governance cannot redirect that accrued credit,
+and it remains claimable after decommissioning.
+
+See [Swap-fee hook](/docs/liquidity/swap-fee-hook) for the complete profiles and
+fallback rules.
+
+## Discovery and decommissioning
+
+Index `ProtocolPoolCreated` rather than expecting an unbounded onchain pool
+array. Use `protocolPool`, `isProtocolPool`, `protocolPoolCreator`, and
+`protocolPoolFeeRate` for bounded reads.
+
+Only timelocked governance can call `decommissionGeneralPool`. The irreversible
+transition stops later swaps and managed LP actions, releases permanent
+liquidity to treasury accounting, and preserves user LP principal, creator
+credits, and earned rewards. The pool creator has no administrative authority.

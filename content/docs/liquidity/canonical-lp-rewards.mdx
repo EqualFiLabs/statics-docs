@@ -1,21 +1,21 @@
 ---
 id: canonical-lp-rewards
 slug: liquidity/canonical-lp-rewards
-label: Canonical LP rewards
-title: Canonical LP rewards
-description: Stake eligible full-range PositionManager NFTs to accrue next-block liquidity weight and claim canonical rewards.
-updated: 2026-08-04
+label: Protocol-pool LP rewards
+title: Protocol-pool LP rewards
+description: Stake eligible full-range PositionManager NFTs from either protocol-pool class to accrue next-block liquidity weight and claim hook rewards.
+updated: 2026-08-27
 order: 440
 ---
 
-Users can stake their own full-range PositionManager NFTs for active canonical
-pools into a PositionNFT and earn the hook's canonical-LP fee allocation. This
-is separate from the global Statics staking rail.
+Users can stake their own full-range PositionManager NFTs for active basket
+canonical or general pools into a PositionNFT and earn the hook's LP allocation.
+This is separate from the global Statics staking rail.
 
 ## Staking a v4 NFT
 
 Any unsubscribed, nonzero, full-range PositionManager NFT for an active
-canonical pool may be attached to a PositionNFT and transferred into voluntary
+registered protocol pool may be attached to a PositionNFT and transferred into voluntary
 Diamond custody — but only when the LP NFT and PositionNFT have the **same
 current owner**. PositionNFT authorization or ERC-721 approval alone does not
 substitute for that ownership match.
@@ -41,13 +41,14 @@ decreasing or burning the v4 NFT.
 ## Borrow-to-liquidity
 
 Statics provides two typed convenience paths that combine an ordinary
-position-owned borrow with canonical LP creation.
+position-owned borrow with **basket canonical** LP creation. General pools have
+no basket backing or borrow-to-liquidity path.
 
 `borrowAndProvideLiquidity` performs an ordinary borrow, applies the origination
 fee, mints BasketTokens from retained principal, and creates one **user-owned**
 PositionManager NFT per supplied canonical pool. Those NFTs receive no automatic
 reward eligibility — the recipient may later stake them through the ordinary
-canonical LP reward entrypoint.
+protocol-pool LP reward entrypoint.
 
 `borrowAndStakeLiquidity` is the PositionNFT-owned alternative. It requires
 full-range positions, mints the NFTs directly to the Diamond, and records them as

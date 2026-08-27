@@ -1,0 +1,66 @@
+---
+id: genesis-rewards
+slug: genesis/rewards
+label: Genesis rewards
+title: Genesis launch and permanent rewards
+description: Claim launch and permanent Genesis rewards across STATICS and WETH while preserving separate historical liabilities.
+updated: 2026-08-25
+order: 260
+---
+
+Genesis rewards have two accounting phases. The temporary
+`GenesisLaunchDistributor` records launch-era liabilities; after the governed
+handoff, `StaticsDiamond` records permanent Genesis liabilities. The books and
+custody boundaries remain separate, so handoff does not migrate historical
+balances.
+
+## Lazy accrual
+
+While the launch distributor is active, every Genesis claim entrypoint also
+harvests the authenticated Doppler beneficiary share before settling the claim.
+There is no required keeper transaction between harvesting and claiming.
+
+The permanent integration keeps the same lazy-processing principle for its
+active distributor. Applications should quote and submit a claim against the
+current distributor state rather than assuming rewards are already indexed.
+
+## Owner claims
+
+Single-token and prior-owner paths remain available:
+
+| Call | Purpose |
+| --- | --- |
+| `claimGenesisRewards(genesisId, asset, receiver)` | Claim one reward asset still attributed to the held Genesis token |
+| `claimGenesisOwnerRewards(asset, receiver)` | Claim crystallized credits from Genesis tokens previously transferred away |
+| `claimAllGenesisRewards(genesisIds, receiver)` | Claim both categories for a caller-supplied set of owned Genesis IDs |
+
+`claimAllGenesisRewards` pays both STATICS and WETH and harvests at most once
+for the batch. The caller must own every supplied Genesis ID; the contract does
+not enumerate the caller's wallet. An empty ID array is valid and claims only
+prior-owner credits. Duplicate IDs do not multiply the claim.
+
+## Treasury claims
+
+`claimAllGenesisTreasuryRewards(receiver)` is the two-asset treasury mirror.
+The receiver is explicit, but the claim remains governed by the distributor's
+treasury accounting and cannot withdraw user liabilities.
+
+Every batch updates both reward books before making external transfers and sends
+each reward asset at most once. Single-asset and single-token calls remain for
+wallets that prefer smaller calldata.
+
+## Transfer and recovery boundaries
+
+When a registered Genesis changes owners, rewards attributed through the
+transfer boundary settle to the previous owner's credit book. Registration
+does not need to be repeated by the new owner, while activation resets to Tier
+0. A recovered Genesis follows the same owner-changing settlement boundary;
+recovery also removes its direct weight and any PositionNFT boost before the
+recovery residual is indexed.
+
+Useful events for an indexer include `GenesisRegistered`, `GenesisLinked`,
+`GenesisUnlinked`, `GenesisWeightChanged`, `GenesisRevenueAccrued`,
+`GenesisRewardsClaimed`, `GenesisOwnerRewardsClaimed`, and
+`GenesisTreasuryRewardsClaimed`. A batch can emit multiple per-token claim
+events, so indexers should reconcile their sums against the call return values
+and current reward views.

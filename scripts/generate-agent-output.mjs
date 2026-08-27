@@ -30,6 +30,9 @@ const SMALL_SLUGS = new Set([
   "start/testnet-onboarding",
   "core/architecture",
   "core/position-nft",
+  "genesis/overview",
+  "genesis/rewards",
+  "genesis/secured-credit",
   "reference/integration",
   "reference/robinhood-testnet-deployment",
 ]);

@@ -1,0 +1,100 @@
+---
+id: genesis-overview
+slug: genesis/overview
+label: Operators overview
+title: STATICS Operators and protocol integration
+description: How the fixed STATICS Operators collection moves from vault or treasury vesting into activation, direct rewards, PositionNFT linkage, and permanent protocol integration.
+updated: 2026-08-27
+order: 250
+---
+
+**STATICS Operators** is the public identity of Statics' fixed 5,555-token NFT
+collection. Contracts and APIs retain the `Genesis` vocabulary. The collection
+is a reserve-backed access and reward layer with a lifecycle separate from
+basket creation.
+
+All token IDs exist at construction, but initial custody is split:
+
+| IDs | Count | Initial custodian | Role |
+| --- | ---: | --- | --- |
+| `1..5000` | 5,000 | `StaticsGenesisVault` | Vault inventory available through the acquisition lifecycle |
+| `5001..5555` | 555 | `StaticsTreasuryVesting` | Fully backed protocol allocation released linearly over 60 days |
+
+The 555 vesting-held Operators count as circulating claims from finalization,
+so the Vault receives exactly 99,900,000 STATICS of backing before they become
+active. The remaining 100,100,000-token treasury allocation follows a separate
+Doppler-native 60-day vesting schedule. See [Launch and vesting](/docs/genesis/launch-and-vesting).
+
+:::warning Source-only launch system
+No standalone Operators deployment is recorded in this docs site's public
+Robinhood testnet manifest. The production launch gate remains unratified in
+current source.
+:::
+
+## Acquisition and redemption
+
+During the immutable Genesis Epoch, a vault-owned token can be acquired for the
+configured STATICS price plus the native acquisition fee. After the epoch,
+acquisition also requires the current reserve buy-in. Always call the vault
+quote immediately before submitting a transaction; the quote returns both the
+STATICS amount and the required native value.
+
+`quoteGenesisRedemption` and `redeemGenesis` return the fixed STATICS payout
+and, after the epoch, the token's share of the accounted native reserve. A
+redeemed token returns to vault inventory and may later be acquired again.
+Native reserve accounting uses the vault's accounted `reserveETH`, not its raw
+balance, so forced or accidental ETH is not treated as redeemable reserve.
+
+## Activation and direct rewards
+
+After the governed Genesis integration handoff, an owner registers a Genesis
+token once for the permanent reward interval. Registration follows the token
+across ordinary owner-changing transfers; it is not the same thing as
+activation. A transfer settles the previous owner's attributed rewards and
+resets activation to Tier 0 for the new owner.
+
+Activation increases the Genesis multiplier used by the global STATICS reward
+weight. It does not change raw stake, withdrawable principal, collateral,
+liquidity rewards, or the Genesis token's direct reward weight.
+
+Direct Genesis rewards are a distinct rail from PositionNFT global rewards.
+They use the Genesis reward books and may be paid in STATICS and WETH. See
+[Genesis rewards](/docs/genesis/rewards) for launch/permanent claims and
+lazy accrual.
+
+## Onchain identity
+
+The ERC-721 name is `Statics Operators` and the symbol is `STATOPS`; the
+collection-level onchain metadata presents the brand as **STATICS Operators**.
+Per-token JSON and SVG artwork are generated fully onchain. Token identity does
+not depend on an offchain metadata server.
+
+## PositionNFT linkage
+
+The same owner must hold both NFTs to call `linkGenesis(positionId, genesisId)`;
+ERC-721 approvals do not authorize linking or unlinking. While linked, both NFTs
+are locked against owner-changing transfers. The relationship is an accounting
+link, not a transfer of Genesis registration.
+
+If secured credit is recovered, the protocol severs only the recovered
+Genesis-to-Position relationship and clears its boost. The former owner keeps
+the PositionNFT, raw stake, pending maturity, claims, and unrelated legs. The
+Genesis token returns to vault inventory and can later be acquired through the
+ordinary post-epoch path.
+
+## Integration surfaces
+
+Applications normally discover these addresses from the deployment manifest:
+
+| Surface | Responsibility |
+| --- | --- |
+| `StaticsGenesis` | ERC-721 ownership, metadata, and transfer locks |
+| `StaticsGenesisVault` | Acquisition, redemption, reserve accounting, inventory, and secured-credit lifecycle |
+| `GenesisActivationRegistry` | Activation tiers, multipliers, and transfer reset |
+| `GenesisLaunchDistributor` | Temporary launch fee ingress and launch reward books |
+| `StaticsTreasuryVesting` | Immutable 555-Operator vesting and bootstrap backing handoff |
+| `StaticsDiamond` | Permanent Genesis registration, linkage, rewards, and recovery |
+
+The public deployment manifest must only list these contracts after the
+corresponding deployment is published. Do not combine an unreleased branch ABI
+with an older live testnet address set.

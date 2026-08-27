@@ -4,7 +4,7 @@ slug: rewards/global-rewards
 label: Global rewards
 title: Global multi-asset rewards
 description: Stake STATICS in a position and opt into up to 64 reward assets, with an eligibility delay that blocks capturing historical fees.
-updated: 2026-08-04
+updated: 2026-08-27
 order: 510
 ---
 
@@ -53,10 +53,13 @@ already settled claims.
 
 ## Non-swap fee routing
 
-Most protocol fees — mint and redemption fees, origination fee reclassification,
-extension payments, repayment excess, flash-loan excess, recovery penalties,
-pegged fees, and the global share of volatile-series fees — enter the same
-non-swap ledger. For a fee on asset `a` when `eligibleStake[a] > 0`:
+Most BasketToken and Dollar fees — mint and redemption fees, BasketToken
+origination fee reclassification, BasketToken extension payments, repayment
+excess, flash-loan excess, recovery penalties, pegged fees, and the global share
+of volatile-series fees — enter the same non-swap ledger. Genesis secured-credit
+origination, additional-draw, and extension fees are a separate native-fee rail: they split
+between Genesis reserve backing and treasury and do not become global Position
+staking rewards. For a fee on asset `a` when `eligibleStake[a] > 0`:
 
 ```text
 stakerAmount   = floor(grossFee * 9000 / 10000)   // 90%
@@ -77,3 +80,6 @@ reservation and never reduces basket backing.
 
 Anyone may call `distributeTreasuryFees(asset)`, but the destination is always
 the configured treasury — the caller cannot choose a recipient.
+
+See [Genesis rewards](/docs/genesis/rewards) for the separate direct Genesis
+reward books, launch/permanent handoff, and dual-asset batch claims.

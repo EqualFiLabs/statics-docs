@@ -3,14 +3,21 @@ id: swap-fee-hook
 slug: liquidity/swap-fee-hook
 label: Swap-fee hook
 title: Swap-fee hook
-description: The Statics swap-fee hook charges bilateral input and output fees and allocates them across POL, LPs, baskets, stakers, and treasury.
-updated: 2026-08-04
+description: The Statics swap-fee hook charges bilateral input and output fees and routes them through pool-class allocation profiles plus a fixed creator share.
+updated: 2026-08-27
 order: 420
 ---
 
-`StaticsSwapFeeHook` charges fees on both realized legs of a canonical swap and
-allocates them across five destinations. It is the sole revenue surface for
-canonical pools, which carry zero native v4 LP fee.
+`StaticsSwapFeeHook` charges fees on both realized legs of every registered
+Statics protocol-pool swap. Basket canonical pools and general pools both carry
+zero native v4 LP fee; the hook is their swap-revenue surface.
+
+:::warning Source versus deployment
+This page describes current `statics` master. The recorded Robinhood testnet
+deployment exposes the earlier governed-pool ABI and fee configuration. Do not
+send the selectors below to that deployment until a matching upgrade is
+published.
+:::
 
 ## Bilateral fees
 
@@ -20,39 +27,47 @@ rates and the split, constrained by:
 
 ```text
 f_in + f_out <= 200 BPS            // combined rate cap
-pol + lp + basket + statics + treasury == 10000   // split totals 10000
+configurable shares == 9500 BPS       // creator is fixed at 500 BPS
 ```
 
-## The five-way split
+The fee **rate** is PoolId-local. Allocation is governed through one global
+basket-pool profile and one global general-pool profile.
 
-For each charged leg, the launch split is:
+## Initial six-way allocation
 
-```text Launch allocation
-10%   permanent liquidity        (POL)
-25%   eligible canonical LPs
-25%   deposited BasketTokens     (basket stakers)
-15%   global Statics stakers
-25%   treasury
+The initial source profiles are:
+
+```text
+                        basket pool    general pool
+permanent liquidity     1,000 BPS      3,500 BPS
+eligible protocol LPs   2,500 BPS      2,500 BPS
+basket stakers          2,500 BPS          0 BPS
+global Statics stakers  1,500 BPS      1,500 BPS
+creator, fixed            500 BPS        500 BPS
+treasury                 2,000 BPS      2,000 BPS
+total                   10,000 BPS     10,000 BPS
 ```
 
-Treasury receives all rounding dust. LP, basket-staker, Statics-staker, and
-treasury shares transfer immediately to the Diamond's fee ledger; the
-permanent-liquidity share stays in the hook.
+The creator share is carved out first and is not governance-configurable. Each
+stored profile must total exactly 9,500 BPS so the fixed creator share brings
+the result to 10,000 BPS. Treasury receives split dust. LP, basket-staker,
+Statics-staker, creator, and treasury liabilities are accounted through the
+Diamond; the permanent-liquidity share stays in the hook.
 
 ## Fallbacks to POL
 
 If a pool has no activated staked liquidity, its LP share redirects to permanent
-liquidity. If either basket or Statics staking cannot accept the reward asset,
-that share independently redirects to permanent liquidity too.
+liquidity. If basket staking cannot accept the reward asset, that share also
+redirects to permanent liquidity. If global Statics staking cannot accept it,
+that share redirects to treasury. Creator accrual never falls back.
 
 ```text Unavailable-share routing
 no activated LP          -> LP share added to POL
 basket cannot accept     -> basket-staker share added to POL
-Statics cannot accept    -> Statics-staker share added to POL
+Statics cannot accept    -> Statics-staker share added to treasury
 ```
 
-The same fallbacks apply under both the global configuration and any per-pool
-override.
+General pools encode a zero basket-staker share; they do not enter that fallback.
 
 ## Compounding
 
@@ -62,18 +77,16 @@ remain pending; anyone may call `compoundPermanentLiquidity` later. Fees earned
 by the hook's position are collected back into pending inventory and may be
 compounded again.
 
-## Per-pool overrides
+## Governance controls
 
-The global fee configuration is the default, not an immutable pool policy.
-Timelocked Diamond governance may set a complete seven-field canonical-pool
-override: input rate, output rate, and the five-way POL / canonical-LP /
-basket-staker / Statics-staker / treasury allocation. The two rates must still
-total at most 200 BPS and the five shares must total 10,000 BPS. Clearing an
-override restores the latest global rates and split.
+Timelocked Diamond governance may update one PoolId's input/output rate with
+`setProtocolPoolFeeRate`; the combined rate remains capped at 200 BPS. It may
+update the two global allocation profiles with `setBasketFeeAllocation` and
+`setGeneralFeeAllocation`. There is no per-pool allocation override in current
+source.
 
 :::note
-Overrides change only future charges and allocation. Pending POL is not released
-or reclassified, hook-owned liquidity stays permanent, and existing two-sided
-pending inventory remains eligible for compounding. No threshold, volume,
-liquidity, or oracle rule changes an override automatically.
+Rate and profile changes affect only future charges. They do not rewrite
+accrued creator credits, LP or staker rewards, treasury revenue, or pending POL.
+No threshold, volume, liquidity, or oracle rule changes them automatically.
 :::

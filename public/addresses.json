@@ -3,9 +3,12 @@
   "summary": "Post-launch financial infrastructure: fixed-bundle baskets, Statics Dollar (USDstx), shared PositionNFT, global multi-asset rewards, self-backed lending, constituent flash loans, and canonical Uniswap v4 liquidity with bilateral hook fees. Basket creation is protocol-only while creationFee is zero.",
   "docs": "https://docs.staticsprotocol.com",
   "source": {
-    "branch": "feat/position-portfolio",
-    "commit": "724df0fe80be8e376a5cb61811d02e1ef7413707",
+    "initialBranch": "feat/position-portfolio",
+    "initialProtocolCommit": "724df0fe80be8e376a5cb61811d02e1ef7413707",
     "deploymentToolingCommit": "9baa3a87bf120fdd02340359a2594590394181a8",
+    "currentBranch": "master",
+    "currentProtocolCommit": "aeed216abe9d8d08d589b5a66aba637f9a04822b",
+    "staticsSdkCommit": "135b68b8c404a1f567ae834c2e46e517e5788e28",
     "repository": "https://github.com/EqualFiLabs/statics"
   },
   "network": {
@@ -13,14 +16,14 @@
     "chainId": 46630,
     "explorer": "https://explorer.testnet.chain.robinhood.com",
     "status": "integration-beta",
-    "releaseStartBlock": 97382446
+    "releaseStartBlock": 97382446,
+    "lastUpgradeBlock": 97967966
   },
   "integrationAddress": "0x2340741Ec94dF12678312f564eBc2c776d8FaA6a",
   "contracts": {
     "StaticsDiamond": {
       "address": "0x2340741Ec94dF12678312f564eBc2c776d8FaA6a",
       "alias": "PositionNFT (STXPOS), basket action surface, Dollar gateway, fee receiver",
-      "shape": "22 facets / 200 selectors",
       "abi": "/abi/statics-diamond.json"
     },
     "StaticsDollarCoreDiamond": {
@@ -34,8 +37,8 @@
       "abi": "/abi/swap-fee-hook.json"
     },
     "StaticsLiquidityManager": {
-      "address": "0xbE5A795ae0754D8D36F6EdFD546e55f5E60d6455",
-      "alias": "typed user PositionManager NFT creation",
+      "address": "0x9E8B33ff86e36fe64ba2f1504fF53bE586F4183A",
+      "alias": "post-upgrade typed PositionManager NFT creation",
       "abi": "/abi/liquidity-manager.json"
     },
     "StaticsTimelock": {
@@ -115,7 +118,10 @@
     "WETH": "0x33e4191705c386532ba27cBF171Db86919200B94",
     "UniswapV4PoolManager": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
     "UniswapV4PositionManager": "0x58DaEC3116AAe6D93017BaaEA7749052E8a04fa7",
-    "Permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3"
+    "Permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+    "Quoter": "0x8dc178eFb8111Bb0973Dd9d722eBefF267c98F94",
+    "StateView": "0xF3334192D15450cdD385c8B70E03f9a6Bd9E673B",
+    "UniversalRouter": "0x8876789976DecbFCbBbe364623C63652db8c0904"
   },
   "configuration": {
     "basketCreationFeeWei": "0",
@@ -142,6 +148,7 @@
     "IModularPositionNFT": "0x212b8e93",
     "IPositionOwnerIndex": "0x7ef5913d",
     "IStaticsPositionPortfolio": "0xcc04fb90",
+    "IStaticsProtocolPools": "0xa076af5a",
     "ERC4906": "0x49064906"
   },
   "disclaimer": "Integration beta on Robinhood Chain Testnet. Mock collateral, owner-mintable staking token, faucets, and the two-minute timelock are testnet fixtures, not production defaults."

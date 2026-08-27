@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
-import { TestnetBanner } from "@/components/testnet-banner";
 import { getNavigationGroups, getPageHref } from "@/lib/docs";
 
 export default function NotFound() {
@@ -9,7 +8,6 @@ export default function NotFound() {
 
   return (
     <div className="docs-app">
-      <TestnetBanner />
       <SiteHeader />
 
       <main className="landing nf">

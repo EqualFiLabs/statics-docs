@@ -7,11 +7,13 @@
 // Override the source with SDK_PATH=/path/to/statics/sdk/src/index.ts.
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 
 const ROOT = process.cwd();
-const DEFAULT_SDK = path.join(ROOT, "..", "statics", "statics", "sdk", "src", "index.ts");
-const sdkPath = process.env.SDK_PATH ? path.resolve(process.env.SDK_PATH) : DEFAULT_SDK;
+const sdkPath = process.env.SDK_PATH ? path.resolve(process.env.SDK_PATH) : "";
+const expectedSdkCommit = process.env.SDK_COMMIT ?? "";
 const outDir = path.join(ROOT, "public", "abi");
+const checkOnly = process.argv.includes("--check");
 
 const TARGETS = [
   ["staticsAbi", "statics-diamond.json", "StaticsDiamond — the single integration address"],
@@ -21,8 +23,26 @@ const TARGETS = [
   ["basketTokenAbi", "basket-token.json", "BasketToken (per-basket ERC-20)"],
 ];
 
+if (!sdkPath || !expectedSdkCommit) {
+  console.error("sync-abis: SDK_PATH and SDK_COMMIT are required so deployed and unreleased ABIs cannot be mixed");
+  process.exit(1);
+}
+
 if (!fs.existsSync(sdkPath)) {
   console.error(`sync-abis: SDK source not found at ${sdkPath}`);
+  process.exit(1);
+}
+
+const sdkRoot = path.resolve(path.dirname(sdkPath), "..");
+let actualSdkCommit;
+try {
+  actualSdkCommit = execFileSync("git", ["-C", sdkRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+} catch {
+  console.error(`sync-abis: unable to read the SDK Git revision at ${sdkRoot}`);
+  process.exit(1);
+}
+if (actualSdkCommit !== expectedSdkCommit) {
+  console.error(`sync-abis: SDK commit mismatch: expected ${expectedSdkCommit}, found ${actualSdkCommit}`);
   process.exit(1);
 }
 
@@ -43,21 +63,36 @@ function extractSignatureArray(name) {
   return sigs;
 }
 
-fs.mkdirSync(outDir, { recursive: true });
+if (!checkOnly) fs.mkdirSync(outDir, { recursive: true });
+
+let staleFiles = 0;
+
+function writeOrCheck(filePath, contents) {
+  if (!checkOnly) {
+    fs.writeFileSync(filePath, contents);
+    return;
+  }
+  if (!fs.existsSync(filePath) || fs.readFileSync(filePath, "utf8") !== contents) {
+    console.error(`sync-abis: stale ${path.relative(ROOT, filePath)}`);
+    staleFiles += 1;
+  }
+}
 
 const index = [];
 for (const [exportName, file, label] of TARGETS) {
   const sigs = extractSignatureArray(exportName);
-  fs.writeFileSync(path.join(outDir, file), `${JSON.stringify(sigs, null, 2)}\n`);
+  writeOrCheck(path.join(outDir, file), `${JSON.stringify(sigs, null, 2)}\n`);
   index.push({ abi: exportName, file, label, signatures: sigs.length });
 }
 
-fs.writeFileSync(
+writeOrCheck(
   path.join(outDir, "index.json"),
   `${JSON.stringify(
     {
       format: "viem human-readable ABI (array of signatures)",
-      note: "Fetch the JSON array; each entry is one function/event/error signature.",
+      scope: "Robinhood Chain Testnet deployment",
+      staticsSdkCommit: expectedSdkCommit,
+      note: "Fetch the JSON array; each entry is one function/event/error signature. These ABIs match the recorded deployment, not unreleased master source.",
       abis: index,
     },
     null,
@@ -65,4 +100,13 @@ fs.writeFileSync(
   )}\n`,
 );
 
-console.log(`sync-abis: wrote ${index.length} ABIs to public/abi/`);
+if (checkOnly && staleFiles > 0) {
+  console.error(`sync-abis: ${staleFiles} vendored artifact(s) need regeneration`);
+  process.exit(1);
+}
+
+console.log(
+  checkOnly
+    ? `sync-abis: ${index.length} deployed ABIs match ${expectedSdkCommit}`
+    : `sync-abis: wrote ${index.length} deployed ABIs from ${expectedSdkCommit}`,
+);

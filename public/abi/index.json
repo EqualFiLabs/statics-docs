@@ -1,12 +1,14 @@
 {
   "format": "viem human-readable ABI (array of signatures)",
-  "note": "Fetch the JSON array; each entry is one function/event/error signature.",
+  "scope": "Robinhood Chain Testnet deployment",
+  "staticsSdkCommit": "135b68b8c404a1f567ae834c2e46e517e5788e28",
+  "note": "Fetch the JSON array; each entry is one function/event/error signature. These ABIs match the recorded deployment, not unreleased master source.",
   "abis": [
     {
       "abi": "staticsAbi",
       "file": "statics-diamond.json",
       "label": "StaticsDiamond — the single integration address",
-      "signatures": 197
+      "signatures": 211
     },
     {
       "abi": "staticsSwapFeeHookAbi",
@@ -18,7 +20,7 @@
       "abi": "staticsLiquidityManagerAbi",
       "file": "liquidity-manager.json",
       "label": "StaticsLiquidityManager",
-      "signatures": 10
+      "signatures": 8
     },
     {
       "abi": "staticsTestnetFaucetAbi",

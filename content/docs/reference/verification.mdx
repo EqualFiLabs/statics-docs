@@ -1,0 +1,102 @@
+---
+id: verification
+slug: reference/verification
+label: Verification status
+title: Formal verification and proof boundaries
+description: The machine-checked Genesis launch properties recorded in current source, the engines used, and the external and market assumptions they do not prove.
+updated: 2026-08-27
+order: 755
+---
+
+Current `statics` master contains a dedicated formal-verification suite for the
+standalone Genesis launch and permanent Diamond integration. Halmos is the
+locally reproducible mandatory symbolic gate. Foundry fuzz, invariant, and
+real-flow tests remain executable regressions. Certora is used selectively for
+aggregate or cross-contract accounting properties.
+
+:::note Evidence boundary
+This page summarizes the result ledger recorded in the source repository. The
+docs build checks that the described targets and critical source facts still
+exist, but it does not rerun Halmos, Certora, Slither, or Robinhood forks. A
+specific release should use the `statics` CI run and hosted-prover reports for
+that exact commit as evidence.
+:::
+
+## Mandatory local and CI layer
+
+The source workflow runs `scripts/run-formal.sh all` with Halmos 0.3.3. Its
+targets cover:
+
+| Property family | Primary targets | Recorded result |
+| --- | --- | --- |
+| STATICS backing, token custody, native reserve, epoch pricing, forced ETH | `StaticsGenesisVault` | Pass |
+| Opening, repeated draw/repay, extension, recovery, and fee-split conservation | `StaticsGenesisVault` plus recovery consumer models | Pass |
+| Harvest attribution, donation exclusion, distributor/share handoff | `StaticsFeeReceiver` | Pass |
+| Dual-asset reward conservation, transfer checkpoints, activation settlement | `GenesisLaunchDistributor`, `GenesisActivationRegistry` | Pass |
+| Permanent registration, allocation, recovery, links, and reward multipliers | Genesis integration facets and libraries | Pass |
+| Fixed 5,555 supply and one-time collection bindings | `StaticsGenesis` | Pass |
+| 99.9M bootstrap backing and 555-NFT vesting | `StaticsTreasuryVesting` | Mandatory CI gate |
+| Six curves, 56 nonzero positions, 120M tail, both token orders, residual at most 100 STATICS | Pinned Doppler Multicurve harness | Pass |
+| Launch-hash coverage and zero-hash production block | `DeployStaticsGenesis` | Pass |
+
+The credit suite proves repeated utilization as draw, partial repayment, and
+restored capacity. It does not claim the superseded target-principal adjustment
+model.
+
+## Selective Certora layer
+
+CVL specs live under `certora/specs` with configurations under `certora/conf`.
+The source ledger records hosted passes for:
+
+- full-width post-epoch Vault division and governance preservation;
+- fee-receiver liability bounds and surplus-recovery protection; and
+- distributor asset/share bounds, crystallized accounting, bounded batch
+  conservation, recovery segregation, and surplus preservation.
+
+The treasury-vesting CVL spec is present, but the repository explicitly requires
+a fresh hosted run after the native STATICS vesting implementation. These docs
+therefore do **not** claim that hosted TreasuryVesting configuration as passed.
+Certora is not a repository CI gate because it requires hosted credentials.
+
+### Why ghost ledgers are used
+
+A ghost variable is prover-only state. It observes contract transitions without
+changing deployed bytecode. The specs use ghost ledgers when a contract stores
+individual credits but not the cumulative external total needed to express an
+aggregate invariant—for example, cumulative distributor attribution.
+
+The important constraint is that every ghost update must correspond to a
+modeled production transition. A ghost invariant proves the contract only under
+that dependency model. The distributor's aggregate attribution ghost remains
+staged because secured-credit recovery is a second valid allocation source that
+does not pass through fee-receiver attribution.
+
+## External assumptions
+
+The symbolic proofs state rather than hide their dependency assumptions:
+
+- modeled ERC-20 transfers move the exact requested amount or revert;
+- WETH withdrawal burns WETH and returns the same native amount;
+- pinned Doppler fee collection reports and transfers the modeled amounts;
+- Genesis ownership, approval, safe-transfer, and activation callbacks follow
+  the pinned interfaces; and
+- keccak, runtime-code-hash collision resistance, and EVM correctness are
+  cryptographic or platform assumptions.
+
+Robinhood fork tests separately execute the exact runtime-hash-pinned Doppler,
+Uniswap, and WETH path. That integration evidence tests the assumptions against
+deployed dependencies; it does not formally prove those external systems.
+
+## What is not proved
+
+Formal verification can establish deterministic EVM mechanics: exact supply,
+allocation, ticks, inventory progression, fees, and WETH requirements from a
+specified state. It cannot prove ETH/USD at launch, an Operator's future USD
+value, future market capitalization, trading volume, arbitrage participation,
+or future liquidity. Those belong to a timestamped launch attestation and an
+economic model, not the EVM property ledger.
+
+The repository also states that this revision has not undergone an independent
+third-party security review. Machine-checked properties narrow specific risks;
+they are not a substitute for full review of implementation, dependencies,
+operations, and governance.

@@ -29,11 +29,20 @@ const docsDirectory = path.join(process.cwd(), "content", "docs");
 const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   {
     title: "Start here",
-    pageIds: ["introduction", "rollout", "testnet-onboarding", "glossary"],
+    pageIds: ["introduction", "tokenomics", "rollout", "glossary"],
   },
   {
     title: "Core",
     pageIds: ["architecture", "position-nft", "custody"],
+  },
+  {
+    title: "Genesis",
+    pageIds: [
+      "genesis-overview",
+      "genesis-launch-vesting",
+      "genesis-rewards",
+      "genesis-secured-credit",
+    ],
   },
   {
     title: "Baskets",
@@ -57,6 +66,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
     title: "Liquidity",
     pageIds: [
       "canonical-pools",
+      "protocol-pools",
       "swap-fee-hook",
       "permanent-liquidity",
       "canonical-lp-rewards",
@@ -76,11 +86,11 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   },
   {
     title: "Security",
-    pageIds: ["security-model"],
+    pageIds: ["security-model", "verification"],
   },
   {
     title: "Reference",
-    pageIds: ["robinhood-testnet-deployment"],
+    pageIds: ["robinhood-testnet-deployment", "testnet-onboarding"],
   },
 ];
 

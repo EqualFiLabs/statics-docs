@@ -6,7 +6,7 @@ eyebrow: Protocol docs
 title: Statics Protocol
 description: Statics turns onchain assets into redeemable baskets that connect liquidity, fee generation, self-backed credit, and the Statics Dollar. Built as post-launch financial infrastructure, the protocol begins with curated baskets before expanding creation to approved partners and, ultimately, open participation.
 status: Protocol docs
-updated: 2026-08-05
+updated: 2026-08-27
 order: 10
 ---
 
@@ -47,10 +47,11 @@ Treat live launch compositions as **TBD until finalized**. Statics itself is ass
 
 | You want to… | Start here |
 | --- | --- |
-| Try the live beta | [Testnet onboarding](/docs/start/testnet-onboarding) |
+| Understand STATICS supply and launch allocation | [Tokenomics](/docs/tokenomics) |
 | Understand availability | [Rollout](/docs/rollout) |
 | Hold or trade a basket | [Mint & redemption](/docs/baskets/mint-and-redemption), [Canonical pools](/docs/liquidity/canonical-pools) |
 | Borrow against a basket | [Self-backed lending](/docs/lending/overview) |
+| Use Genesis activation, rewards, or secured credit | [Genesis overview](/docs/genesis/overview) |
 | Use Statics Dollar | [Dollar overview](/docs/dollar/overview) |
 | Earn fee shares | [Global rewards](/docs/rewards/global-rewards), [LP rewards](/docs/liquidity/canonical-lp-rewards) |
 | Integrate contracts | [Integration](/docs/reference/integration) |
@@ -70,22 +71,27 @@ A basket can add:
 - self-backed constituent credit against deposited BasketTokens.
 
 :::note Creator economics
-Creation records a creator address for discovery only. Creators receive **no admin power** after create and **no protocol fee cut** by default. Ongoing fees route to permanent liquidity, eligible LPs, deposited BasketTokens, STATICS stakers, and treasury. Creators benefit by holding, providing liquidity, or staking like any other participant.
+Creation records an immutable creator address. The creator receives **no admin
+power**, but current source assigns that address a fixed **5% of bilateral hook
+fees** from its basket pools. The share is pull-based and remains claimable
+after decommissioning. The permissionless general-pool source uses the same
+fixed creator share. These newer economics are not yet deployed at the recorded
+Robinhood testnet addresses.
 :::
 
 On the current beta, public creation is closed. Partner baskets, if any, are an operational choice while the protocol retains owner-only creation. Details: [Rollout](/docs/rollout) and [Basket creation](/docs/baskets/creation).
 
 ## Fees and permanent liquidity
 
-When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the protocol can charge configured fees. Swap fees on canonical pools are bilateral hook fees. A share of eligible fees can accumulate as protocol-owned inventory and **may** compound into more full-range permanent liquidity when sides match.
+When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the protocol can charge configured fees. Swap fees on Statics protocol pools are bilateral hook fees. A share of eligible fees can accumulate as protocol-owned inventory and **may** compound into more full-range permanent liquidity when sides match.
 
 None of that is automatic depth: seed liquidity bootstraps markets; **activity** determines whether fees and POL grow.
 
-## Staged rollout and current availability
+## Staged rollout and availability
 
 Statics is permissionless by design and staged in deployment:
 
-1. **Now (integration beta)** — protocol-curated/genesis baskets; users trade and use live markets; creation fee is zero (owner-only).
+1. **Integration beta** — protocol-curated/genesis baskets; testnet users trade and use recorded markets; creation fee is zero (owner-only).
 2. **Partner operations** — protocol may create baskets for approved partners while creation remains owner-gated onchain.
 3. **Open creation** — governance sets a positive creation fee so anyone who pays it can create.
 
@@ -93,7 +99,7 @@ See [Rollout](/docs/rollout) for the live matrix. Permissionless basket creation
 
 ## Risks and limitations
 
-- **Beta software** on testnet: addresses and parameters can change; not production-qualified.
+- **Recorded testnet software** is an integration environment: its addresses and parameters can change and are not production defaults.
 - **Token compatibility** is not certified by inclusion in a basket.
 - **No guaranteed** volume, arb profit, reward APY, peg, or liquidity growth.
 - **Self-backed credit** is not oracle-liquidated cross-margin; read lending and recovery rules before borrowing.

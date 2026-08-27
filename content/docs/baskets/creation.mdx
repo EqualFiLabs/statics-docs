@@ -4,7 +4,7 @@ slug: baskets/creation
 label: Creation
 title: Basket creation
 description: How basket creation works onchain, what is enabled now, how partner baskets fit while creation is owner-only, and the technical atomic launch path.
-updated: 2026-08-05
+updated: 2026-08-27
 order: 120
 ---
 
@@ -32,7 +32,11 @@ owner-only.
 The creation fee (when positive) is forwarded immediately, in full, to the
 configured treasury; creation reverts if the exact fee cannot be forwarded.
 Creation records the creator for discovery but gives that address **no
-administrative authority** and **no ongoing protocol fee share**.
+administrative authority**. In current source, the immutable creator receives a
+fixed **500 BPS (5%)** of bilateral hook fees from that basket's canonical
+pools. Accrual is pull-based, cannot be redirected by governance, and survives
+pool decommissioning. This creator allocation is source behavior, not a claim
+about the earlier Robinhood testnet deployment.
 
 ## Approved-partner creation
 
