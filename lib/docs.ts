@@ -86,7 +86,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   },
   {
     title: "Security",
-    pageIds: ["security-model"],
+    pageIds: ["security-model", "verification"],
   },
   {
     title: "Reference",

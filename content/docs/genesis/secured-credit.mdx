@@ -43,6 +43,13 @@ Governance may set `creditIncreasesPaused`. That containment switch blocks new
 facilities and additional draws but does not block repayment, extension, or
 recovery. It cannot retroactively change outstanding principal.
 
+```solidity Current source surface
+drawGenesisCredit(uint256 genesisId, uint256 amount)
+repayGenesisCredit(uint256 genesisId, uint256 amount)
+creditAvailable(uint256 genesisId)
+setCreditIncreasesPaused(bool paused)
+```
+
 ## Lock and beneficial ownership
 
 An active facility makes the Genesis NFT non-transferable, but the borrower

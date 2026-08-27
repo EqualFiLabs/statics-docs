@@ -1,0 +1,56 @@
+name: Docs CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@v4
+
+      - name: Checkout current Statics source
+        uses: actions/checkout@v4
+        with:
+          repository: EqualFiLabs/statics
+          ref: master
+          path: .verification/statics
+
+      - name: Checkout deployment-pinned SDK
+        uses: actions/checkout@v4
+        with:
+          repository: EqualFiLabs/statics-sdk
+          ref: 135b68b8c404a1f567ae834c2e46e517e5788e28
+          path: .verification/statics-sdk
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check deployment ABI provenance
+        env:
+          SDK_PATH: ${{ github.workspace }}/.verification/statics-sdk/src/index.ts
+          SDK_COMMIT: 135b68b8c404a1f567ae834c2e46e517e5788e28
+        run: npm run check:abis
+
+      - name: Check current-source and deployment drift
+        env:
+          STATICS_PATH: ${{ github.workspace }}/.verification/statics
+        run: npm run check:source
+
+      - name: Check links, types, and production build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+        run: npm run verify
