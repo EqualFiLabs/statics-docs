@@ -4,7 +4,7 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 720
 ---
 
@@ -42,6 +42,19 @@ import { /* builders, quotes, ABIs */ } from "@statics-protocol/sdk";
 
 Source, issues, and local build live in that repository (`npm run build`, `npm test`).
 
+## Match the SDK to the target
+
+These docs track two deliberate revisions:
+
+| Target | SDK revision |
+| --- | --- |
+| Recorded Robinhood testnet deployment and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
+| Current `statics` master source | `f4b88bf43a130fbd5fa8aebd2b784da16fa54b6f` |
+
+Pin the deployment revision when submitting transactions to the recorded live
+addresses. Current master includes Operators launch/vesting, redrawable Genesis
+credit, and permissionless general-pool APIs that are not deployed there.
+
 ## Chain bindings
 
 The SDK ships generated per-chain address bindings. The tracked binding is
@@ -55,6 +68,9 @@ rounding helpers so integrators do not re-derive them:
 
 - `BPS`, `SHARE_SCALE` (`1e18`), `MAX_LTV_BPS` (`9500`),
   `LOAN_RECOVERY_GRACE_PERIOD`, `RECOVERY_CALLER_SHARE_BPS` (`2000`);
+- launch allocation: `STATICS_MAX_SUPPLY`, `STATICS_DOPPLER_INVENTORY`,
+  `TREASURY_GENESIS_BACKING`, `TREASURY_STATICS_VESTING_PRINCIPAL`, and the
+  treasury Operator ID range and 60-day duration;
 - v4 fixed-point: `Q96`, `Q128`, `Q192`, `MIN_TICK`, `MAX_TICK`, `MAX_UINT256`;
 - `mulDivDown` / `mulDivUp`;
 - `backingAtSupply`, `selectFeeShares`, `encodeSqrtPriceAssetPerBasketX96`;
@@ -76,6 +92,7 @@ Quotes mirror the onchain quote functions and return the same per-asset legs:
 | `quoteGenesisCredit` / `quoteGenesisCreditExtension` | Current native Genesis service fee and reserve/treasury split |
 | `quoteGenesisCreditRecovery` | Unused credit, recovery residual, caller incentive, and Genesis distribution |
 | `quoteBorrowAndProvideLiquidity` | Combined borrow + LP construction quote |
+| `quoteProtocolPool` | Sorted general-pool key, PoolId, normalized price, fee rate, creation fee, and creator-authorization digest |
 
 ## Calldata builders
 
@@ -95,14 +112,20 @@ returns signed-calldata-ready `Hex`:
   `buildClaimAllGenesisTreasuryRewardsCall`;
 - Genesis linkage: `buildLinkGenesisCall` and `buildUnlinkGenesisCall`;
 - Genesis credit: `buildOpenGenesisCreditTransaction`,
-  `buildExtendGenesisCreditTransaction`, `buildRepayGenesisCreditCall`, and
+  `buildDrawGenesisCreditTransaction`, `buildExtendGenesisCreditTransaction`,
+  amount-bearing `buildRepayGenesisCreditCall`, and
   `buildRecoverGenesisCreditCall`;
+- Genesis treasury vesting: `buildReleaseTreasuryStaticsCall`,
+  `buildReleaseTreasuryGenesisCall`, `buildSweepTreasuryStaticsSurplusCall`,
+  and `buildSetTreasuryWithdrawalRecipientCall`;
 - lending: `buildBorrowCall`, `buildRepayCall`, `buildExtendCall`,
   `buildRecoverCall`, `buildFlashLoanCall`;
 - liquidity: `buildBorrowAndProvideLiquidityCall`,
   `buildBorrowAndStakeLiquidityCall`, `buildStakeLiquidityPositionCall`,
   `buildUnstakeLiquidityPositionCall`, `buildClaimLiquidityRewardsCall`,
-  `buildUnwindBasketLiquidityCall`;
+  `buildUnwindBasketLiquidityCall`, plus general-pool quote, EIP-712 creator
+  authorization, creation, nonce invalidation, fee profile, creator claim, and
+  decommissioning helpers;
 - governance: `buildQuarantineBasketCall`, `buildReleaseBasketQuarantineCall`,
   `buildDecommissionBasketCall`, fee configuration setters;
 - dollar: `buildDepositETHTransaction`, `buildDepositWETHCall`,

@@ -4,7 +4,7 @@ slug: core/position-nft
 label: PositionNFT
 title: Shared PositionNFT
 description: One transferable ERC-721 position owns every Dollar leg, basket collateral, loan, reward selection, staked liquidity position, and optional Genesis link.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 30
 ---
 
@@ -121,6 +121,6 @@ artwork in facets or protocol storage.
 | --- | --- | --- | --- |
 | Basket position rewards | Deposited BasketTokens in one basket | Immediate on deposit | Leg waits until the block after its latest deposit; locked loan collateral stays eligible |
 | Global Statics rewards | Configured stake selected into one reward asset | Stake, new selections, and top-ups mature at an hourly boundary 24–25 hours later | Stake always withdrawable; withdrawal consumes pending before eligible |
-| Canonical LP rewards | Full-range liquidity in a custodied v4 NFT | Initial and increased deltas activate next block | NFT can leave immediately in any lifecycle state; claims stay attached |
+| Protocol-pool LP rewards | Full-range basket-canonical or general-pool liquidity in a custodied v4 NFT | Initial and increased deltas activate next block | NFT can leave immediately in any lifecycle state; claims stay attached |
 | Dollar Risk liquidity | Supplied series Risk Shares | Staking makes shares immediately consumable | Unconsumed effective shares remain withdrawable |
 | Genesis boost | Activation multiplier on a linked Genesis NFT | Link and activation state determine effective global STATICS weight | Credit recovery clears only the Genesis boost and link; the PositionNFT and unrelated legs remain |

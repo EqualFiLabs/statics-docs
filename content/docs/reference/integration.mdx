@@ -4,7 +4,7 @@ slug: reference/integration
 label: Integration
 title: Integration guide
 description: The single StaticsDiamond address, the approvals and interfaces to call, and the common flows with their failure conditions.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 710
 ---
 
@@ -99,14 +99,22 @@ flashLender.flashLoan(basketId, shares, address(receiver), routeData);
 
 ## Integrate Genesis
 
-Genesis has a standalone NFT/vault lifecycle and a permanent integration at
+Genesis is the contract/API name for the **STATICS Operators** collection. It
+has a standalone NFT/vault lifecycle and a permanent integration at
 `StaticsDiamond`. Applications should discover the `StaticsGenesis`,
 `StaticsGenesisVault`, `GenesisActivationRegistry`, and
 `GenesisLaunchDistributor` addresses from the matching deployment manifest,
 then use `StaticsDiamond` for permanent registration, linkage, rewards, and
 the Genesis integration boundary. Use `StaticsGenesisVault` for opening,
-extending, repaying, and recovering secured credit; recovery invokes the
+drawing, extending, partially or fully repaying, and recovering secured credit;
+recovery invokes the
 permanent integration boundary as part of settlement.
+
+Current source creates IDs `1..5000` in Vault custody and IDs `5001..5555` in
+`StaticsTreasuryVesting`. The latter 555 claims are backed by 99.9M STATICS at
+finalization and vest separately from the Doppler-native 100.1M treasury token
+schedule. The recorded Robinhood testnet deployment does not include these
+standalone launch contracts.
 
 After `genesisIntegrationReady()` is true, an owner can call
 `registerGenesis(genesisId)` once. Registration follows ordinary owner-changing
@@ -132,11 +140,28 @@ once.
 
 For the separate secured-credit flow, use `quoteGenesisCredit`,
 `quoteGenesisCreditExtension`, and `quoteGenesisCreditRecovery` immediately
-before `openGenesisCredit`, `extendGenesisCredit`, or
-`recoverGenesisCredit`. Origination and extension fees are flat native service
-fees; the current governed split sends 10% to permanent Genesis reserve backing
-and 90% to treasury. See [Genesis secured credit](/docs/genesis/secured-credit)
-for lock, repayment, and recovery semantics.
+before the corresponding action. `openGenesisCredit(genesisId, principal)`
+starts a facility; `drawGenesisCredit(genesisId, amount)` reuses unexpired
+capacity; and `repayGenesisCredit(genesisId, amount)` accepts partial or full
+repayment from any payer. Origination and draw calls pay the current flat native
+origination service fee; extension pays its separate flat fee. The initial
+source split sends 10% to permanent Genesis reserve backing and 90% to treasury.
+See [Genesis secured credit](/docs/genesis/secured-credit) for lock, pause,
+repayment, and recovery semantics.
+
+## Create and discover general pools
+
+Current source supports permissionless general pools, but the recorded testnet
+deployment exposes the earlier governed-pool version. Against a matching future
+deployment, call `quotePool(params)` immediately before
+`createPool(params, creatorAuthorization)`. The quote provides the sorted
+PoolKey, PoolId, normalized price, exact creation fee, and EIP-712 digest.
+
+Index `ProtocolPoolCreated`; do not expect an unbounded pool array. Resolve a
+known PoolId with `protocolPool`, `isProtocolPool`, `protocolPoolCreator`, and
+`protocolPoolFeeRate`. Pool creators claim the fixed 5% bilateral-fee credit
+with `claimCreatorRevenue(asset, receiver, minReceived)`. See
+[General protocol pools](/docs/liquidity/protocol-pools).
 
 ## Canonical interfaces
 
@@ -145,6 +170,7 @@ for lock, repayment, and recovery semantics.
 | Baskets | `IStaticsBasket`, `IStaticsBasketAdmin`, `IStaticsBasketCollateral`, `IStaticsBasketRewards` |
 | Global staking and rewards | `IStaticsGlobalRewards` |
 | Genesis NFT and vault | `IStaticsGenesis`, `IStaticsGenesisVault`, `IERC5192` |
+| Genesis treasury vesting | `IStaticsTreasuryVesting` |
 | Genesis activation and launch rewards | `IGenesisActivationRegistry`, `IGenesisLaunchDistributor` |
 | Permanent Genesis integration | `IStaticsGenesisIntegration` |
 | Lending | `IStaticsLending` |
@@ -152,6 +178,7 @@ for lock, repayment, and recovery semantics.
 | PositionNFT | `IStaticsPosition`, ERC-721, `IStaticsPositionMetadata`, `IPositionOwnerIndex` |
 | Governance / custody | `IStaticsGovernance`, `IStaticsCustody` |
 | Liquidity | `IStaticsBasketLiquidity`, `IStaticsLiquidityRewards`, `IStaticsBorrowLiquidity` |
+| General pools and creator revenue | `IStaticsProtocolPools`, `IStaticsProtocolRevenue` |
 | Hook / manager | `IStaticsSwapFeeHook`, `IStaticsLiquidityManager` |
 | Dollar | `IStaticsDollarGateway`, `IStaticsDollarRiskLiquidity`, `IStaticsDollarRiskIncentives`, `IStaticsDollarCore` |
 

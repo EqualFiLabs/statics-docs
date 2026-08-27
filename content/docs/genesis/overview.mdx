@@ -1,17 +1,35 @@
 ---
 id: genesis-overview
 slug: genesis/overview
-label: Genesis overview
-title: Genesis NFTs and protocol integration
-description: How the fixed Genesis collection moves from vault inventory into activation, direct rewards, PositionNFT linkage, and permanent protocol integration.
-updated: 2026-08-25
+label: Operators overview
+title: STATICS Operators and protocol integration
+description: How the fixed STATICS Operators collection moves from vault or treasury vesting into activation, direct rewards, PositionNFT linkage, and permanent protocol integration.
+updated: 2026-08-27
 order: 250
 ---
 
-Genesis is Statics' fixed-supply NFT and reserve-backed access layer. It is a
-separate lifecycle from basket creation: all 5,555 Genesis NFTs exist at
-deployment, and the Genesis Vault controls which tokens are available for
-acquisition or redemption.
+**STATICS Operators** is the public identity of Statics' fixed 5,555-token NFT
+collection. Contracts and APIs retain the `Genesis` vocabulary. The collection
+is a reserve-backed access and reward layer with a lifecycle separate from
+basket creation.
+
+All token IDs exist at construction, but initial custody is split:
+
+| IDs | Count | Initial custodian | Role |
+| --- | ---: | --- | --- |
+| `1..5000` | 5,000 | `StaticsGenesisVault` | Vault inventory available through the acquisition lifecycle |
+| `5001..5555` | 555 | `StaticsTreasuryVesting` | Fully backed protocol allocation released linearly over 60 days |
+
+The 555 vesting-held Operators count as circulating claims from finalization,
+so the Vault receives exactly 99,900,000 STATICS of backing before they become
+active. The remaining 100,100,000-token treasury allocation follows a separate
+Doppler-native 60-day vesting schedule. See [Launch and vesting](/docs/genesis/launch-and-vesting).
+
+:::warning Source-only launch system
+No standalone Operators deployment is recorded in this docs site's public
+Robinhood testnet manifest. The production launch gate remains unratified in
+current source.
+:::
 
 ## Acquisition and redemption
 
@@ -44,6 +62,13 @@ They use the Genesis reward books and may be paid in STATICS and WETH. See
 [Genesis rewards](/docs/genesis/rewards) for launch/permanent claims and
 lazy accrual.
 
+## Onchain identity
+
+The ERC-721 name is `Statics Operators` and the symbol is `STATOPS`; the
+collection-level onchain metadata presents the brand as **STATICS Operators**.
+Per-token JSON and SVG artwork are generated fully onchain. Token identity does
+not depend on an offchain metadata server.
+
 ## PositionNFT linkage
 
 The same owner must hold both NFTs to call `linkGenesis(positionId, genesisId)`;
@@ -67,6 +92,7 @@ Applications normally discover these addresses from the deployment manifest:
 | `StaticsGenesisVault` | Acquisition, redemption, reserve accounting, inventory, and secured-credit lifecycle |
 | `GenesisActivationRegistry` | Activation tiers, multipliers, and transfer reset |
 | `GenesisLaunchDistributor` | Temporary launch fee ingress and launch reward books |
+| `StaticsTreasuryVesting` | Immutable 555-Operator vesting and bootstrap backing handoff |
 | `StaticsDiamond` | Permanent Genesis registration, linkage, rewards, and recovery |
 
 The public deployment manifest must only list these contracts after the

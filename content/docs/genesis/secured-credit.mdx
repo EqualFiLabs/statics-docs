@@ -3,8 +3,8 @@ id: genesis-secured-credit
 slug: genesis/secured-credit
 label: Secured credit
 title: Genesis secured credit
-description: A post-epoch, fixed-term release of isolated Genesis backing with native service fees and permissionless recovery.
-updated: 2026-08-25
+description: A post-epoch, redrawable fixed-term release of isolated Operator backing with partial repayment, native service fees, and permissionless recovery.
+updated: 2026-08-27
 order: 270
 ---
 
@@ -16,7 +16,7 @@ price-based liquidation, or a percentage fee over the released principal.
 ## Opening a facility
 
 The maximum principal is 171,000 STATICS against 180,000 STATICS of gross
-Genesis backing. The owner calls `openGenesisCredit(genesisId, principal)` with
+Operator backing. The owner calls `openGenesisCredit(genesisId, principal)` with
 the exact current native origination service fee from
 `quoteGenesisCredit(principal)`.
 
@@ -30,6 +30,18 @@ secured-access term, not added to STATICS principal. The governed split is:
 
 The reserve and treasury percentages are configuration, not a promise that a
 future deployment will retain these defaults.
+
+## Draws and reusable capacity
+
+An active, unexpired facility may draw additional principal with
+`drawGenesisCredit(genesisId, amount)` up to the 171,000-STATICS limit and the
+Vault's currently available backing. Each draw pays the current origination
+service fee and does not reset maturity. Read `creditAvailable(genesisId)` and a
+fresh `quoteGenesisCredit(amount)` before submission.
+
+Governance may set `creditIncreasesPaused`. That containment switch blocks new
+facilities and additional draws but does not block repayment, extension, or
+recovery. It cannot retroactively change outstanding principal.
 
 ## Lock and beneficial ownership
 
@@ -55,10 +67,13 @@ not refund previously paid service fees.
 
 ## Repayment and recovery
 
-Anyone may call `repayGenesisCredit(genesisId)` before recovery executes because
-repayment only reduces risk and benefits the recorded Genesis owner. Repayment
-restores the released backing, clears the facility, preserves Genesis activation
-and rewards, and unlocks the NFT.
+Anyone may call `repayGenesisCredit(genesisId, amount)` before recovery executes
+because repayment only reduces risk and benefits the recorded Operator owner.
+Repayment may be partial or complete. A partial payment restores the same amount
+of Vault backing, reduces outstanding principal, and makes that capacity
+available for a later owner draw while the facility remains active and
+unexpired. Full repayment clears the facility and unlocks the NFT. Neither path
+resets activation or rewards.
 
 After maturity plus the configured recovery grace period, anyone may call
 `recoverGenesisCredit(genesisId)`. Recovery:
@@ -78,7 +93,7 @@ caller has an incentive without discarding the remaining reward liability.
 
 ## SDK and views
 
-The SDK exposes typed builders for `openGenesisCredit`,
-`extendGenesisCredit`, `repayGenesisCredit`, and `recoverGenesisCredit`, plus
-quotes for opening, extending, and recovering. Onchain quotes remain
-authoritative; clients should not cache native fees across transactions.
+The SDK exposes typed builders for `openGenesisCredit`, `drawGenesisCredit`,
+`extendGenesisCredit`, amount-bearing `repayGenesisCredit`, and
+`recoverGenesisCredit`, plus the credit and availability views. Onchain quotes
+remain authoritative; clients should not cache native fees across transactions.

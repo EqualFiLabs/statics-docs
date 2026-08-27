@@ -3,21 +3,24 @@ id: rollout
 slug: rollout
 label: Rollout
 title: Rollout and availability
-description: What Statics exposes today on testnet, who can create baskets, what comes next, and which outcomes stay conditional on real activity.
+description: What Statics exposes on the recorded testnet deployment, what exists only in current source, and which outcomes stay conditional on real activity.
 status: Protocol docs
-updated: 2026-08-05
+updated: 2026-08-27
 order: 15
 badge: Now
 ---
 
-Statics is permissionless by design and staged in deployment. The contracts implement the full product surface; public access opens in steps as operational confidence grows.
+Statics is permissionless by design and staged in deployment. Current `master`
+has moved beyond the recorded Robinhood testnet bytecode, so source availability
+and deployment availability must be tracked separately.
 
-Use this page to separate three clocks:
+Use this page to separate four clocks:
 
 | Clock | Meaning |
 | --- | --- |
-| **Implemented** | Present in the deployed contract surface |
-| **Enabled now** | Open to ordinary users on the current deployment |
+| **Source** | Present in current `statics` master and its fresh-deployment tests |
+| **Deployed** | Present in the recorded Robinhood testnet bytecode |
+| **Enabled** | Open to ordinary users under current onchain parameters |
 | **Conditional** | Possible when real activity, pricing, and risk conditions allow — never guaranteed |
 
 ## Current phase
@@ -30,6 +33,9 @@ Use this page to separate three clocks:
 | Basket creation | **Protocol-only** (`creationFee = 0` → owner-only genesis) |
 | Live basket example | Genesis **TPA1** (tokenized-stock fixtures: TSLA, PLTR, AMD) |
 | Diamonds | Pre-release and upgradeable under timelock |
+| Governed protocol pools | Deployed by timelock upgrade at block `97967966` |
+| Permissionless general pools | Current source only; **not deployed** at the recorded addresses |
+| Standalone STATICS Operators launch | Current source only; production hash remains zero |
 
 :::warning Not production
 Do not treat testnet fixtures, mock USDG, owner-mintable STATICS, or the short timelock delay as production defaults. See the [deployment snapshot](/docs/reference/robinhood-testnet-deployment) and [security model](/docs/reference/security-model).
@@ -45,9 +51,11 @@ On the integration beta, ordinary users can:
 - swap on TPA1's canonical Uniswap v4 pools;
 - deposit basket tokens, borrow self-backed constituent credit, repay, extend, and recover;
 - mint pegged `USDstx` against the active Mock USDG profile;
-- stake eligible canonical LP positions where configured.
+- stake eligible protocol-pool LP positions where configured.
 
 Ordinary users **cannot** create new baskets while the creation fee is zero.
+They also cannot use the current-source permissionless general-pool or Operators
+launch APIs against the recorded deployment.
 
 ## Who can create baskets
 
@@ -78,18 +86,28 @@ Open (fee-gated) creation is a **parameter change** (`setCreationFee` under gove
 
 No calendar date is committed in these docs. Creation is open only once governance has actually raised the creation fee above zero — that onchain value is the authoritative signal.
 
-## Implemented but not publicly enabled
+## Source and deployment matrix
 
-These surfaces are in the contracts and may already be usable against **existing** baskets, but are easy to misread as fully public product access:
+This matrix prevents current source from being mistaken for the recorded live
+deployment:
 
-| Surface | Notes |
-| --- | --- |
-| Permissionless basket creation | Implemented; **disabled** while `creationFee = 0` |
-| Full creator configuration surface | Available to the creating caller when creation is allowed |
-| Flash arbitrage receiver | Optional helper for one overpriced path — no profit guarantee |
-| Permanent liquidity compounding | Permissionless compound of matched inventory; depth depends on activity |
-| Dollar volatile profiles / risk recovery | Implemented; check which profiles are active on the deployment |
-| Production immutability | Final cut that removes diamond-cut authority is a later release ceremony |
+| Surface | Source | Recorded testnet |
+| --- | --- | --- |
+| Permissionless basket creation | Implemented | **Disabled** while `creationFee = 0` |
+| Governed protocol pools | Superseded by normalized basket/general registry | Deployed; governance-created only |
+| Permissionless general pools | Implemented with independent fee switch and creator authorization | Not deployed |
+| Fixed 5% protocol-pool creator share | Implemented | Not deployed in the current-source form |
+| STATICS Operators standalone launch | Implemented and verification-gated | Not deployed; production hash is zero |
+| Redrawable Operator secured credit | Implemented | Not deployed |
+| Flash arbitrage receiver | Implemented; no profit guarantee | Available for compatible live baskets |
+| Permanent liquidity compounding | Permissionless; depth depends on activity | Available for registered live pools |
+| Dollar volatile profiles / risk recovery | Implemented | Check which profiles are active |
+| Production immutability | Later release ceremony | Not completed |
+
+The source-only Operators launch fixes supply and custody at 1B STATICS, 800M
+Doppler inventory, 100.1M native treasury vesting, 99.9M backing for the 555
+treasury-vesting Operators, and 5,000 Vault-owned Operators. These are
+deterministic source facts, not a live-deployment or market-valuation claim.
 
 ## Outcomes are conditional
 

@@ -4,7 +4,7 @@ slug: glossary
 label: Glossary
 title: Glossary
 description: Plain-language definitions for Statics terms used across the protocol docs.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 25
 ---
 
@@ -20,8 +20,10 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Bundle amount** | How many units of a constituent back one full BasketToken (scaled to 18 decimals in accounting). |
 | **Genesis basket** | A basket created by the Diamond owner while public creation is closed (`creationFee = 0`). |
 | **Canonical pool** | The single Uniswap v4 BasketToken/constituent pool registered for each constituent at basket creation. |
-| **Permanent liquidity / POL** | Hook-owned full-range liquidity seeded at creation and compounded from matched fee inventory. No ordinary withdrawal until ExitOnly unwind. |
-| **Bilateral hook fee** | Swap fee charged on both input and output by `StaticsSwapFeeHook`, separate from Uniswap's native LP fee (canonical pools use zero native fee). |
+| **General pool** | A Statics-hook Uniswap v4 pool between compatible ERC-20s with no basket association. Current source supports permissionless creation; the recorded testnet deployment does not. |
+| **Protocol pool** | A normalized registered market: either one basket canonical pool or one general pool. |
+| **Permanent liquidity / POL** | Hook-owned full-range liquidity seeded at basket creation or compounded from matched fee inventory. No ordinary withdrawal while the pool is active. |
+| **Bilateral hook fee** | Swap fee charged on both input and output by `StaticsSwapFeeHook`, separate from Uniswap's native LP fee (all Statics protocol pools use zero native fee). |
 
 ## Accounts and credit
 
@@ -29,8 +31,8 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | --- | --- |
 | **PositionNFT (`STXPOS`)** | The shared ERC-721 account on `StaticsDiamond`. It can hold basket deposits, loans, Dollar legs, reward selections, and staked LP positions. Transfer moves the whole economic bundle. |
 | **Self-backed lending / basket credit** | Borrowing a basket's proportional constituent vector against deposited BasketTokens at the basket LTV. No price-oracle liquidation; unpaid debt does not create bad debt on other baskets. |
-| **Genesis NFT** | One of the fixed 5,555 Genesis ERC-721 tokens. After the Genesis Epoch it can be registered for direct rewards, activated for a global STATICS multiplier, linked to a PositionNFT, or used for secured credit. |
-| **Genesis secured credit** | A post-epoch, fixed-term release of bounded STATICS backing represented by a Genesis NFT. It charges flat native origination and extension service fees and uses permissionless, incentivized recovery after maturity plus grace. |
+| **STATICS Operator / Genesis NFT** | One of the fixed 5,555 `STATOPS` ERC-721 tokens. “Operator” is the public collection identity; contracts retain the Genesis name. It can be acquired or redeemed through the Vault and later registered, activated, linked, or used for secured credit. |
+| **Genesis secured credit** | A post-epoch, fixed-term release of bounded STATICS backing represented by an Operator. It supports additional draws and partial repayment, charges flat native origination/draw and extension service fees, and uses permissionless recovery after maturity plus grace. |
 | **Tranche** | An independent loan slice on a position with its own principal vector and maturity. |
 | **Recovery** | After maturity and grace, anyone may settle an expired tranche, applying the recovery penalty and splitting a bounty with protocol fees. |
 | **Flash composition** | Atomic borrow of a basket's full constituent vector through a typed callback; principal plus fees must return in the same transaction. |
@@ -63,7 +65,7 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | --- | --- |
 | **STATICS** | The configured staking token used for global multi-asset reward eligibility (testnet uses an owner-mintable fixture). |
 | **Global rewards** | Fee shares claimable by positions that stake STATICS and opt into selected reward assets after the eligibility delay. |
-| **Canonical LP rewards** | Separate rewards for staking eligible full-range PositionManager NFTs on active Statics pools. |
+| **Protocol-pool LP rewards** | Separate rewards for staking eligible full-range PositionManager NFTs on active basket canonical or general pools. |
 
 ## Reading tip
 

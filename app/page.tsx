@@ -22,7 +22,7 @@ const capabilities = [
   },
   {
     title: "Permanent protocol liquidity",
-    body: "Seeded full-range POL can compound from matched fee inventory. Growth depends on activity; there is no ordinary withdraw until ExitOnly.",
+    body: "Full-range POL can compound from matched fee inventory. Growth depends on activity; there is no ordinary withdrawal while a pool is active.",
     href: "/docs/liquidity/permanent-liquidity",
   },
   {
@@ -37,12 +37,12 @@ const capabilities = [
   },
   {
     title: "Shared PositionNFT",
-    body: "One transferable ERC-721 account for deposits, loans, Dollar legs, reward selections, and staked canonical LP positions.",
+    body: "One transferable ERC-721 account for deposits, loans, Dollar legs, reward selections, and staked protocol-pool LP positions.",
     href: "/docs/core/position-nft",
   },
   {
     title: "Fee participation",
-    body: "Routed swap and non-swap fees can accrue to deposited baskets, eligible LPs, STATICS stakers, POL, and treasury when activity occurs.",
+    body: "Routed swap and non-swap fees can accrue to creators, deposited baskets, eligible LPs, STATICS stakers, POL, and treasury when activity occurs.",
     href: "/docs/rewards/global-rewards",
   },
   {
@@ -69,7 +69,7 @@ const personas = [
   },
   {
     title: "Token projects & partners",
-    body: "After launching elsewhere, inventory or treasury capital can seed a Statics basket when creation access allows. Creators get discovery attribution, not admin rights or a fee cut.",
+    body: "After launching elsewhere, inventory or treasury capital can seed a Statics basket when creation access allows. Current source gives the immutable creator a fixed 5% hook-fee share but no admin rights.",
     links: [
       { label: "How Statics helps tokens", href: "/docs/introduction#already-launched-tokens" },
       { label: "Basket creation policy", href: "/docs/baskets/creation" },

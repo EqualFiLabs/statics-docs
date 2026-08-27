@@ -4,7 +4,7 @@ slug: reference/security-model
 label: Security model
 title: Security model
 description: Authority, custody, and liveness assumptions for the Statics protocol.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 750
 ---
 
@@ -25,6 +25,11 @@ about the chain (liveness).
   timelocked upgradeability can change protocol behavior after delay.
 - Reward-asset selection is a PositionNFT owner action and requires no governance
   admission.
+- Current source uses a separate `poolCreationFee()` switch for general pools.
+  Zero is owner-only; a positive exact fee opens creation. Creators receive the
+  fixed fee share but no decommissioning or configuration authority.
+- The standalone Robinhood launch remains fail-closed while
+  `APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH == bytes32(0)`.
 
 ## Custody
 
@@ -40,10 +45,15 @@ about the chain (liveness).
   requires the same actual owner on both NFTs; ERC-721 approvals do not bypass
   the owner check.
 - Genesis secured credit is post-epoch, fixed-term, and bounded by the Genesis
-  backing. Its extension fee is read at execution time, and its recovery path
-  settles reward books, clears only the recovered Genesis boost/link, preserves
-  the PositionNFT's unrelated ledger state, and returns the NFT to vault
-  inventory.
+  backing. Additional draws and new facilities can be paused independently;
+  repayment remains permissionless and may be partial. Draws cannot exceed
+  restored capacity or available Vault backing. Recovery settles reward books,
+  clears only the recovered Genesis boost/link, preserves the PositionNFT's
+  unrelated ledger state, and returns the NFT to vault inventory.
+- Initial Operator custody is split between 5,000 Vault IDs and 555 fully backed
+  treasury-vesting IDs. The immutable vesting contract can release only IDs
+  5001 through 5555 under the 60-day schedule; recipient administration cannot
+  change timing, principal, or asset type.
 - Dollar Core collateral remains outside Diamond custody reservations — only fees
   explicitly transferred to the periphery enter shared reservations.
 
@@ -53,10 +63,13 @@ about the chain (liveness).
   governance parameters. A misconfigured or manipulated feed impairs or halts a
   profile; impairment latches exits until 48 continuous healthy hours are
   checkpointed.
-- Canonical liquidity inherits Uniswap v4, immutable-dependency,
+- Protocol-pool liquidity inherits Uniswap v4, immutable-dependency,
   price-manipulation, inventory, and impermanent-loss risk.
 - Hook-owned permanent liquidity is intentionally non-withdrawable while its pool
   remains active.
+- General-pool registration does not admit either currency as basket backing,
+  Dollar collateral, or a borrowable asset. Its spot price and liquidity are not
+  protocol solvency inputs.
 - No keeper runs automatically. Claims, LP activation, recovery, compounding,
   treasury distribution, and ExitOnly unwind depend on users, integrators, or
   externally motivated keepers.

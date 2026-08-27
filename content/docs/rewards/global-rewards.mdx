@@ -4,7 +4,7 @@ slug: rewards/global-rewards
 label: Global rewards
 title: Global multi-asset rewards
 description: Stake STATICS in a position and opt into up to 64 reward assets, with an eligibility delay that blocks capturing historical fees.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 510
 ---
 
@@ -57,7 +57,7 @@ Most BasketToken and Dollar fees — mint and redemption fees, BasketToken
 origination fee reclassification, BasketToken extension payments, repayment
 excess, flash-loan excess, recovery penalties, pegged fees, and the global share
 of volatile-series fees — enter the same non-swap ledger. Genesis secured-credit
-origination and extension fees are a separate native-fee rail: they split
+origination, additional-draw, and extension fees are a separate native-fee rail: they split
 between Genesis reserve backing and treasury and do not become global Position
 staking rewards. For a fee on asset `a` when `eligibleStake[a] > 0`:
 

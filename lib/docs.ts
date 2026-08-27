@@ -37,7 +37,12 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   },
   {
     title: "Genesis",
-    pageIds: ["genesis-overview", "genesis-rewards", "genesis-secured-credit"],
+    pageIds: [
+      "genesis-overview",
+      "genesis-launch-vesting",
+      "genesis-rewards",
+      "genesis-secured-credit",
+    ],
   },
   {
     title: "Baskets",

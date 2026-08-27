@@ -4,7 +4,7 @@ slug: reference/indexing
 label: Indexing
 title: Indexing
 description: Events and read models for building reorg-safe indexers over Statics state.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 730
 ---
 
@@ -16,7 +16,7 @@ authoritative views as truth.
 
 Each module emits events for its value-moving actions: basket creation, mint and
 redemption, collateral deposit and withdrawal, lending borrow/extend/repay/
-recovery, flash loans, global stake and reward opt-in/out, canonical LP stake/
+recovery, flash loans, global stake and reward opt-in/out, protocol-pool LP stake/
 unstake, dollar mint/recombine/pegged mint/redeem, Risk liquidity and incentive
 funding, governance lifecycle transitions, and swap-fee hook settlement.
 
@@ -36,6 +36,9 @@ deployed facet bytecode; do not hand-encode them.
 | Dollar series | `(profileId, seriesId)` | series state, Risk liquidity, incentive reserves |
 | Custody | `token` | `globalReservedByToken`, per-account reservations |
 | Genesis | `(chainId, StaticsGenesis, genesisId)` | ownership/lock state, registration, activation, direct reward views, and `genesisOwnerClaimable` |
+| Protocol pool | `(chainId, StaticsDiamond, poolId)` | `protocolPool`, creator, PoolId-local fee rate, class allocation, hook POL, and v4 state |
+| Creator credit | `(chainId, StaticsDiamond, creator, asset)` | creator revenue accrual/claim events and current credit views |
+| Treasury vesting | `(chainId, vesting contract)` | native token schedule, released Operator range, recipient, and releasable amounts |
 
 The PositionNFT owner index (`positionCount`, `positionsOfOwner`) lets an indexer
 enumerate a wallet's current positions without scanning every transfer event;
@@ -68,7 +71,8 @@ reflect state only after the confirming event is finalized.
 Index `GenesisRegistered`, `GenesisLinked`, `GenesisUnlinked`,
 `GenesisWeightChanged`, `GenesisActivated`, `GenesisActivationReset`,
 `GenesisPurchased`, `GenesisRedeemed`, `GenesisCreditOpened`,
-`GenesisCreditExtended`, `GenesisCreditRepaid`, `GenesisCreditRecovered`,
+`GenesisCreditDrawn`, `GenesisCreditExtended`, `GenesisCreditRepaid`,
+`GenesisCreditRecovered`, `CreditIncreasesPausedSet`,
 `RevenueAccrued`, `GenesisRevenueAccrued`, `GenesisRewardsClaimed`,
 `GenesisOwnerRewardsClaimed`, and `GenesisTreasuryRewardsClaimed`. A batch claim
 is caller-supplied and does not imply owner-wide enumeration. Reconcile emitted
@@ -80,3 +84,27 @@ owner-changing transfer, settle the previous owner's attributed reward credit,
 reset activation, and follow future direct weight under the new owner. Recovery
 has the same settlement boundary while also removing the recovered Genesis link
 and boost.
+
+## Protocol-pool discovery
+
+For current source, index `CanonicalPoolInitialized` and `ProtocolPoolCreated`
+as the two pool-discovery roots. Follow `ProtocolPoolFeeRateSet`,
+`BasketFeeAllocationSet`, `GeneralFeeAllocationSet`, `PoolCreationFeeSet`,
+`PoolCreationNonceInvalidated`, `CreatorRevenueAccrued`,
+`CreatorRevenueClaimed`, `GeneralPoolDecommissioned`, LP staking/reward events,
+and hook permanent-liquidity events.
+
+The PoolKey does not encode the creator or bilateral Statics fee rate. Preserve
+those fields from `ProtocolPoolCreated` and reconcile them with bounded views.
+General pools have no basket association and no basket-staker reward book.
+Treat the current-source event schema as distinct from the earlier governed-pool
+schema in the deployment-pinned ABI.
+
+## Launch and vesting events
+
+The Operators constructor uses two ERC-2309 `ConsecutiveTransfer` batches,
+rather than 5,555 individual mint events. Index the Vault range `1..5000` and
+treasury-vesting range `5001..5555` from those batches, then follow
+`TreasuryVestingBootstrapped`, `GenesisReleased`, `WithdrawalRecipientUpdated`,
+and the Doppler token's `TokensReleased`. `GenesisReleased` reports an inclusive
+ascending range and cumulative released count.

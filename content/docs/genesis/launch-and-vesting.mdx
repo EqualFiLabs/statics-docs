@@ -1,0 +1,83 @@
+---
+id: genesis-launch-vesting
+slug: genesis/launch-and-vesting
+label: Launch and vesting
+title: STATICS Genesis launch and treasury vesting
+description: The source-committed Prepare, Launch, and Finalize sequence for the fixed token supply, six-curve market, Operator custody split, backing, and 60-day treasury vesting.
+updated: 2026-08-27
+order: 255
+---
+
+The standalone Genesis launcher is designed to establish the STATICS token,
+STATICS/WETH market, Operators collection, backing, fee ingress, and temporary
+reward system before the full Diamond is deployed.
+
+:::warning Production execution is disabled
+`APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH` is `bytes32(0)` in current source. The
+Robinhood production `runPrepare()` and `runLaunch()` paths reject execution
+until a reviewed follow-up commit ratifies the exact nonzero launch hash. No
+standalone production launch is claimed here.
+:::
+
+## Fixed allocation
+
+| Destination or commitment | Amount |
+| --- | ---: |
+| Fixed STATICS total supply | 1,000,000,000 |
+| Six-curve Doppler market inventory | 800,000,000 |
+| Doppler-native treasury vesting | 100,100,000 |
+| Backing for 555 treasury-vesting Operators | 99,900,000 |
+| Total treasury-side allocation | 200,000,000 |
+
+The 99.9M backing is not liquid treasury inventory. It moves through the
+bootstrap contract into `StaticsGenesisVault` and backs the 555 Operators held
+by treasury vesting. Each circulating Operator represents 180,000 STATICS of
+gross backing. IDs still owned by the Vault do not require backing until
+acquired.
+
+## Prepare, Launch, Finalize
+
+1. **Prepare** deploys the permanent fee receiver and immutable treasury
+   vesting bootstrap, verifies pinned Robinhood dependencies, predicts the
+   deterministic token and PoolId, and commits the exact Airlock calldata in a
+   confidential artifact.
+2. **Launch** calls the canonical Airlock once. It creates the fixed 1B supply,
+   establishes one zero-cliff 60-day schedule for 100.1M treasury STATICS,
+   passes 800M to the exact six-curve Multicurve initializer, and routes 99.9M
+   to the bootstrap contract.
+3. **Finalize** creates the 5,555 Operators in two consecutive batches, moves
+   99.9M into Vault backing, starts the 555-NFT vesting schedule, binds the
+   Vault, fee receiver, activation registry, and launch distributor, then
+   proposes two-step ownership to governance.
+
+Finalization is intentionally separate from market creation so every deployed
+contract can authenticate the already-live token and pool before binding.
+
+## Two independent 60-day schedules
+
+Treasury STATICS vest from the Launch timestamp inside the Doppler token. Anyone
+may trigger `releaseFor(treasury, 0, 0)`, but released assets always go to the
+immutable beneficiary.
+
+The 555 Operators vest from the Finalize timestamp in
+`StaticsTreasuryVesting`. Anyone may call `releaseGenesis(maxCount)`; releases
+are ascending from ID 5001, capped at 50 NFTs per transaction, and always sent
+to the configured withdrawal recipient. The recipient admin may rotate that
+recipient but cannot change principal, token range, duration, or release assets.
+
+## What the launch hash binds
+
+The reviewed hash is intended to bind chain provenance, fixed and launch
+economics, governance, treasury, integrator, confidential salt commitment,
+WETH and Doppler module addresses plus runtime hashes, tick spacing, far tick,
+all six curves, metadata, Genesis epoch end, predicted token and PoolId, and the
+exact Airlock calldata. Keccak collision resistance is a cryptographic
+assumption; the contracts verify equality to the approved value.
+
+## Mechanical facts versus market assumptions
+
+The contracts and verification harnesses can establish token supply, inventory,
+tick geometry, allocation, vesting, fee mathematics, and deterministic WETH
+requirements from a specified pool state. They do not prove an ETH/USD price,
+future USD valuation, trading volume, arbitrage participation, or future
+liquidity. Those require separate launch-time attestations and economic models.
