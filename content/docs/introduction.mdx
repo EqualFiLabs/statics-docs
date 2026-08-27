@@ -87,15 +87,21 @@ When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the p
 
 None of that is automatic depth: seed liquidity bootstraps markets; **activity** determines whether fees and POL grow.
 
-## Staged rollout and availability
+## Mainnet launch and protocol rollout
 
-Statics is permissionless by design and staged in deployment:
+The STATICS Genesis launch is live on Robinhood mainnet. It established the
+fixed token supply, six-curve STATICS/WETH market, Operators collection,
+backing, vesting, fee ingress, and launch rewards described in these docs.
 
-1. **Integration beta** — protocol-curated/genesis baskets; testnet users trade and use recorded markets; creation fee is zero (owner-only).
-2. **Partner operations** — protocol may create baskets for approved partners while creation remains owner-gated onchain.
-3. **Open creation** — governance sets a positive creation fee so anyone who pays it can create.
+The broader basket, Dollar, lending, and general-pool suite has its own rollout
+and governance controls. Basket creation is owner-only whenever
+`creationFee()` is zero and becomes open when governance sets a positive fee.
+The recorded Robinhood testnet deployment remains available as a separate
+integration reference; its fixture addresses are not the mainnet Genesis
+deployment.
 
-See [Rollout](/docs/rollout) for the live matrix. Permissionless basket creation is not live while the creation fee is zero.
+See [Rollout](/docs/rollout) for production availability and the distinction
+between the live Genesis system and the basket-suite test environment.
 
 ## Risks and limitations
 

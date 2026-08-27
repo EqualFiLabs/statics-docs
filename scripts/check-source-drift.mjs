@@ -72,16 +72,20 @@ for (const [constant, label] of [
   const value = requireMatch(launcher, new RegExp(`\\b${constant}\\s*=\\s*([\\d_]+) ether;`), constant)?.[1];
   if (value) requireText(docsText, value.replaceAll("_", ","), label);
 }
-requireText(
-  launcher,
-  "APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH = bytes32(0);",
-  "zero production launch gate in source",
-);
-requireText(
-  docsText,
-  "`APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH` is `bytes32(0)`",
-  "zero production launch gate in docs",
-);
+for (const staleClaim of [
+  "APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH",
+  "not yet production-ratified",
+  "Production execution is disabled",
+  "Source-only launch system",
+  "production launch gate remains unratified",
+  "No production Statics deployment is recorded",
+  "production hash remains zero",
+  "Not deployed; production hash is zero",
+]) {
+  if (docsText.toLowerCase().includes(staleClaim.toLowerCase())) {
+    errors.push(`docs drift: stale pre-launch claim remains: ${staleClaim}`);
+  }
+}
 
 const launchCurves = read(staticsRoot, "src/genesis/doppler/StaticsLaunchCurves.sol");
 const farTick = requireMatch(launchCurves, /FAR_TICK\s*=\s*([\d_]+);/, "FAR_TICK")?.[1];

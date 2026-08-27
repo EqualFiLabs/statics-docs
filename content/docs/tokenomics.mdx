@@ -3,22 +3,16 @@ id: tokenomics
 slug: tokenomics
 label: Tokenomics
 title: STATICS tokenomics
-description: The fixed 1 billion STATICS supply, launch allocation, six-curve Doppler geometry, treasury vesting, and reserve backing committed by the Genesis launch source.
+description: The fixed 1 billion STATICS supply, launch allocation, six-curve Doppler geometry, treasury vesting, and reserve backing established by the Genesis launch.
 updated: 2026-08-27
 order: 12
 badge: Fixed
 ---
 
-STATICS launches with a **fixed supply of 1,000,000,000 tokens**. The Genesis
-launcher assigns 800 million to the six-curve Doppler market and commits the
+STATICS has a **fixed supply of 1,000,000,000 tokens**. The Genesis launch
+assigns 800 million to the six-curve Doppler market and commits the
 remaining 200 million to two independent treasury-side obligations. The launch
-token has no post-launch mint path in the committed configuration.
-
-:::warning Source-committed, not yet production-ratified
-These economics are fixed in the current Genesis launch source, but production
-execution remains disabled while `APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH` is
-`bytes32(0)`. This page does not claim that the standalone launch has executed.
-:::
+token has no post-launch mint path.
 
 ## Fixed supply and allocation
 
@@ -110,6 +104,6 @@ separate evidence.
 
 ## Verify the model
 
-- [Launch and vesting](/docs/genesis/launch-and-vesting) — deployment sequence and launch-hash boundary
+- [Launch and vesting](/docs/genesis/launch-and-vesting) — deployment sequence and configuration binding
 - [Formal verification](/docs/reference/verification) — machine-checked launch properties and assumptions
-- [Rollout](/docs/rollout) — source, deployment, and production-ratification status
+- [Rollout](/docs/rollout) — production availability and protocol rollout

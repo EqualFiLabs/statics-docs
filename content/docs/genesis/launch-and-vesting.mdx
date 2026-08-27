@@ -3,21 +3,14 @@ id: genesis-launch-vesting
 slug: genesis/launch-and-vesting
 label: Launch and vesting
 title: STATICS Genesis launch and treasury vesting
-description: The source-committed Prepare, Launch, and Finalize sequence for the fixed token supply, six-curve market, Operator custody split, backing, and 60-day treasury vesting.
+description: The Prepare, Launch, and Finalize sequence that established the fixed token supply, six-curve market, Operator custody split, backing, and 60-day treasury vesting.
 updated: 2026-08-27
 order: 255
 ---
 
-The standalone Genesis launcher is designed to establish the STATICS token,
+The standalone Genesis launcher established the STATICS token,
 STATICS/WETH market, Operators collection, backing, fee ingress, and temporary
-reward system before the full Diamond is deployed.
-
-:::warning Production execution is disabled
-`APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH` is `bytes32(0)` in current source. The
-Robinhood production `runPrepare()` and `runLaunch()` paths reject execution
-until a reviewed follow-up commit ratifies the exact nonzero launch hash. No
-standalone production launch is claimed here.
-:::
+reward system independently of the full Diamond deployment.
 
 ## Fixed allocation
 
