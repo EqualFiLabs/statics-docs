@@ -29,7 +29,7 @@ const docsDirectory = path.join(process.cwd(), "content", "docs");
 const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   {
     title: "Start here",
-    pageIds: ["introduction", "rollout", "testnet-onboarding", "glossary"],
+    pageIds: ["introduction", "tokenomics", "rollout", "glossary"],
   },
   {
     title: "Core",
@@ -90,7 +90,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   },
   {
     title: "Reference",
-    pageIds: ["robinhood-testnet-deployment"],
+    pageIds: ["robinhood-testnet-deployment", "testnet-onboarding"],
   },
 ];
 

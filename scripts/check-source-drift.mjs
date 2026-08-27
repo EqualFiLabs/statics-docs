@@ -83,6 +83,24 @@ requireText(
   "zero production launch gate in docs",
 );
 
+const launchCurves = read(staticsRoot, "src/genesis/doppler/StaticsLaunchCurves.sol");
+const farTick = requireMatch(launchCurves, /FAR_TICK\s*=\s*([\d_]+);/, "FAR_TICK")?.[1];
+if (farTick) requireText(docsText, farTick.replaceAll("_", ","), "far tick");
+
+const curvePattern =
+  /tickLower:\s*(-?[\d_]+),\s*tickUpper:\s*(-?[\d_]+),\s*numPositions:\s*(\d+),\s*shares:\s*([\d.]+) ether/g;
+const curves = [...launchCurves.matchAll(curvePattern)];
+if (curves.length !== 6) {
+  errors.push(`source drift: expected 6 launch curves, found ${curves.length}`);
+} else {
+  for (const [index, curve] of curves.entries()) {
+    requireText(docsText, curve[1].replaceAll("_", ","), `curve ${index + 1} lower tick`);
+    requireText(docsText, curve[2].replaceAll("_", ","), `curve ${index + 1} upper tick`);
+  }
+}
+requireText(docsText, "**56 positions**", "launch position count");
+requireText(docsText, "**800 million STATICS**", "launch inventory narrative");
+
 const genesis = read(staticsRoot, "src/tokens/StaticsGenesis.sol");
 requireText(genesis, 'ERC721("Statics Operators", "STATOPS")', "Operators collection identity in source");
 requireText(docsText, "`Statics Operators`", "Operators ERC-721 name");

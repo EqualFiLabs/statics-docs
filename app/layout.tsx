@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 // Runs before paint so a stored theme choice never flashes the wrong theme.
-const themeInitScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t;if(localStorage.getItem("testnet-banner")==="dismissed")document.documentElement.dataset.banner="off"}catch(e){}`;
+const themeInitScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({
   children,

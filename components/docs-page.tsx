@@ -4,7 +4,6 @@ import { MdxContent } from "@/components/mdx-content";
 import { MobileDocsMenu } from "@/components/mobile-docs-menu";
 import { PageTools } from "@/components/page-tools";
 import { SiteHeader } from "@/components/site-header";
-import { TestnetBanner } from "@/components/testnet-banner";
 import { Toc } from "@/components/toc";
 import { type DocPage as DocPageType, getAllPages, getNavigationGroups, getPageHref } from "@/lib/docs";
 
@@ -38,7 +37,6 @@ export function DocsPage({ page }: { page: DocPageType }) {
       <a className="skip-link" href="#doc-content">
         Skip to content
       </a>
-      <TestnetBanner />
 
       <SiteHeader
         leading={

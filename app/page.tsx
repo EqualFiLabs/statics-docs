@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
-import { TestnetBanner } from "@/components/testnet-banner";
 import { PROTOCOL_SOURCE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -10,6 +9,11 @@ export const metadata: Metadata = {
 };
 
 const capabilities = [
+  {
+    title: "Fixed launch economics",
+    body: "A fixed 1B STATICS supply, 800M across six Doppler curves, 200M committed to treasury vesting and Operator backing, and no post-launch mint path.",
+    href: "/docs/tokenomics",
+  },
   {
     title: "Redeemable baskets",
     body: "Fixed-bundle tokens of up to 16 assets. Mint and redeem the same constituent vector — deliberately not ERC-4626 yield vaults.",
@@ -59,12 +63,12 @@ const capabilities = [
 
 const personas = [
   {
-    title: "Users on testnet",
-    body: "Claim faucet assets, stake STATICS, mint pegged USDstx, and use the live genesis basket — without creating a new market.",
+    title: "STATICS holders & Operators",
+    body: "Understand the fixed supply, launch inventory, treasury vesting, Operator backing, activation, and reward mechanics before participating.",
     links: [
-      { label: "Testnet onboarding", href: "/docs/start/testnet-onboarding" },
-      { label: "Deployment addresses", href: "/docs/reference/robinhood-testnet-deployment" },
-      { label: "Rollout status", href: "/docs/rollout" },
+      { label: "Tokenomics", href: "/docs/tokenomics" },
+      { label: "Launch and vesting", href: "/docs/genesis/launch-and-vesting" },
+      { label: "Operators overview", href: "/docs/genesis/overview" },
     ],
   },
   {
@@ -102,7 +106,6 @@ export default function HomePage() {
       <a className="skip-link" href="#landing-content">
         Skip to content
       </a>
-      <TestnetBanner />
       <SiteHeader />
 
       <main className="landing" id="landing-content">
@@ -120,8 +123,8 @@ export default function HomePage() {
             permissionless, fee-gated deployment.
           </p>
           <div className="landing-actions">
-            <Link className="cta" href="/docs/baskets/overview">
-              Explore curated baskets
+            <Link className="cta" href="/docs/tokenomics">
+              Explore tokenomics
             </Link>
             <Link className="cta-secondary" href="/docs/introduction">
               How Statics works

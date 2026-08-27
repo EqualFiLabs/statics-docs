@@ -1,0 +1,115 @@
+---
+id: tokenomics
+slug: tokenomics
+label: Tokenomics
+title: STATICS tokenomics
+description: The fixed 1 billion STATICS supply, launch allocation, six-curve Doppler geometry, treasury vesting, and reserve backing committed by the Genesis launch source.
+updated: 2026-08-27
+order: 12
+badge: Fixed
+---
+
+STATICS launches with a **fixed supply of 1,000,000,000 tokens**. The Genesis
+launcher assigns 800 million to the six-curve Doppler market and commits the
+remaining 200 million to two independent treasury-side obligations. The launch
+token has no post-launch mint path in the committed configuration.
+
+:::warning Source-committed, not yet production-ratified
+These economics are fixed in the current Genesis launch source, but production
+execution remains disabled while `APPROVED_ROBINHOOD_LAUNCH_CONFIG_HASH` is
+`bytes32(0)`. This page does not claim that the standalone launch has executed.
+:::
+
+## Fixed supply and allocation
+
+| Destination or commitment | STATICS | Share of supply |
+| --- | ---: | ---: |
+| Six-curve Doppler market inventory | 800,000,000 | 80.00% |
+| Doppler-native treasury vesting | 100,100,000 | 10.01% |
+| Backing for 555 treasury-vesting Operators | 99,900,000 | 9.99% |
+| **Fixed total supply** | **1,000,000,000** | **100.00%** |
+
+The 200 million treasury-side allocation is not 200 million tokens of
+immediately liquid treasury inventory. Of that amount, 100.1 million follows a
+zero-cliff, 60-day Doppler-native vesting schedule. The other 99.9 million moves
+into `StaticsGenesisVault` to back the 555 Operators held in a separate 60-day
+treasury vesting contract.
+
+## Six launch curves
+
+![STATICS Doppler launch curves showing six inventory bands, their approximate valuation ranges, token allocations, shares, tick ranges, and position counts.](/images/launch-curves.jpg)
+
+The Solidity launch geometry is authoritative. It creates **56 positions**
+across six curves, assigns exactly **800 million STATICS**, and gives the
+permanent tail **120 million STATICS (15%)**. The growth curve ends where the
+tail begins at tick `-77,800`. `FAR_TICK` is `887,100`; the tail position's
+ordered upper boundary is `887,200` at tick spacing 100.
+
+| Curve | Inventory | Supply share | Tick range | Positions |
+| --- | ---: | ---: | ---: | ---: |
+| Launch access | 20,000,000 | 2.5% | `-168,800` to `-153,800` | 11 |
+| Genesis discovery | 60,000,000 | 7.5% | `-160,700` to `-139,900` | 11 |
+| Early market | 100,000,000 | 12.5% | `-146,900` to `-123,800` | 11 |
+| Core market | 160,000,000 | 20.0% | `-130,800` to `-100,800` | 11 |
+| Growth market | 340,000,000 | 42.5% | `-107,700` to `-77,800` | 11 |
+| Permanent tail | 120,000,000 | 15.0% | `-77,800` to `887,200` | 1 |
+| **Total** | **800,000,000** | **100% of launch inventory** |  | **56** |
+
+The curves overlap intentionally. They are separate liquidity distributions,
+not six consecutive price buckets.
+
+## Operator backing
+
+The fixed **5,555 STATICS Operators** collection begins in two custody groups:
+
+| Operator IDs | Count | Initial custody | Backing at finalization |
+| --- | ---: | --- | ---: |
+| `1..5000` | 5,000 | `StaticsGenesisVault` | Added as each Operator enters circulation |
+| `5001..5555` | 555 | `StaticsTreasuryVesting` | 99,900,000 STATICS |
+
+Each circulating Operator represents **180,000 STATICS of gross backing**.
+Therefore the 555 treasury-vesting Operators require exactly 99.9 million
+STATICS at finalization. Vault-owned Operators do not require backing while
+they remain in vault inventory; acquisition brings the required backing into
+the vault before the Operator becomes a circulating claim.
+
+Backing is reserve accounting, not a promise that an Operator will maintain a
+particular USD value. Acquisition and redemption rules are documented in the
+[Operators overview](/docs/genesis/overview).
+
+## Vesting and market circulation
+
+The two 60-day schedules have different assets and start times:
+
+- **100.1 million STATICS** vest to the immutable treasury beneficiary from the
+  Doppler Launch timestamp.
+- **555 Operators** vest from token ID 5001 upward from the Genesis Finalize
+  timestamp, with their full 99.9 million STATICS backing already held by the
+  vault.
+
+Anyone may trigger release, but the configured contracts always send the
+released assets to their immutable or governed recipient. See
+[Launch and vesting](/docs/genesis/launch-and-vesting) for the full Prepare,
+Launch, and Finalize sequence.
+
+## Protocol facts and market assumptions
+
+| Machine-checkable protocol fact | Market interpretation that is not guaranteed |
+| --- | --- |
+| Fixed 1B STATICS supply | Future token price or fully diluted valuation |
+| Exact tick ranges, shares, and 800M inventory | USD values shown for illustrative curve bands |
+| 180,000 STATICS gross backing per circulating Operator | A stable USD value for that backing |
+| Exact vesting principal and duration | Market liquidity when tokens vest |
+| Deterministic token/WETH geometry from a specified pool state | ETH/USD at launch, volume, or arbitrage participation |
+
+The approximate valuation labels in the curve image are an **economic model**,
+not an EVM guarantee or price forecast. Their USD meaning changes with WETH/USD
+and live pool state. Formal verification can prove the encoded allocation and
+geometry; launch-time price attestations and future market behavior remain
+separate evidence.
+
+## Verify the model
+
+- [Launch and vesting](/docs/genesis/launch-and-vesting) — deployment sequence and launch-hash boundary
+- [Formal verification](/docs/reference/verification) — machine-checked launch properties and assumptions
+- [Rollout](/docs/rollout) — source, deployment, and production-ratification status
