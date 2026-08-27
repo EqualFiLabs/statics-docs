@@ -61,6 +61,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
     title: "Liquidity",
     pageIds: [
       "canonical-pools",
+      "protocol-pools",
       "swap-fee-hook",
       "permanent-liquidity",
       "canonical-lp-rewards",

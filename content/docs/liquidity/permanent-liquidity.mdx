@@ -3,15 +3,16 @@ id: permanent-liquidity
 slug: liquidity/permanent-liquidity
 label: Permanent liquidity
 title: Permanent protocol liquidity
-description: Matched protocol-owned inventory becomes hook-owned full-range liquidity with no ordinary withdrawal path until ExitOnly.
-updated: 2026-08-04
+description: Matched protocol-owned inventory becomes hook-owned full-range liquidity with no ordinary withdrawal path while its protocol pool is active.
+updated: 2026-08-27
 order: 430
 ---
 
-Permanent liquidity is the protocol-owned side of every canonical pool. It is
-seeded by the basket creator at launch and expanded from swap-fee allocations.
-It is hook-owned, full-range, and intentionally non-withdrawable while its pool
-remains active.
+Permanent liquidity is the protocol-owned side of every Statics protocol pool.
+Basket canonical pools receive mandatory creator-funded seed liquidity at
+launch. General pools may begin with zero liquidity and form their first POL
+position from bilateral hook-fee allocations. POL is hook-owned, full-range,
+and intentionally non-withdrawable while its pool remains active.
 
 ## Hook-owned and locked
 
@@ -37,7 +38,7 @@ Unmatched amounts remain pending until someone calls
 `compoundPermanentLiquidity`. Fees earned by the hook's position are collected
 back into pending inventory and may be compounded again.
 
-## Exit-only unwind
+## Terminal unwind
 
 After a basket enters `ExitOnly`, anyone may call `unwindBasketLiquidity` once
 per constituent. The flow:
@@ -51,11 +52,17 @@ per constituent. The flow:
 User-owned PositionManager NFTs are untouched. No position, LP, or staker claim
 is created by the unwind — released value accrues to global treasury.
 
+General pools use the separate owner-only `decommissionGeneralPool` transition.
+It stops swaps and managed LP actions, releases POL to treasury accounting, and
+preserves creator credits, earned LP rewards, and user-owned LP principal. A
+general-pool creator has no decommissioning authority.
+
 ## Dependency and recovery
 
-The hook, PoolManager, PositionManager, Permit2, and liquidity-manager bindings
-are version-level dependencies. V1 does not implement live in-place replacement
-of those immutable integrations. A critical dependency failure after final
+The hook, PoolManager, PositionManager, and Permit2 bindings are version-level
+dependencies. Current source allows timelocked replacement of the standalone
+liquidity manager, including approval revocation and grant during the handoff.
+A critical immutable-dependency failure after final
 immutability is handled by guardian containment, terminal V1 `ExitOnly`
 wind-down and liability settlement where executable, followed by a separately
 deployed and governed V2. Users and external LPs are not force-migrated.

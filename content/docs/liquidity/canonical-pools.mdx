@@ -4,7 +4,7 @@ slug: liquidity/canonical-pools
 label: Canonical pools
 title: Canonical v4 pools
 description: Each basket constituent gets one canonical Uniswap v4 pool with zero native LP fee, created with protocol-owned liquidity.
-updated: 2026-08-04
+updated: 2026-08-27
 order: 410
 ---
 
@@ -32,7 +32,11 @@ registered canonical pools. Unregistered pools are not canonical.
 ## Immediate swappability
 
 A successful basket creation makes every canonical pool immediately swappable
-and available to the typed borrow-to-liquidity and canonical LP reward paths.
+and available to the typed borrow-to-liquidity and protocol-pool LP reward paths.
+
+Current source also supports [general protocol pools](/docs/liquidity/protocol-pools)
+between compatible ERC-20s. Those pools share the hook, manager, and LP reward
+machinery but have no basket backing, basket-staker rewards, or lending role.
 There is no standalone initialization, activation, checkpoint, or manager-sync
 action — pools are live the moment the basket exists.
 
@@ -49,7 +53,7 @@ Liquidity entry uses current pool state and stays bounded by caller-supplied
 token caps and deadlines. The canonical paths are:
 
 - ordinary full-range PositionManager NFT creation through the liquidity manager
-  (optionally staked for [canonical LP rewards](/docs/liquidity/canonical-lp-rewards));
+  (optionally staked for [protocol-pool LP rewards](/docs/liquidity/canonical-lp-rewards));
 - typed [borrow-to-liquidity](/docs/liquidity/canonical-lp-rewards#borrow-to-liquidity)
   convenience paths; and
 - hook-owned permanent liquidity seeded at launch and compounded from swap fees.

@@ -6,7 +6,7 @@ eyebrow: Protocol docs
 title: Statics Protocol
 description: Statics turns onchain assets into redeemable baskets that connect liquidity, fee generation, self-backed credit, and the Statics Dollar. Built as post-launch financial infrastructure, the protocol begins with curated baskets before expanding creation to approved partners and, ultimately, open participation.
 status: Protocol docs
-updated: 2026-08-25
+updated: 2026-08-27
 order: 10
 ---
 
@@ -71,14 +71,19 @@ A basket can add:
 - self-backed constituent credit against deposited BasketTokens.
 
 :::note Creator economics
-Creation records a creator address for discovery only. Creators receive **no admin power** after create and **no protocol fee cut** by default. Ongoing fees route to permanent liquidity, eligible LPs, deposited BasketTokens, STATICS stakers, and treasury. Creators benefit by holding, providing liquidity, or staking like any other participant.
+Creation records an immutable creator address. The creator receives **no admin
+power**, but current source assigns that address a fixed **5% of bilateral hook
+fees** from its basket pools. The share is pull-based and remains claimable
+after decommissioning. The permissionless general-pool source uses the same
+fixed creator share. These newer economics are not yet deployed at the recorded
+Robinhood testnet addresses.
 :::
 
 On the current beta, public creation is closed. Partner baskets, if any, are an operational choice while the protocol retains owner-only creation. Details: [Rollout](/docs/rollout) and [Basket creation](/docs/baskets/creation).
 
 ## Fees and permanent liquidity
 
-When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the protocol can charge configured fees. Swap fees on canonical pools are bilateral hook fees. A share of eligible fees can accumulate as protocol-owned inventory and **may** compound into more full-range permanent liquidity when sides match.
+When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the protocol can charge configured fees. Swap fees on Statics protocol pools are bilateral hook fees. A share of eligible fees can accumulate as protocol-owned inventory and **may** compound into more full-range permanent liquidity when sides match.
 
 None of that is automatic depth: seed liquidity bootstraps markets; **activity** determines whether fees and POL grow.
 

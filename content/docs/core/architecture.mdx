@@ -4,7 +4,7 @@ slug: core/architecture
 label: Architecture
 title: Architecture
 description: Statics is two coordinated EIP-2535 diamonds behind one ordinary user-action address, with custody and solvency split across clear boundaries.
-updated: 2026-08-25
+updated: 2026-08-27
 order: 20
 ---
 
@@ -21,7 +21,7 @@ health machinery stay isolated in a separate `StaticsDollarCoreDiamond`.
 
 | Diamond | Role | Holds |
 | --- | --- | --- |
-| `StaticsDiamond` | User gateway, PositionNFT, baskets, rewards, lending, flash loans, canonical liquidity, and the Dollar gateway | Basket vaults, fee account, staking custody, voluntary LP custody |
+| `StaticsDiamond` | User gateway, PositionNFT, baskets, rewards, lending, flash loans, protocol pools, and the Dollar gateway | Basket vaults, fee account, staking custody, voluntary LP custody |
 | `StaticsDollarCoreDiamond` | Dollar collateral, issuance, health, transitions, insurance, and recovery | Core collateral and insurance |
 
 `StaticsDiamond` is the ordinary integration address. It is simultaneously the
@@ -57,7 +57,7 @@ StaticsDiamond
 ├── global staking, reward claims, and treasury fee distribution
 ├── Statics Dollar typed gateway, Risk liquidity, and funded incentives
 ├── shared custody reservations
-└── canonical pool lifecycle and borrow-to-liquidity
+└── basket canonical pools, general pools, and borrow-to-liquidity
         |
         +-------------------------> StaticsDollarCoreDiamond
         |                           ├── collateral and issuance
@@ -70,6 +70,7 @@ StaticsDiamond
         |                           └── hook-owned permanent liquidity
         |
         +-------------------------> StaticsLiquidityManager
+                                    ├── normalized protocol-pool validation
                                     └── typed user PositionManager NFT creation
 ```
 
@@ -84,7 +85,7 @@ accounting boundary can be verified independently:
 | `StaticsDollarCoreDiamond` | Dollar collateral and insurance |
 | `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
 | `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
-| Uniswap v4 `PoolManager` | Canonical pool liquidity under v4 accounting |
+| Uniswap v4 `PoolManager` | Basket-canonical and general-pool liquidity under v4 accounting |
 
 Direct donations to the Diamond are unreserved and do not inflate backing, fee
 claims, or stake. See [Custody and accounting](/docs/core/custody) for the
@@ -92,10 +93,10 @@ reservation equation and deficit handling.
 
 ## Canonical deployment shape
 
-The current PR #49 source and fresh-deployment tests expect **30 facets / 256
+Current `master` source and fresh-deployment tests expect **30 facets / 254
 selectors** on `StaticsDiamond` and **11 facets / 95 selectors** on
-`StaticsDollarCoreDiamond`. These counts include the Genesis integration and
-batched-claim selectors.
+`StaticsDollarCoreDiamond`. These counts include the Operators integration,
+general-pool lifecycle, and batched-claim selectors.
 
 The public Robinhood Chain testnet manifest is an earlier deployment snapshot
 and currently records a different shape. Do not treat the PR source count as a
@@ -110,7 +111,8 @@ lifecycle is upgradeable development followed by an independent audit, reduction
 of retained powers, and a final reviewed cut that removes Diamond-cut authority
 from both diamonds. See [Governance and lifecycle](/docs/governance/timelock-and-roles).
 
-The hook, PoolManager, PositionManager, Permit2, and liquidity-manager bindings
-are version-level dependencies. V1 does not implement live in-place replacement
-of those immutable integrations; before final immutability, an audited Diamond
-upgrade may correct integration logic.
+The hook, PoolManager, PositionManager, and Permit2 bindings remain
+version-level dependencies. Current source allows timelocked governance to
+replace `StaticsLiquidityManager` with `replaceLiquidityManager`; replacement
+revokes approval from the old manager, approves the new manager, and emits the
+handoff. It does not replace the hook or Uniswap contracts.
