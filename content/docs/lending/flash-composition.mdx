@@ -4,7 +4,7 @@ slug: lending/flash-composition
 label: Flash composition
 title: Flash composition
 description: Borrow a basket's constituent vector atomically through a typed callback that restores principal plus fees in the same transaction.
-updated: 2026-08-04
+updated: 2026-09-05
 order: 340
 ---
 
@@ -28,21 +28,61 @@ requested_i   = principal_i + quotedFee_i
 
 The receiver must implement `IStaticsFlashBorrower` and return
 `keccak256("IStaticsFlashBorrower.onStaticsFlashLoan")` from its callback. The
-Diamond uses OpenZeppelin `ReentrancyGuardTransient`: short persistent guard
+Diamond uses OpenZeppelin `ReentrancyGuardTransient` for the flash domain and
+the shared persistent `ReentrancyGuard` slot for transfer phases: short guard
 phases protect disbursement and repayment accounting, while the receiver callback
 runs outside the common persistent guard.
 
-```solidity
-function onStaticsFlashLoan(
-    uint256 basketId,
-    uint256 shares,
-    address feeReceiver,
-    bytes calldata data
-) external returns (bytes4) {
-    // ... searcher logic ...
-    return IStaticsFlashBorrower.onStaticsFlashLoan.selector;
+```solidity Flash receiver
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.33;
+
+import {IStaticsFlashBorrower} from "src/interfaces/IStaticsFlashBorrower.sol";
+
+interface IERC20Like {
+    function approve(address spender, uint256 amount) external returns (bool);
+}
+
+contract DocumentedFlashReceiver is IStaticsFlashBorrower {
+    address public immutable diamond;
+    address public immutable expectedInitiator;
+
+    constructor(address diamond_, address expectedInitiator_) {
+        diamond = diamond_;
+        expectedInitiator = expectedInitiator_;
+    }
+
+    function onStaticsFlashLoan(
+        address initiator,
+        uint256 basketId,
+        address[] calldata assets,
+        uint256[] calldata amounts,
+        uint256[] calldata fees,
+        bytes calldata data
+    ) external override returns (bytes32) {
+        require(msg.sender == diamond && initiator == expectedInitiator,
+            "unauthorized lender or initiator");
+        require(assets.length == amounts.length && amounts.length == fees.length,
+            "length mismatch");
+        // Execute a strategy using basketId and data, then approve principal + quoted fee.
+        for (uint256 i; i < assets.length; ++i) {
+            require(
+                IERC20Like(assets[i]).approve(diamond, amounts[i] + fees[i]),
+                "approval failed"
+            );
+        }
+        return keccak256("IStaticsFlashBorrower.onStaticsFlashLoan");
+    }
 }
 ```
+
+Configure `expectedInitiator` as the caller that will invoke the Diamond's
+`flashLoan`. This minimal receiver performs no strategy: it needs to be
+prefunded with every quoted fee so the lender can pull principal plus fees.
+The approval example assumes ordinary bool-returning ERC-20 tokens; production
+code needs token-compatible approval handling. This is an interface/authentication
+example, not production-ready execution code or proof that a route is
+profitable; add strategy-specific slippage, deadline, and profit checks.
 
 Because the callback runs outside the persistent guard, **a callback may call the
 ordinary public `mint` and `redeem` entrypoints**. Those calls receive no

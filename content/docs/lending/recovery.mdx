@@ -4,7 +4,7 @@ slug: lending/recovery
 label: Recovery
 title: Recovery
 description: After maturity and a one-hour grace period, anyone can permissionlessly recover an expired tranche and claim a recovery bounty.
-updated: 2026-08-04
+updated: 2026-09-05
 order: 330
 ---
 
@@ -12,11 +12,15 @@ When a loan tranche matures and its one-hour grace period lapses, recovery
 becomes permissionless. Recovery settles the expired tranche only — sibling
 tranches and other positions are untouched.
 
-## When recovery opens
+## Three timing periods
 
-Recovery is available only after **maturity plus one hour**. Before that window,
-no one — including the borrower — can seize the tranche. The borrower can always
-repay or extend in the meantime.
+Through maturity, the borrower may repay or extend. After maturity, repayment
+remains possible during the one-hour grace period, but extension is no longer
+available: `extend` requires the basket to be Active, the extension pause to be
+off, and `block.timestamp <= maturity`. Recovery becomes permissionless only
+when `block.timestamp > maturity + 1 hour` (strictly later than the boundary).
+Extension adds `loanDuration` to the existing maturity; it does not restart a
+clock from the extension transaction.
 
 ## What recovery does
 

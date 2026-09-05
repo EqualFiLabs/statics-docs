@@ -4,7 +4,7 @@ slug: reference/verification
 label: Verification status
 title: Formal verification and proof boundaries
 description: The machine-checked Genesis launch properties recorded in current source, the engines used, and the external and market assumptions they do not prove.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 755
 ---
 
@@ -16,8 +16,12 @@ aggregate or cross-contract accounting properties.
 
 :::note Evidence boundary
 This page summarizes the result ledger recorded in the source repository. The
-docs build checks that the described targets and critical source facts still
-exist, but it does not rerun Halmos, Certora, Slither, or Robinhood forks. A
+ordinary docs build checks rendering, not protocol parity. CI separately runs
+`check:source` against a fetched protocol checkout, `check:abis` against the
+deployment-pinned SDK, and `check:examples` to compile the documented flash
+receiver against the source interface. These are targeted drift checks, not
+complete semantic verification. They do not rerun Halmos, Certora, Slither,
+protocol Foundry tests, or Robinhood forks. A
 specific release should use the `statics` CI run and hosted-prover reports for
 that exact commit as evidence.
 :::

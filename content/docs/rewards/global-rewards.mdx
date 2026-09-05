@@ -4,7 +4,7 @@ slug: rewards/global-rewards
 label: Global rewards
 title: Global multi-asset rewards
 description: Stake STATICS in a position and opt into up to 64 reward assets, with an eligibility delay that blocks capturing historical fees.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 510
 ---
 
@@ -27,17 +27,36 @@ balance-changing staking tokens are rejected.
 | `stake` | Increase an existing authorized position |
 | `optInRewardAssets` / `optOutRewardAssets` | Manage the position's reward selections |
 
-Stake is always withdrawable.
+There is no staking cooldown, but “withdrawable” means available stake. STATICS
+committed as Morpho collateral is unavailable until recalled and must satisfy
+Morpho withdrawal/health checks. Liquidation or external loss can also reduce
+the position's recorded available stake after synchronization. See [Morpho
+credit](/docs/lending/morpho).
 
 ## The 24-hour eligibility delay
 
-Initial stake, new selections, and top-up deltas enter a per-asset pending
-tranche that matures at the next hourly boundary **at least 24 hours later** (a
-24–25 hour window). Mature stake remains eligible when a position is increased.
+Initial stake and new selections enter a per-asset pending tranche that matures
+at the next hourly boundary **at least 24 hours later** (a 24–25 hour window).
+Top-ups merge with existing pending stake using a weighted pending age; they do
+not reset the entire tranche to a fresh 24 hours. Mature stake remains eligible
+when a position is increased.
 
 Each matured bucket records its activation index, so pending stake cannot capture
 historical fees. Fee accrual and position interactions roll the affected asset's
 bounded maturity ring before updating its index.
+
+For a top-up to an existing pending tranche, the age credit is proportional to
+the old pending amount, capped at 24 hours, and rounded down:
+
+```text
+oldCredit      = min(now - pendingStartTime, 24 hours)
+weightedCredit = floor(oldPending * oldCredit / (oldPending + added))
+newStartTime   = now - weightedCredit
+eligibleAt     = ceil((newStartTime + 24 hours) / 1 hour) * 1 hour
+```
+
+Hourly rounding and integer math are part of the eligibility rule; do not derive
+an exact activation timestamp from a wallet's last deposit time alone.
 
 :::note
 This delay is the anti-fee-theft mechanism: a position that selects an asset
@@ -59,15 +78,16 @@ excess, flash-loan excess, recovery penalties, pegged fees, and the global share
 of volatile-series fees — enter the same non-swap ledger. Genesis secured-credit
 origination, additional-draw, and extension fees are a separate native-fee rail: they split
 between Genesis reserve backing and treasury and do not become global Position
-staking rewards. For a fee on asset `a` when `eligibleStake[a] > 0`:
+staking rewards. For a fee on asset `a` when `eligibleWeight[a] > 0` (stake
+multiplied by each position's active reward multiplier):
 
 ```text
 stakerAmount   = floor(grossFee * 9000 / 10000)   // 90%
 treasuryAmount = grossFee - stakerAmount           // 10%
-indexDelta[a]  = floor(stakerAmount * 1e27 / eligibleStake[a])
+indexDelta[a]  = floor(stakerAmount * 1e27 / eligibleWeight[a])
 ```
 
-If `eligibleStake[a] == 0`, no staker liability is created and the entire fee
+If `eligibleWeight[a] == 0`, no staker liability is created and the entire fee
 accrues to treasury. Indexed whole-token value that never crystallizes to a
 position routes to treasury only when that asset's eligible stake returns to
 zero.

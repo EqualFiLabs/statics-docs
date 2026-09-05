@@ -4,20 +4,42 @@ slug: reference/robinhood-testnet-deployment
 label: Robinhood testnet
 title: Robinhood testnet deployment
 description: "The recorded Robinhood Chain Testnet integration-beta deployment: contracts, governance, genesis basket, faucets, and dependencies."
-updated: 2026-08-27
+updated: 2026-09-05
 order: 740
 ---
 
-This page records the current Statics deployment on Robinhood Chain Testnet. It
-is an integration beta, not a production deployment. `deployment.md` in the
-source repository is the canonical record, and this release replaces every
-earlier Robinhood testnet deployment.
+This page records two deliberately distinct Robinhood Chain Testnet snapshots.
+The older public integration-beta release remains the stable address/ABI
+reference for existing integrations. A newer September 2026 full-stack
+rehearsal is recorded separately and is not asserted to be live or healthy here.
+`deployment.md` in the source repository is canonical for both manifests.
 
 For what users can do today versus later creation access, see
 [Rollout](/docs/rollout). First actions:
 [Testnet onboarding](/docs/start/testnet-onboarding).
 
-## Release
+## September 2026 full-stack rehearsal
+
+This disposable rehearsal used protocol commit `0be136bd43b7ae94c776857e0cfa0bee3752c9f7`
+and deployment tooling `da14dd26a7ae7aa4749ff4c379a44dcd480cec53`. It recorded
+34 facets / 283 selectors, a connected Genesis replica, and two registered
+Morpho markets. Its separate addresses were:
+
+| Contract | Address |
+| --- | --- |
+| StaticsDiamond / PositionNFT | `0xA37016d1d5daA516c2E9cE32d335048D11FeA395` |
+| StaticsDollarCoreDiamond | `0x800dd1E86595575Cd0938a08ceF51244Db39eceB` |
+| Statics Dollar | `0x1d86aA03bC74eE3582Cc23e0818f3c2f8f533491` |
+| Risk Shares | `0x054Ce0D82A7178a0Cf4b63901B98c91337419973` |
+| Rehearsal faucet | `0xb80f88145315a772829B42c0Efb6F79ee8A55645` |
+
+The Morpho markets were staked STATICS/USDstx and TPA1/USDstx, both configured
+with 77% LLTV and testnet oracle fixtures. The performance-fee router was
+unset. See the [rehearsal manifest](https://github.com/EqualFiLabs/statics/blob/ca509b76e35103d0bccccb86876caa94711f37e8/deployments/robinhood-testnet-46630-rehearsal-20260903T033729Z.json)
+for the complete addresses and validation record. This page makes no claim
+about either snapshot's present live health.
+
+## Previous public release
 
 | Field | Value |
 | --- | --- |

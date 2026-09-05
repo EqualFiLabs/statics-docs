@@ -56,11 +56,12 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
       "pegged-profiles",
       "solvency-and-recovery",
       "oracle-model",
+      "dollar-risk-liquidity",
     ],
   },
   {
     title: "Lending",
-    pageIds: ["lending-overview", "loan-lifecycle", "recovery", "flash-composition"],
+    pageIds: ["lending-overview", "loan-lifecycle", "recovery", "flash-composition", "morpho"],
   },
   {
     title: "Liquidity",

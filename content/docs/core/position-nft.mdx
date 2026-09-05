@@ -4,7 +4,7 @@ slug: core/position-nft
 label: PositionNFT
 title: Shared PositionNFT
 description: One transferable ERC-721 position owns every Dollar leg, basket collateral, loan, reward selection, staked liquidity position, and optional Genesis link.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 30
 ---
 
@@ -19,6 +19,7 @@ A single PositionNFT may bundle any of the following legs:
 - a global staking balance and accrued multi-asset reward claims;
 - deposited and locked BasketTokens used as lending collateral;
 - independent basket loan tranches;
+- Morpho account control, deployed collateral, and external debt obligations;
 - immediately consumable Statics Dollar Risk Share liquidity, funded incentives,
   fill proceeds, and series-migration credits;
 - pairing-vault state; and
@@ -57,6 +58,11 @@ and pays the then-current fee.
 `closePosition` succeeds only after all balances, claims, collateral, loans,
 Dollar legs, custodied LP NFTs, and LP claims are empty.
 
+`isPositionClosable` is an aggregate precheck, not a guarantee: closure also
+requires tracked Morpho markets to be empty. Recover raw tokens from a Morpho
+account before closing because the account-empty check does not enumerate
+arbitrary ERC-20 balances.
+
 ## Modular reporting interface
 
 `StaticsDiamond` implements the pre-ERC Modular Position NFT reporting interface
@@ -74,7 +80,7 @@ transfer, approval, reward settlement, or loan extension.
 
 ## Owner index
 
-An optional append-only owner index tracks every position by its current owner
+An owner index tracks every position by its current owner
 across mint, transfer, and burn. It is ERC-165 advertised through
 `IPositionOwnerIndex` (`0x7ef5913d`).
 
@@ -84,43 +90,42 @@ across mint, transfer, and burn. It is ERC-165 advertised through
 | `positionsOfOwner(owner, cursor, limit)` | Bounded pagination returning `(positionIds, nextCursor)` |
 | `syncPositionOwnerIndex(positionId)` | Permissionless migration of a single legacy position into the index |
 
-Index writes emit `PositionOwnerIndexSynced` and the ERC-4906 metadata-update
-event (`0x49064906`). Migration removes only the requested position, leaving
+Transfers and burns remove entries with swap-and-pop; ordering is not stable.
+Explicit `syncPositionOwnerIndex` calls emit `PositionOwnerIndexSynced`; ordinary
+mint, transfer, and burn maintain the index alongside ERC-721 `Transfer` events.
+Current source does not emit ERC-4906 metadata-update events. Migration removes
+only the requested position, leaving
 sibling positions indexed. The index lets integrators enumerate a wallet's
 positions without looping transfer events.
 
+## Portfolio enumeration
+
+`IStaticsPositionPortfolio` provides `positionPortfolioCounts` and bounded,
+block-consistent pages through `basketIdsOfPosition`, `loanIdsOfPosition`,
+`liquidityPositionIdsOfPosition`, `globalRewardAssetsOfPosition`,
+`riskSeriesIdsOfPosition`, and `morphoMarketIdsOfPosition`. Each page accepts a
+cursor and a limit from **1 to 100** entries. Ordering can change after state updates;
+read all pages at one block and do not treat any list as append-only.
+
+Counts include a separate `morphoMarketCount`. The current pinned SDK's portfolio
+ABI omits that field; see the [SDK compatibility warning](/docs/reference/sdk#match-the-sdk-to-the-target)
+before decoding portfolio results.
+
 ## Onchain metadata
 
-Each valid PositionNFT exposes fully onchain metadata through `tokenURI`. Its
-immutable visual seed is:
-
-```text
-keccak256(abi.encodePacked(
-    bytes32("STATICS_AVATAR_V1"),
-    block.chainid,
-    address(StaticsDiamond),
-    positionId
-))
-```
-
-Transfers, approvals, balances, claims, legs, and obligations do not alter the
-avatar. The returned Base64 JSON contains a Base64 SVG and eight cosmetic visual
-attributes (Field, Boundary, Shell, Interface, Mantle, Telemetry, Sigil,
-Signal). It contains no live status, achievement, yield, debt, health, or rarity
-semantics.
-
-The Diamond stores one collection-wide renderer address. The owner may replace
-or clear it with `setPositionRenderer`; clearing it makes valid positions return
-an empty URI. The stateless renderer holds one immutable `StaticsAvatarSVG`
-helper so both contracts stay below the EIP-170 code-size limit without placing
-artwork in facets or protocol storage.
+Each valid PositionNFT exposes fully onchain metadata through `tokenURI`. Current
+source builds the Base64 JSON and SVG directly through `LibPositionSVG`; the
+image is the Statics logo plus the position ID. There is no avatar seed,
+attributes array, replaceable collection renderer, `setPositionRenderer`, or
+empty-URI clearing path in this revision. Renderer addresses are historical
+deployment details only when a deployment manifest explicitly lists them.
 
 ## Reward eligibility at a glance
 
 | Reward rail | Weight | Eligibility | Exit behavior |
 | --- | --- | --- | --- |
-| Basket position rewards | Deposited BasketTokens in one basket | Immediate on deposit | Leg waits until the block after its latest deposit; locked loan collateral stays eligible |
-| Global Statics rewards | Configured stake selected into one reward asset | Stake, new selections, and top-ups mature at an hourly boundary 24–25 hours later | Stake always withdrawable; withdrawal consumes pending before eligible |
+| Basket position rewards | Deposited BasketTokens in one basket | First deposits mature at the next hourly bucket at least 24 hours later (24–25h); top-ups use a weighted pending age while matured weight remains eligible | Withdrawal removes pending shares first; locked loan collateral stays eligible |
+| Global Statics rewards | Matured selected STATICS stake times its active reward multiplier | Fresh stake and selections mature at an hourly boundary 24–25 hours later; top-ups merge by weighted pending age | Undeployed stake has no cooldown; stake committed as Morpho collateral must be recalled first |
 | Protocol-pool LP rewards | Full-range basket-canonical or general-pool liquidity in a custodied v4 NFT | Initial and increased deltas activate next block | NFT can leave immediately in any lifecycle state; claims stay attached |
 | Dollar Risk liquidity | Supplied series Risk Shares | Staking makes shares immediately consumable | Unconsumed effective shares remain withdrawable |
 | Genesis boost | Activation multiplier on a linked Genesis NFT | Link and activation state determine effective global STATICS weight | Credit recovery clears only the Genesis boost and link; the PositionNFT and unrelated legs remain |

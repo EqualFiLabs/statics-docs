@@ -4,7 +4,7 @@ slug: liquidity/protocol-pools
 label: General protocol pools
 title: Permissionless general protocol pools
 description: Current source lets users register zero-native-fee Statics-hook pools between compatible ERC-20s without granting those markets basket or Dollar privileges.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 415
 ---
 
@@ -20,11 +20,14 @@ Statics fees, full-range protocol-owned liquidity, and the same optional LP
 reward custody. A normalized PoolId registry lets the hook, liquidity manager,
 and reward system validate either class through one bounded lookup.
 
-:::warning Not deployed at the recorded testnet addresses
-The Robinhood testnet deployment currently exposes the earlier
+:::warning Not deployed at the earlier public release addresses
+The earlier public Robinhood release exposes the
 governance-created protocol-pool model. Permissionless general pools, creator
-authorization, and the APIs on this page are current source behavior awaiting a
-matching deployment.
+authorization, and the APIs on this page describe current source. The
+[September rehearsal](/docs/reference/robinhood-testnet-deployment) is a separate
+deployment record. Match the deployed ABI and current creation-fee switch before
+enabling these actions; neither a source feature nor an installed selector
+proves that public creation is enabled at a particular address.
 :::
 
 ## Creation switch
