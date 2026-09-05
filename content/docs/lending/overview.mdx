@@ -4,7 +4,7 @@ slug: lending/overview
 label: Overview
 title: Self-backed lending
 description: Deposit basket tokens as collateral and borrow their proportional constituent vector at a basket-defined loan-to-value.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 310
 ---
 
@@ -12,7 +12,7 @@ order: 310
 back them, and repay those assets later. There is no oracle liquidation bot —
 risk is bounded by the basket LTV and recovery rules after maturity.
 
-Statics lending is self-backed: a borrower deposits BasketTokens as collateral
+Statics basket lending is self-backed: a borrower deposits BasketTokens as collateral
 and borrows the proportional constituent vector against them. There is no price
 oracle and no external liquidation. The loan is overcollateralized by its own
 deposited basket at a creator-chosen loan-to-value.
@@ -24,10 +24,16 @@ accounting. See
 [Genesis secured credit](/docs/genesis/secured-credit) before treating the
 BasketToken fee formulas below as universal lending rules.
 
+[Morpho credit](/docs/lending/morpho) is another distinct rail: approved external
+markets can take available basket collateral or staked STATICS and lend USDstx.
+That rail has oracle-based health, interest, and liquidation risk; the absence
+of oracle liquidation described here applies only to self-backed basket loans.
+
 ## How it works
 
 Only BasketTokens deposited through the collateral interface can be locked for
-borrowing. Deposited and locked BasketTokens keep earning their basket's share of
+borrowing. Once their [reward weight matures](/docs/baskets/overview#basket-position-reward-eligibility),
+deposited and locked BasketTokens earn their basket's share of
 [canonical hook fees](/docs/liquidity/swap-fee-hook) in both the BasketToken and
 constituent assets — locking does not remove them from the reward denominator.
 

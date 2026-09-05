@@ -4,7 +4,7 @@ slug: glossary
 label: Glossary
 title: Glossary
 description: Plain-language definitions for Statics terms used across the protocol docs.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 25
 ---
 
@@ -17,10 +17,10 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Basket / static basket** | A fixed-composition multi-asset market. Constituents and per-unit bundle amounts are set at creation and do not change. |
 | **BasketToken** | The ERC-20 that represents one unit of a basket's fixed bundle. Minting deposits the bundle; redemption returns it (less fees). Not ERC-4626. |
 | **Constituent** | One ERC-20 asset inside a basket's immutable vector (up to 16). |
-| **Bundle amount** | How many units of a constituent back one full BasketToken (scaled to 18 decimals in accounting). |
+| **Bundle amount** | Raw constituent-token units backing one full BasketToken. The BasketToken share denominator is `1e18`; constituent amounts retain each token's own decimals. |
 | **Genesis basket** | A basket created by the Diamond owner while public creation is closed (`creationFee = 0`). |
 | **Canonical pool** | The single Uniswap v4 BasketToken/constituent pool registered for each constituent at basket creation. |
-| **General pool** | A Statics-hook Uniswap v4 pool between compatible ERC-20s with no basket association. Current source supports permissionless creation; the recorded testnet deployment does not. |
+| **General pool** | A Statics-hook Uniswap v4 pool between compatible ERC-20s with no basket association. Current source supports permissionless creation; the earlier public testnet release uses a governed-pool API. |
 | **Protocol pool** | A normalized registered market: either one basket canonical pool or one general pool. |
 | **Permanent liquidity / POL** | Hook-owned full-range liquidity seeded at basket creation or compounded from matched fee inventory. No ordinary withdrawal while the pool is active. |
 | **Bilateral hook fee** | Swap fee charged on both input and output by `StaticsSwapFeeHook`, separate from Uniswap's native LP fee (all Statics protocol pools use zero native fee). |

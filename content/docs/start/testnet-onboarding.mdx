@@ -4,12 +4,17 @@ slug: start/testnet-onboarding
 label: Testnet onboarding
 title: Get started on testnet
 description: Fund a wallet from the Statics faucet and try staking, the pegged Dollar, and the live genesis basket on Robinhood Chain Testnet.
-updated: 2026-08-05
+updated: 2026-09-05
 order: 745
 badge: Testnet
 ---
 
-The Robinhood Chain Testnet ships an ownerless faucet and a live genesis basket so you can try Statics without production assets. Basket **creation** stays protocol-only on this deployment — see [Rollout](/docs/rollout).
+This guide targets the [previous public integration-beta release](/docs/reference/robinhood-testnet-deployment#previous-public-release),
+with its ownerless faucet and genesis basket. Its addresses and SDK pin are not
+those of the newer September rehearsal. Verify the target's current state and
+faucet inventory before sending transactions; this guide is not a live-health
+attestation. Basket **creation** is recorded as protocol-only on this deployment
+— see [Rollout](/docs/rollout).
 
 ## What you can do in this guide
 
@@ -36,7 +41,10 @@ testnet fixtures. They are deliberately not production defaults.
 
 ## Fund a wallet
 
-1. Connect to Robinhood Chain Testnet (chain ID `46630`).
+1. Connect to Robinhood Chain Testnet (chain ID `46630`) and fund the wallet
+   with native testnet ETH for gas. The listed Statics faucets dispense tokens,
+   not native gas; the claim transaction and PositionNFT creation fee both need
+   ETH.
 2. Claim testnet assets from the faucet.
 3. Approve `StaticsDiamond` (`0x2340741Ec94dF12678312f564eBc2c776d8FaA6a`) for
    the asset you want to use.

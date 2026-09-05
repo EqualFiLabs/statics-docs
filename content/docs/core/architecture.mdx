@@ -4,12 +4,12 @@ slug: core/architecture
 label: Architecture
 title: Architecture
 description: Statics is two coordinated EIP-2535 diamonds behind one ordinary user-action address, with custody and solvency split across clear boundaries.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 20
 ---
 
 **In plain language:** users talk to one main contract for baskets, positions,
-lending, and swaps; Dollar collateral and solvency live in a second contract so
+lending, and pool management; Dollar collateral and solvency live in a second contract so
 those books stay isolated.
 
 Statics is built as two EIP-2535 diamonds that share one timelock but keep
@@ -21,7 +21,7 @@ health machinery stay isolated in a separate `StaticsDollarCoreDiamond`.
 
 | Diamond | Role | Holds |
 | --- | --- | --- |
-| `StaticsDiamond` | User gateway, PositionNFT, baskets, rewards, lending, flash loans, protocol pools, and the Dollar gateway | Basket vaults, fee account, staking custody, voluntary LP custody |
+| `StaticsDiamond` | User gateway, PositionNFT, baskets, rewards, lending, flash loans, protocol pools, and the Dollar gateway | Basket vaults, fee account, staking custody, Genesis reward account, voluntary LP custody |
 | `StaticsDollarCoreDiamond` | Dollar collateral, issuance, health, transitions, insurance, and recovery | Core collateral and insurance |
 
 `StaticsDiamond` is the ordinary integration address. It is simultaneously the
@@ -54,6 +54,7 @@ StaticsDiamond
 ├── EIP-2535 dispatch and governance
 ├── PositionNFT ERC-721
 ├── basket creation, mint, redeem, collateral, lending, and flash loans
+├── Morpho collateral, USDstx borrowing, and loss synchronization
 ├── global staking, reward claims, and treasury fee distribution
 ├── Statics Dollar typed gateway, Risk liquidity, and funded incentives
 ├── shared custody reservations
@@ -70,8 +71,11 @@ StaticsDiamond
         |                           └── hook-owned permanent liquidity
         |
         +-------------------------> StaticsLiquidityManager
-                                    ├── normalized protocol-pool validation
-                                    └── typed user PositionManager NFT creation
+        |                           ├── normalized protocol-pool validation
+        |                           └── typed user PositionManager NFT creation
+        |
+        +-------------------------> position-specific StaticsMorphoAccount
+                                    └── Morpho Blue collateral and debt
 ```
 
 ## What lives where
@@ -81,11 +85,12 @@ accounting boundary can be verified independently:
 
 | Location | Holds |
 | --- | --- |
-| `StaticsDiamond` | Basket vault backing, the fee account, staking custody, and voluntarily custodied LP NFTs |
+| `StaticsDiamond` | Basket vault backing, the fee account, staking custody, Genesis reward account, and voluntarily custodied LP NFTs |
 | `StaticsDollarCoreDiamond` | Dollar collateral and insurance |
 | `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
 | `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
 | Uniswap v4 `PoolManager` | Basket-canonical and general-pool liquidity under v4 accounting |
+| Morpho Blue | Deployed collateral attributed to each position's `StaticsMorphoAccount` |
 
 Direct donations to the Diamond are unreserved and do not inflate backing, fee
 claims, or stake. See [Custody and accounting](/docs/core/custody) for the
@@ -93,15 +98,18 @@ reservation equation and deficit handling.
 
 ## Canonical deployment shape
 
-Current `master` source and fresh-deployment tests expect **30 facets / 254
+Current `master` source and fresh-deployment tests expect **34 facets / 283
 selectors** on `StaticsDiamond` and **11 facets / 95 selectors** on
 `StaticsDollarCoreDiamond`. These counts include the Operators integration,
-general-pool lifecycle, and batched-claim selectors.
+general-pool lifecycle, Morpho, portfolio, and batched-claim selectors. They
+are structural facts for the stated source/deployment revision, not a promise
+about every address.
 
-The public Robinhood Chain testnet manifest is an earlier deployment snapshot
-and currently records a different shape. Do not treat the PR source count as a
-live-address or deployed-bytecode claim; refresh `addresses.json` and the
-canonical ABI only when the matching deployment is published.
+The [earlier public Robinhood release and newer September rehearsal](/docs/reference/robinhood-testnet-deployment)
+are distinct snapshots. The downloadable `addresses.json` and ABIs remain pinned
+to the earlier release, which has a different shape. These source counts come
+from `test/deployment/DeployStatics.t.sol`, not a claim that every published
+address has been upgraded.
 
 ## Upgradeability
 

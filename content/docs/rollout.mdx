@@ -5,7 +5,7 @@ label: Rollout
 title: Rollout and availability
 description: The live Robinhood mainnet Genesis launch, the separate basket-protocol rollout, and which outcomes remain conditional on real activity.
 status: Protocol docs
-updated: 2026-08-27
+updated: 2026-09-05
 order: 15
 badge: Live
 ---
@@ -16,8 +16,9 @@ collection, reserve backing, treasury vesting, fee ingress, and launch reward
 system documented here.
 
 The broader Statics basket, Dollar, lending, and general-pool suite follows a
-separate deployment and governance lifecycle. The Robinhood testnet snapshot is
-retained as an integration reference and must not be used as a source of
+separate deployment and governance lifecycle. The earlier public Robinhood
+testnet release and newer September full-stack rehearsal are
+[separate records](/docs/reference/robinhood-testnet-deployment). Neither is a source of
 mainnet Genesis addresses.
 
 ## Live Genesis system
@@ -55,9 +56,10 @@ permissionless to create subject to token-behavior and market risk.
 
 Applications must read the active chain's deployed addresses and current
 onchain parameters before enabling basket, Dollar, lending, or general-pool
-actions. The [Robinhood testnet snapshot](/docs/reference/robinhood-testnet-deployment)
-and [testnet onboarding guide](/docs/start/testnet-onboarding) describe only the
-separate integration environment.
+actions. The [Robinhood testnet records](/docs/reference/robinhood-testnet-deployment)
+distinguish the two environments; the [testnet onboarding guide](/docs/start/testnet-onboarding)
+and vendored ABI/address downloads target the earlier public release. The
+rehearsal has its own manifest and does not replace those download bindings.
 
 ## Outcomes remain conditional
 

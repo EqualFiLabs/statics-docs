@@ -4,7 +4,7 @@ slug: core/custody
 label: Custody
 title: Custody and accounting
 description: Statics isolates logical reservations per module while LibCustody enforces global physical backing through measured, balance-delta transfers.
-updated: 2026-08-04
+updated: 2026-09-05
 order: 40
 ---
 
@@ -21,6 +21,7 @@ globalReserved(token)
   = dollarAccount(token)
   + feeAccount(token)
   + stakingAccount(token)
+  + genesisRewardAccount(token)
   + sum over all basketAccount(basketId, token)
 
 physical balance(token) >= globalReserved(token)
@@ -30,6 +31,11 @@ Each basket account covers that basket's vault backing, outstanding debt
 accounting, and recovery state. Moving a reservation between accounts (for
 example, reclassifying an origination fee into the fee ledger) does not change
 the global total — it only changes which sub-account claims it.
+
+The separate Genesis reward reservation covers assets actually held by the
+Diamond for its permanent Genesis reward books. Its account key is exposed by
+`genesisRewardCustodyAccount()`. It does not include backing or rewards still
+held at the standalone Genesis Vault or launch distributor.
 
 ## Measured transfers
 
@@ -57,10 +63,22 @@ Several physical locations are intentionally outside the Diamond reservation:
 | `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
 | `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
 | Uniswap v4 `PoolManager` | Canonical pool liquidity under v4 accounting |
+| Morpho Blue | Collateral supplied on behalf of position-specific `StaticsMorphoAccount` addresses |
+| `StaticsMorphoAccount` | Any raw ERC-20 balances sent directly to that account |
 
 Borrow-to-liquidity inventory cannot enter basket backing, global staking,
 permanent liquidity, or another user's accounting — it is scoped to the
 transaction.
+
+## Morpho external custody
+
+Basket collateral and staked STATICS deployed to approved Morpho Blue markets
+leave Diamond custody and are tracked by the position's Morpho accounting.
+Recall is subject to Morpho withdrawal and health checks. Interest increases
+external debt; liquidation or collateral loss is synchronized into the position's
+collateral and reward accounting. External allocations are not simultaneously
+reserved as physical Diamond balances. See [Morpho
+credit](/docs/lending/morpho) for the external-risk boundary.
 
 ## Deficits are incidents, not policy
 
