@@ -3,125 +3,80 @@ id: rollout
 slug: rollout
 label: Rollout
 title: Rollout and availability
-description: What Statics exposes on the recorded testnet deployment, what exists only in current source, and which outcomes stay conditional on real activity.
+description: The live Robinhood mainnet Genesis launch, the separate basket-protocol rollout, and which outcomes remain conditional on real activity.
 status: Protocol docs
 updated: 2026-08-27
 order: 15
-badge: Now
+badge: Live
 ---
 
-Statics is permissionless by design and staged in deployment. Current `master`
-has moved beyond the recorded Robinhood testnet bytecode, so source availability
-and deployment availability must be tracked separately.
+The **STATICS Genesis launch is live on Robinhood mainnet**. It established the
+fixed STATICS supply, the six-curve STATICS/WETH market, the 5,555 Operators
+collection, reserve backing, treasury vesting, fee ingress, and launch reward
+system documented here.
 
-Use this page to separate four clocks:
+The broader Statics basket, Dollar, lending, and general-pool suite follows a
+separate deployment and governance lifecycle. The Robinhood testnet snapshot is
+retained as an integration reference and must not be used as a source of
+mainnet Genesis addresses.
 
-| Clock | Meaning |
+## Live Genesis system
+
+| Field | Production status |
 | --- | --- |
-| **Source** | Present in current `statics` master and its fresh-deployment tests |
-| **Deployed** | Present in the recorded Robinhood testnet bytecode |
-| **Enabled** | Open to ordinary users under current onchain parameters |
-| **Conditional** | Possible when real activity, pricing, and risk conditions allow — never guaranteed |
+| Network | Robinhood mainnet |
+| Genesis launch | Live |
+| Fixed STATICS supply | 1,000,000,000 |
+| Doppler market inventory | 800,000,000 across six curves and 56 positions |
+| STATICS Operators | Fixed 5,555-token collection |
+| Gross backing | 180,000 STATICS per circulating Operator |
+| Treasury-side allocation | 100.1M STATICS vesting plus 99.9M Operator backing |
+| Permanent market tail | 120M STATICS, 15% of launch inventory |
 
-## Current phase
+The [Tokenomics](/docs/tokenomics) page records the exact allocation and curve
+geometry. [Launch and vesting](/docs/genesis/launch-and-vesting) explains the
+Prepare, Launch, and Finalize sequence, while the
+[Operators overview](/docs/genesis/overview) covers acquisition, redemption,
+activation, rewards, and protocol integration.
 
-| Field | Status |
-| --- | --- |
-| Network | Robinhood Chain Testnet (`46630`) |
-| Deployment class | Integration beta — addresses and parameters can change |
-| Mainnet | No production Statics deployment is recorded |
-| Basket creation | **Protocol-only** (`creationFee = 0` → owner-only genesis) |
-| Live basket example | Genesis **TPA1** (tokenized-stock fixtures: TSLA, PLTR, AMD) |
-| Diamonds | Pre-release and upgradeable under timelock |
-| Governed protocol pools | Deployed by timelock upgrade at block `97967966` |
-| Permissionless general pools | Current source only; **not deployed** at the recorded addresses |
-| Standalone STATICS Operators launch | Current source only; production hash remains zero |
+## Basket protocol availability
 
-:::warning Not production
-Do not treat testnet fixtures, mock USDG, owner-mintable STATICS, or the short timelock delay as production defaults. See the [deployment snapshot](/docs/reference/robinhood-testnet-deployment) and [security model](/docs/reference/security-model).
-:::
-
-## What you can do now
-
-On the integration beta, ordinary users can:
-
-- claim faucet fixtures and [get started on testnet](/docs/start/testnet-onboarding);
-- open a PositionNFT and stake `STATICS`;
-- mint and redeem the live genesis basket (TPA1);
-- swap on TPA1's canonical Uniswap v4 pools;
-- deposit basket tokens, borrow self-backed constituent credit, repay, extend, and recover;
-- mint pegged `USDstx` against the active Mock USDG profile;
-- stake eligible protocol-pool LP positions where configured.
-
-Ordinary users **cannot** create new baskets while the creation fee is zero.
-They also cannot use the current-source permissionless general-pool or Operators
-launch APIs against the recorded deployment.
-
-## Who can create baskets
-
-Onchain creation has two modes, switched by `creationFee()`:
+Basket creation has two onchain modes, switched by `creationFee()`:
 
 | `creationFee()` | Who may create |
 | --- | --- |
-| **Zero** | Diamond owner only (controlled genesis). Public creation is closed. |
-| **Positive** | Any caller that pays the exact native fee. |
+| **Zero** | Diamond owner only |
+| **Positive** | Any caller that pays the exact native fee |
 
-There is **no onchain partner role or asset allowlist**. While creation is owner-only, the protocol may still deploy baskets for selected partners through the same genesis path as an operational choice — that is offchain coordination, not a separate contract mode.
+There is no separate onchain partner role or asset allowlist. While creation is
+owner-only, governance may coordinate selected basket deployments through the
+same creation path. When the fee is positive, compatible ERC-20 baskets become
+permissionless to create subject to token-behavior and market risk.
 
-See [Basket creation](/docs/baskets/creation).
+Applications must read the active chain's deployed addresses and current
+onchain parameters before enabling basket, Dollar, lending, or general-pool
+actions. The [Robinhood testnet snapshot](/docs/reference/robinhood-testnet-deployment)
+and [testnet onboarding guide](/docs/start/testnet-onboarding) describe only the
+separate integration environment.
 
-## Expected basket focus
+## Outcomes remain conditional
 
-| Phase | Creation access | Basket focus |
-| --- | --- | --- |
-| **Initial launch / current beta** | Protocol only | Curated baskets. Testnet uses tokenized-stock fixtures (TPA1); exact launch compositions remain TBD until finalized. |
-| **Partner operations** | Protocol deploys for approved partners | Selected partner tokens and configurations, still via owner-controlled creation while the fee is zero |
-| **Open creation** | Anyone paying the creation fee | Compatible ERC-20 assets, subject to protocol requirements and token-behavior risk |
+The EVM fixes supply, allocation, backing rules, vesting, fee mathematics, and
+launch geometry. It does not guarantee market outcomes. Trading volume,
+rewards, liquidity growth, arbitrage participation, future valuation, and the
+USD value of Operator backing depend on real market activity and external
+prices.
 
-Statics is a generic fixed-bundle basket protocol (1–16 ERC-20s), not a stock-only product. Tokenized-stock baskets are the concrete early example.
-
-## Path to open creation
-
-Open (fee-gated) creation is a **parameter change** (`setCreationFee` under governance), not a separate product build. It depends on security review and release qualification, production staking-token and role configuration, economic parameters and monitoring, and market readiness.
-
-No calendar date is committed in these docs. Creation is open only once governance has actually raised the creation fee above zero — that onchain value is the authoritative signal.
-
-## Source and deployment matrix
-
-This matrix prevents current source from being mistaken for the recorded live
-deployment:
-
-| Surface | Source | Recorded testnet |
-| --- | --- | --- |
-| Permissionless basket creation | Implemented | **Disabled** while `creationFee = 0` |
-| Governed protocol pools | Superseded by normalized basket/general registry | Deployed; governance-created only |
-| Permissionless general pools | Implemented with independent fee switch and creator authorization | Not deployed |
-| Fixed 5% protocol-pool creator share | Implemented | Not deployed in the current-source form |
-| STATICS Operators standalone launch | Implemented and verification-gated | Not deployed; production hash is zero |
-| Redrawable Operator secured credit | Implemented | Not deployed |
-| Flash arbitrage receiver | Implemented; no profit guarantee | Available for compatible live baskets |
-| Permanent liquidity compounding | Permissionless; depth depends on activity | Available for registered live pools |
-| Dollar volatile profiles / risk recovery | Implemented | Check which profiles are active |
-| Production immutability | Later release ceremony | Not completed |
-
-The source-only Operators launch fixes supply and custody at 1B STATICS, 800M
-Doppler inventory, 100.1M native treasury vesting, 99.9M backing for the 555
-treasury-vesting Operators, and 5,000 Vault-owned Operators. These are
-deterministic source facts, not a live-deployment or market-valuation claim.
-
-## Outcomes are conditional
-
-Additional mint, redeem, and pool paths may increase activity when prices
-diverge, and activity can generate swap and non-swap fees. Fee shares may
-compound into permanent protocol-owned liquidity when inventory matches. Self-backed
-basket credit and Statics Dollar minting are available only within configured
-risk limits. None of these outcomes is guaranteed: volume, rewards, liquidity
-growth, and peg maintenance all depend on real market activity.
+Additional mint, redeem, pool, and credit paths may create activity when market
+conditions support them. Fee shares may compound into permanent
+protocol-owned liquidity when inventory matches. Self-backed basket credit and
+Statics Dollar minting remain bounded by their configured risk parameters.
 
 ## Related pages
 
-- [Introduction](/docs/introduction) — plain-language product overview
-- [Testnet onboarding](/docs/start/testnet-onboarding) — first actions on the beta
-- [Basket creation](/docs/baskets/creation) — fee switch and technical create path
-- [Deployment snapshot](/docs/reference/robinhood-testnet-deployment) — live addresses and parameters
-- [Security model](/docs/reference/security-model) — trust assumptions
+- [Tokenomics](/docs/tokenomics) — fixed supply, allocation, launch curves, and backing
+- [Launch and vesting](/docs/genesis/launch-and-vesting) — Genesis deployment sequence
+- [Operators overview](/docs/genesis/overview) — live Operator mechanics
+- [Formal verification](/docs/reference/verification) — machine-checked properties and proof boundaries
+- [Basket creation](/docs/baskets/creation) — creation fee switch and technical path
+- [Robinhood testnet snapshot](/docs/reference/robinhood-testnet-deployment) — separate integration environment
