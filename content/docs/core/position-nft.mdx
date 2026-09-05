@@ -107,9 +107,7 @@ block-consistent pages through `basketIdsOfPosition`, `loanIdsOfPosition`,
 cursor and a limit from **1 to 100** entries. Ordering can change after state updates;
 read all pages at one block and do not treat any list as append-only.
 
-Counts include a separate `morphoMarketCount`. The current pinned SDK's portfolio
-ABI omits that field; see the [SDK compatibility warning](/docs/reference/sdk#match-the-sdk-to-the-target)
-before decoding portfolio results.
+Counts include a separate `morphoMarketCount`.
 
 ## Onchain metadata
 
