@@ -1,13 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { compileFlashExample, deploymentShapes } from "./source-checks.mjs";
+import { compileFlashExample, deploymentShapes, errorMessage } from "./source-checks.mjs";
 
 test("deployment counts come from assertions, ignoring stale comments", () => {
   assert.deepEqual(deploymentShapes(`
+    string memory explorer = "https://example.invalid/_assertManifest(diamond, 1, 1)";
     // _assertManifest(diamond, 30, 254);
+    /*
+      _assertManifest(deployment.core, 9, 90);
+    */
     _assertManifest(deployment.core, 11, 95);
-    _assertManifest(diamond, 34, 283);
+    _assertManifest(diamond, 34, 283); // executable expectation
   `), { StaticsDollarCoreDiamond: "11 facets / 95 selectors", StaticsDiamond: "34 facets / 283 selectors" });
+});
+
+test("non-Error failures retain useful diagnostics", () => {
+  assert.equal(errorMessage(new Error("ordinary failure")), "ordinary failure");
+  assert.equal(errorMessage("thrown text"), "thrown text");
+  assert.equal(errorMessage(404), "404");
 });
 
 test("missing or conflicting deployment assertions fail closed", () => {

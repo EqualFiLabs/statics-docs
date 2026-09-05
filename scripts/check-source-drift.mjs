@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { deploymentShapes } from "./source-checks.mjs";
+import { deploymentShapes, errorMessage } from "./source-checks.mjs";
 
 const ROOT = process.cwd();
 const staticsRoot = process.env.STATICS_PATH ? path.resolve(process.env.STATICS_PATH) : "";
@@ -66,7 +66,7 @@ try {
   const documentedSdk = sdkDocs.match(/\| Current `statics` master source \| `([a-f0-9]{40})` \|/)?.[1];
   requireEqual(documentedSdk, sdkCommit, "current-source SDK revision");
 } catch (error) {
-  errors.push(`source drift: ${error.message}`);
+  errors.push(`source drift: ${errorMessage(error)}`);
 }
 
 // These high-impact surfaces previously had no public guide at all. Keep checks
@@ -108,9 +108,10 @@ for (const staleClaim of [
   "No production Statics deployment is recorded",
   "production hash remains zero",
   "Not deployed; production hash is zero",
+  "Current-source SDK gaps",
 ]) {
   if (docsText.toLowerCase().includes(staleClaim.toLowerCase())) {
-    errors.push(`docs drift: stale pre-launch claim remains: ${staleClaim}`);
+    errors.push(`docs drift: stale claim remains: ${staleClaim}`);
   }
 }
 

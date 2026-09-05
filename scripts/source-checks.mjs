@@ -2,9 +2,10 @@ import solc from "solc";
 
 // Read executable deployment expectations, not another copy of the docs prose.
 export function deploymentShapes(source) {
-  const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
+  const code = source.replace(/\/\*[\s\S]*?\*\//g, "");
   const result = {};
-  for (const match of code.matchAll(/_assertManifest\(\s*(diamond|deployment\.core)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/g)) {
+  const assertion = /^[\t ]*_assertManifest\(\s*(diamond|deployment\.core)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*;[\t ]*(?:\/\/[^\n]*)?$/gm;
+  for (const match of code.matchAll(assertion)) {
     const name = match[1] === "diamond" ? "StaticsDiamond" : "StaticsDollarCoreDiamond";
     const shape = `${match[2]} facets / ${match[3]} selectors`;
     if (result[name] && result[name] !== shape) throw new Error(`ambiguous deployment shape for ${name}`);
@@ -14,6 +15,10 @@ export function deploymentShapes(source) {
     if (!result[name]) throw new Error(`unable to derive deployment shape for ${name}`);
   }
   return result;
+}
+
+export function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 export function compileFlashExample(markdown, interfaceSource) {

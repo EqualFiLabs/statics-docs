@@ -49,7 +49,7 @@ These docs track two deliberate revisions:
 | Target | SDK revision |
 | --- | --- |
 | Earlier public Robinhood release and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
-| Current `statics` master source | `d6fd04e1b5ab28d2cb956055616d233fe28f84b3` |
+| Current `statics` master source | `8470f6c0c8b1924d142ea4c46ac4a2b692abe128` |
 
 Pin the deployment revision when submitting transactions to that earlier
 release. The [September rehearsal](/docs/reference/robinhood-testnet-deployment#september-2026-full-stack-rehearsal)
@@ -59,16 +59,11 @@ credit, Morpho, portfolio, and permissionless general-pool APIs that are not all
 deployed there. Installing unpinned SDK `master` does not ensure compatibility
 with a chosen deployment.
 
-:::warning Current-source SDK gaps
-Even the protocol-pinned SDK revision is not a complete mirror of current source.
-At `d6fd04e`, `positionPortfolioCounts` is encoded with five fields, while the
-source interface returns six, including `morphoMarketCount`. The SDK also omits
-`recoverMorphoAccountToken`. Use the matching contract interface/compiled ABI for
-these surfaces; do not treat a successful five-field decode as a complete
-portfolio. The dedicated `staticsPositionPortfolioAbi` omits the Morpho market
-enumerator, although that enumerator is present in `staticsAbi`. SDK alignment
-is separate work from this documentation update.
-:::
+At `8470f6c`, the current-source SDK includes the six-field
+`PositionPortfolioCounts` result with `morphoMarketCount`, raw Morpho account-token
+recovery, and `morphoMarketIdsOfPosition` in both the unified and dedicated
+portfolio ABIs. Those bindings describe current source; they do not imply that
+the earlier public deployment exposes the same selectors.
 
 ## Chain bindings
 
@@ -87,6 +82,8 @@ rounding helpers so integrators do not re-derive them:
   `TREASURY_GENESIS_BACKING`, `TREASURY_STATICS_VESTING_PRINCIPAL`, and the
   treasury Operator ID range and 60-day duration;
 - v4 fixed-point: `Q96`, `Q128`, `Q192`, `MIN_TICK`, `MAX_TICK`, `MAX_UINT256`;
+- Morpho math: `MORPHO_ORACLE_PRICE_SCALE`, `MORPHO_LLTV_SCALE`,
+  `MORPHO_VIRTUAL_ASSETS`, and `MORPHO_VIRTUAL_SHARES`;
 - `mulDivDown` / `mulDivUp`;
 - `backingAtSupply`, `selectFeeShares`, `encodeSqrtPriceAssetPerBasketX96`;
 - hook fee math: `quoteHookFee`, `splitSwapFee`, `effectiveCanonicalFees`;
@@ -108,7 +105,7 @@ Quotes mirror the onchain quote functions and return the same per-asset legs:
 | `quoteGenesisCreditRecovery` | Unused credit, recovery residual, caller incentive, and Genesis distribution |
 | `quoteBorrowAndProvideLiquidity` | Combined borrow + LP construction quote |
 | `quoteProtocolPool` | Sorted general-pool key, PoolId, normalized price, fee rate, creation fee, and creator-authorization digest |
-| `quoteMorphoHealth` | Debt, collateral value, and health derived from supplied Morpho market, position, oracle price, and LLTV inputs; refresh inputs and simulate before submitting |
+| `quoteMorphoHealth` | Debt, collateral value, and health derived from supplied Morpho market, position, oracle price, and LLTV inputs; debt conversion includes Morpho's virtual balances and rounds up; refresh inputs and simulate before submitting |
 
 ## Calldata builders
 
@@ -139,7 +136,8 @@ transaction fields such as native value. Coverage is not exhaustive:
 - Morpho: `buildDeployMorphoCollateralCall`, `buildRecallMorphoCollateralCall`,
   `buildWithdrawUntrackedMorphoCollateralCall`, `buildBorrowMorphoUsdCall`,
   `buildRepayMorphoUsdCall`, `buildSyncMorphoCall`, and
-  `buildClaimMorphoSyncBountiesCall`;
+  `buildClaimMorphoSyncBountiesCall`, plus the PositionNFT-authorized raw-token
+  sweep `buildRecoverMorphoAccountTokenCall`;
 - liquidity: `buildBorrowAndProvideLiquidityCall`,
   `buildBorrowAndStakeLiquidityCall`, `buildStakeLiquidityPositionCall`,
   `buildUnstakeLiquidityPositionCall`, `buildClaimLiquidityRewardsCall`,

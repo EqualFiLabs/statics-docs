@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { compileFlashExample } from "./source-checks.mjs";
+import { compileFlashExample, errorMessage } from "./source-checks.mjs";
 
 if (!process.env.STATICS_PATH) {
   console.error("check-solidity-examples: STATICS_PATH is required");
@@ -14,6 +14,6 @@ try {
   );
   console.log(`check-solidity-examples: flash receiver compiles against the source interface with solc ${version}`);
 } catch (error) {
-  console.error(`check-solidity-examples: ${error.message}`);
+  console.error(`check-solidity-examples: ${errorMessage(error)}`);
   process.exit(1);
 }
