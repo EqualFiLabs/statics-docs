@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
+import { deploymentShapes } from "./source-checks.mjs";
 
 const ROOT = process.cwd();
 const staticsRoot = process.env.STATICS_PATH ? path.resolve(process.env.STATICS_PATH) : "";
@@ -51,18 +53,43 @@ const docsText = [
   .join("\n")
   .replace(/\s+/g, " ");
 
-const architecture = read(staticsRoot, "docs/architecture.md");
-const shape = requireMatch(
-  architecture,
-  /installs (\d+) facets and (\d+) selectors on\s+`StaticsDiamond`, and (\d+) facets and (\d+) selectors on\s+`StaticsDollarCoreDiamond`/,
-  "fresh deployment shape",
-);
-if (shape) {
-  requireText(docsText, `**${shape[1]} facets / ${shape[2]} selectors**`, "StaticsDiamond shape");
-  requireText(docsText, `**${shape[3]} facets / ${shape[4]} selectors**`, "Core Diamond shape");
+try {
+  const shapes = deploymentShapes(read(staticsRoot, "test/deployment/DeployStatics.t.sol"));
+  const architecture = read(ROOT, "content/docs/core/architecture.mdx").replace(/\s+/g, " ");
+  for (const [name, shape] of Object.entries(shapes)) {
+    requireText(architecture, `**${shape}**`, `${name} fresh-deployment shape`);
+  }
+  const gitlink = execFileSync("git", ["-C", staticsRoot, "ls-tree", "HEAD", "sdk"], { encoding: "utf8" });
+  const sdkCommit = gitlink.match(/^160000 commit ([a-f0-9]{40})\s+sdk$/m)?.[1];
+  if (!sdkCommit) throw new Error("cannot resolve protocol SDK gitlink");
+  const sdkDocs = read(ROOT, "content/docs/reference/sdk.mdx");
+  const documentedSdk = sdkDocs.match(/\| Current `statics` master source \| `([a-f0-9]{40})` \|/)?.[1];
+  requireEqual(documentedSdk, sdkCommit, "current-source SDK revision");
+} catch (error) {
+  errors.push(`source drift: ${error.message}`);
+}
+
+// These high-impact surfaces previously had no public guide at all. Keep checks
+// page-local so an unrelated mention cannot substitute for integration guidance.
+for (const [page, sourceInterface, names] of [
+  ["lending/morpho", "src/interfaces/IStaticsMorpho.sol", ["IStaticsMorpho", "deployMorphoCollateral", "recallMorphoCollateral", "borrowMorphoUsd", "repayMorphoUsd", "syncMorpho", "recoverMorphoAccountToken"]],
+  ["core/position-nft", "src/interfaces/IStaticsPositionPortfolio.sol", ["IStaticsPositionPortfolio", "positionPortfolioCounts", "basketIdsOfPosition", "loanIdsOfPosition", "liquidityPositionIdsOfPosition", "globalRewardAssetsOfPosition", "riskSeriesIdsOfPosition", "morphoMarketIdsOfPosition"]],
+  ["dollar/risk-liquidity", "src/dollar/interfaces/IStaticsDollarRiskLiquidity.sol", ["IStaticsDollarRiskLiquidity", "createAndStakeRiskShares", "stakeRiskShares", "unstakeRiskShares", "claimRiskProceeds", "riskLiquidity"]],
+]) {
+  const pageText = read(ROOT, `content/docs/${page}.mdx`);
+  const source = read(staticsRoot, sourceInterface);
+  for (const name of names) {
+    requireText(pageText, name, `${page}: ${name}`);
+    requireText(source, name, `${sourceInterface}: ${name}`);
+  }
 }
 
 const launcher = read(staticsRoot, "script/DeployStaticsGenesis.s.sol");
+const rewardsGuide = read(ROOT, "content/docs/rewards/global-rewards.mdx");
+requireText(rewardsGuide, "eligibleWeight", "boost-adjusted global reward denominator");
+requireText(rewardsGuide.toLowerCase(), "weighted", "pending top-up waiting-time accounting");
+requireText(read(ROOT, "content/docs/core/custody.mdx"), "genesisRewardAccount", "separate Genesis reward custody reservation");
+
 for (const [constant, label] of [
   ["STATICS_SUPPLY", "fixed STATICS supply"],
   ["DOPPLER_INVENTORY", "Doppler inventory"],
