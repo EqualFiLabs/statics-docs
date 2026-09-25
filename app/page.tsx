@@ -136,6 +136,43 @@ export default function HomePage() {
         </section>
 
         <section className="landing-section">
+          <h2>What is live</h2>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Surface</th>
+                  <th>Network</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>STATICS supply, six-curve market, and Operators</td>
+                  <td>Robinhood Chain, chain ID 4663</td>
+                  <td>
+                    Live. <Link href="/docs/reference/robinhood-mainnet-genesis">Addresses</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Baskets, Statics Dollar, lending, and protocol pools</td>
+                  <td>Robinhood Chain Testnet, chain ID 46630</td>
+                  <td>
+                    Integration reference.{" "}
+                    <Link href="/docs/reference/robinhood-testnet-deployment">Addresses</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Baskets, Statics Dollar, lending, and protocol pools</td>
+                  <td>Robinhood Chain mainnet</td>
+                  <td>Not in the recorded deployment</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="landing-section">
           <h2>What Statics provides</h2>
           <div className="card-grid">
             {capabilities.map((capability) => (
