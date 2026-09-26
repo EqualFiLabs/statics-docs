@@ -4,7 +4,7 @@ slug: reference/security-model
 label: Security model
 title: Security model
 description: Authority, custody, and liveness assumptions for the Statics protocol.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 750
 ---
 
@@ -57,6 +57,13 @@ about the chain (liveness).
 
 ## Liveness and oracles
 
+- [Morpho credit](/docs/lending/morpho) adds external oracle, LLTV, interest-rate,
+  liquidity, and liquidation assumptions. Supplied collateral leaves Diamond
+  custody; synchronization records collateral loss and can forfeit
+  uncrystallized rewards. Already deployed STATICS is not freely withdrawable.
+  Market admission does not guarantee safe collateral valuation or liquidity.
+  Morpho market `ExitOnly` is its own governance gate, separate from basket
+  quarantine and the ordinary global pause.
 - Dollar safety depends on configured oracle, sequencer, collateral, health, and
   governance parameters. A misconfigured or manipulated feed impairs or halts a
   profile; impairment latches exits until 48 continuous healthy hours are
@@ -88,6 +95,10 @@ about the chain (liveness).
 - Permissionless Risk incentive funding is restricted to the series collateral,
   Statics Dollar, and configured staking token, but funders still bear series,
   profile, consumption, rollover, and retirement timing risk.
+- [Dollar Risk liquidity](/docs/dollar/risk-liquidity) is consumed during fills.
+  Incentive funders have no refund route; unspent reserves may roll into a
+  successor series or route globally on retirement. Original deposits are not
+  guaranteed withdrawal amounts.
 - Basket-loan recovery and Dollar expired-risk recovery have distinct
   caller-incentive formulas; other basket and liquidity maintenance has no
   guaranteed caller or protocol bounty.
@@ -95,6 +106,9 @@ about the chain (liveness).
   only after maturity plus grace and pays a configured share of the fixed
   recovery residual to the caller while distributing the remainder through the
   existing Genesis reward books.
+- Morpho synchronization has a separate configurable keeper bounty drawn from
+  forfeited uncrystallized rewards, not a fixed percentage of collateral. A
+  keeper must claim the resulting per-asset credit separately.
 
 ## Testnet fixtures are not production trust assumptions
 

@@ -4,7 +4,7 @@ slug: reference/indexing
 label: Indexing
 title: Indexing
 description: Events and read models for building reorg-safe indexers over Statics state.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 730
 ---
 
@@ -33,6 +33,7 @@ deployed facet bytecode; do not hand-encode them.
 | Position | `(chainId, StaticsDiamond, positionId)` | `positionState`, `isLegActive`, `IPositionOwnerIndex` enumeration |
 | Basket | `basketId` | basket config, supply, backing, reward state |
 | Loan tranche | `loanId` | stored principal vector, maturity, lock state |
+| Morpho position market | `(chainId, StaticsDiamond, positionId, marketId)` | `morphoMarket`, `morphoAccount`, `morphoPositionMarket`, external Morpho state |
 | Dollar series | `(profileId, seriesId)` | series state, Risk liquidity, incentive reserves |
 | Custody | `token` | `globalReservedByToken`, per-account reservations |
 | Genesis | `(chainId, StaticsGenesis, genesisId)` | ownership/lock state, registration, activation, direct reward views, and `genesisOwnerClaimable` |
@@ -42,7 +43,11 @@ deployed facet bytecode; do not hand-encode them.
 
 The PositionNFT owner index (`positionCount`, `positionsOfOwner`) lets an indexer
 enumerate a wallet's current positions without scanning every transfer event;
-call `syncPositionOwnerIndex` for any legacy position not yet migrated.
+call `syncPositionOwnerIndex` for any legacy position not yet migrated. Portfolio
+views expose bounded, block-consistent pages (maximum 100 entries) for basket
+IDs, loan IDs, LP NFTs, global reward assets, Dollar Risk series, and Morpho
+markets. Ordering can change after state updates, so persist the block and
+cursor together; neither owner indexing nor portfolio ordering is append-only.
 
 ## Reorg-safe indexing
 
@@ -61,10 +66,24 @@ the view that reports the stored post-state.
 
 ## No background execution
 
-No keeper runs automatically. Lifecycle transitions, recovery, compounding,
-treasury distribution, and ExitOnly unwind only advance when a transaction is
-submitted. An indexer should not assume time-based state changes; it should
-reflect state only after the confirming event is finalized.
+No keeper runs automatically. Persisted lifecycle transitions, recovery,
+compounding, treasury distribution, and ExitOnly unwind only advance when a
+transaction is submitted and should be reconciled from finalized events. Derived
+eligibility and status are different: `globalImpairment()`, extension eligibility,
+and recovery eligibility can change at timestamp boundaries without a new
+Statics event. Refresh those views at a known block and reevaluate actions
+against that block's timestamp and external inputs.
+
+## Morpho reconciliation
+
+Discover approved markets from `MorphoMarketRegistered`; follow
+`MorphoMarketModeChanged`, `MorphoAccountDeployed`, collateral deployment/recall,
+borrow/repay, `MorphoSynchronized`, and bounty claim events. Direct Morpho
+liquidations and oracle or interest changes need not emit a Statics event.
+Refresh external debt/health and compare tracked versus actual collateral in
+`morphoPositionMarket`; a read does not synchronize the position. Account-token
+recovery and untracked-surplus withdrawal are distinct from recalled deposits
+and must not be added to the source stake ledger.
 
 ## Genesis event and claim handling
 

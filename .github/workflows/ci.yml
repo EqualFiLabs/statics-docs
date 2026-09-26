@@ -50,6 +50,11 @@ jobs:
           STATICS_PATH: ${{ github.workspace }}/.verification/statics
         run: npm run check:source
 
+      - name: Test source checks and compile the flash example
+        env:
+          STATICS_PATH: ${{ github.workspace }}/.verification/statics
+        run: npm test && npm run check:examples
+
       - name: Check links, types, and production build
         env:
           NEXT_TELEMETRY_DISABLED: 1

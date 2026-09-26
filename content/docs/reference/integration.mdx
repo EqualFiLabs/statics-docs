@@ -4,7 +4,7 @@ slug: reference/integration
 label: Integration
 title: Integration guide
 description: The single StaticsDiamond address, the approvals and interfaces to call, and the common flows with their failure conditions.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 710
 ---
 
@@ -17,7 +17,8 @@ separate user router.
 
 - **Quote immediately before submission.** Quotes reflect current supply, pool
   state, and health.
-- **Pass explicit maximums and minimums** on every value-moving call.
+- **Use the maximums and minimums provided by each interface.** Do not invent
+  parameters for exact-amount calls or `claimRiskProceeds`, which has no minima.
 - **Scope approvals to the typed next action.** Reusable allowances are tolerated
   by the permit paths but not required.
 - **Reconcile indexed events against current views** after reorgs.
@@ -97,6 +98,18 @@ flashLender.flashLoan(basketId, shares, address(receiver), routeData);
 // keccak256("IStaticsFlashBorrower.onStaticsFlashLoan") and restore principal + fees.
 ```
 
+## Morpho and Dollar Risk liquidity
+
+Use [Morpho credit](/docs/lending/morpho) for the exact deploy, borrow,
+repay, recall, synchronization, and account-recovery calls. Morpho repayment
+pulls `maxAssets` from the authorized caller and refunds unused USDstx; it is
+not the self-backed loan's permissionless fixed-principal repayment path.
+
+Use [Dollar Risk liquidity](/docs/dollar/risk-liquidity) for ERC-1155 approval,
+create-and-stake, consumption-aware withdrawal, three-asset claims, incentive
+funding, and finalization. Both rails attach obligations and claims to the
+[PositionNFT portfolio](/docs/core/position-nft#portfolio-enumeration).
+
 ## Integrate Genesis
 
 Genesis is the contract/API name for the **STATICS Operators** collection. It
@@ -151,8 +164,8 @@ repayment, and recovery semantics.
 
 ## Create and discover general pools
 
-Current source supports permissionless general pools, but the recorded testnet
-deployment exposes the earlier governed-pool version. Against a matching future
+Current source supports permissionless general pools, but the earlier public
+testnet release exposes the governed-pool version. Against a matching
 deployment, call `quotePool(params)` immediately before
 `createPool(params, creatorAuthorization)`. The quote provides the sorted
 PoolKey, PoolId, normalized price, exact creation fee, and EIP-712 digest.
@@ -175,12 +188,13 @@ with `claimCreatorRevenue(asset, receiver, minReceived)`. See
 | Permanent Genesis integration | `IStaticsGenesisIntegration` |
 | Lending | `IStaticsLending` |
 | Flash loans | `IStaticsFlashLoan`, `IStaticsFlashBorrower` |
-| PositionNFT | `IStaticsPosition`, ERC-721, `IStaticsPositionMetadata`, `IPositionOwnerIndex` |
+| PositionNFT | `IStaticsPosition`, ERC-721, `IPositionOwnerIndex`, `IStaticsPositionPortfolio` |
 | Governance / custody | `IStaticsGovernance`, `IStaticsCustody` |
 | Liquidity | `IStaticsBasketLiquidity`, `IStaticsLiquidityRewards`, `IStaticsBorrowLiquidity` |
 | General pools and creator revenue | `IStaticsProtocolPools`, `IStaticsProtocolRevenue` |
 | Hook / manager | `IStaticsSwapFeeHook`, `IStaticsLiquidityManager` |
 | Dollar | `IStaticsDollarGateway`, `IStaticsDollarRiskLiquidity`, `IStaticsDollarRiskIncentives`, `IStaticsDollarCore` |
+| Morpho credit | `IStaticsMorpho` |
 
 :::note
 `IStaticsBasketLaunchModule` is an internal composition boundary. Its selectors

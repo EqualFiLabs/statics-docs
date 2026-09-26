@@ -4,7 +4,7 @@ slug: governance/timelock-and-roles
 label: Timelock & roles
 title: Timelock and roles
 description: A shared Statics timelock owns both diamonds and defines proposer, canceller, executor, guardian, and treasury roles.
-updated: 2026-08-04
+updated: 2026-09-05
 order: 610
 ---
 
@@ -43,6 +43,15 @@ The timelock currently controls Diamond cuts, economic configuration, lifecycle
 release and decommissioning, hook fee configuration, and treasury or guardian
 changes. Reward-asset selection is a PositionNFT owner action and requires no
 governance admission or retirement.
+
+Morpho administration is also owner-gated: integration initialization, market
+registration, `setMorphoMarketMode`, `setMorphoSyncBountyBps`, and
+`setMorphoPerformanceFeeConfig` flow through the timelock. Registered markets
+use `Active` or `ExitOnly`; the latter blocks new collateral deployments and
+borrows while preserving exits and settlement. The guardian's basket quarantine
+does not set Morpho market mode. An unset performance-fee router disables that
+fee route; a market registration alone is not evidence of a live lender-reward
+product. See [Morpho credit](/docs/lending/morpho).
 
 ## Diamond cuts are the only upgrade path
 

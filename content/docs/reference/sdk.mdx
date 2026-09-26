@@ -4,7 +4,7 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-27
+updated: 2026-09-05
 order: 720
 ---
 
@@ -48,12 +48,22 @@ These docs track two deliberate revisions:
 
 | Target | SDK revision |
 | --- | --- |
-| Recorded Robinhood testnet deployment and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
-| Current `statics` master source | `f4b88bf43a130fbd5fa8aebd2b784da16fa54b6f` |
+| Earlier public Robinhood release and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
+| Current `statics` master source | `8470f6c0c8b1924d142ea4c46ac4a2b692abe128` |
 
-Pin the deployment revision when submitting transactions to the recorded live
-addresses. Current master includes Operators launch/vesting, redrawable Genesis
-credit, and permissionless general-pool APIs that are not deployed there.
+Pin the deployment revision when submitting transactions to that earlier
+release. The [September rehearsal](/docs/reference/robinhood-testnet-deployment#september-2026-full-stack-rehearsal)
+has its own source, tooling, and address record; it is not the target of these
+vendored ABI downloads. Current source includes Operators launch/vesting, redrawable Genesis
+credit, Morpho, portfolio, and permissionless general-pool APIs that are not all
+deployed there. Installing unpinned SDK `master` does not ensure compatibility
+with a chosen deployment.
+
+At `8470f6c`, the current-source SDK includes the six-field
+`PositionPortfolioCounts` result with `morphoMarketCount`, raw Morpho account-token
+recovery, and `morphoMarketIdsOfPosition` in both the unified and dedicated
+portfolio ABIs. Those bindings describe current source; they do not imply that
+the earlier public deployment exposes the same selectors.
 
 ## Chain bindings
 
@@ -72,6 +82,8 @@ rounding helpers so integrators do not re-derive them:
   `TREASURY_GENESIS_BACKING`, `TREASURY_STATICS_VESTING_PRINCIPAL`, and the
   treasury Operator ID range and 60-day duration;
 - v4 fixed-point: `Q96`, `Q128`, `Q192`, `MIN_TICK`, `MAX_TICK`, `MAX_UINT256`;
+- Morpho math: `MORPHO_ORACLE_PRICE_SCALE`, `MORPHO_LLTV_SCALE`,
+  `MORPHO_VIRTUAL_ASSETS`, and `MORPHO_VIRTUAL_SHARES`;
 - `mulDivDown` / `mulDivUp`;
 - `backingAtSupply`, `selectFeeShares`, `encodeSqrtPriceAssetPerBasketX96`;
 - hook fee math: `quoteHookFee`, `splitSwapFee`, `effectiveCanonicalFees`;
@@ -93,16 +105,17 @@ Quotes mirror the onchain quote functions and return the same per-asset legs:
 | `quoteGenesisCreditRecovery` | Unused credit, recovery residual, caller incentive, and Genesis distribution |
 | `quoteBorrowAndProvideLiquidity` | Combined borrow + LP construction quote |
 | `quoteProtocolPool` | Sorted general-pool key, PoolId, normalized price, fee rate, creation fee, and creator-authorization digest |
+| `quoteMorphoHealth` | Debt, collateral value, and health derived from supplied Morpho market, position, oracle price, and LLTV inputs; debt conversion includes Morpho's virtual balances and rounds up; refresh inputs and simulate before submitting |
 
 ## Calldata builders
 
-Every ordinary user action has a `build*Call` / `build*Transaction` helper that
-returns signed-calldata-ready `Hex`:
+The SDK provides `build*Call` / `build*Transaction` helpers for many ordinary
+user actions. Call builders encode calldata; transaction builders also carry
+transaction fields such as native value. Coverage is not exhaustive:
 
 - baskets: `buildCreateBasketTransaction`, `buildMintCall`, `buildRedeemCall`,
   collateral deposit/withdraw/redeem;
-- positions: `buildCreatePositionCall`, `buildClosePositionCall`,
-  `buildSetPositionRendererCall`;
+- positions: `buildCreatePositionCall`, `buildClosePositionCall`;
 - rewards: `buildCreateAndStakeCall`, `buildStakeCall`, `buildUnstakeCall`,
   `buildOptIn/OptOutRewardAssetsCall`, `buildClaimRewardsCall`, plus Genesis
   registration, activation, launch/permanent accrual, single-token claims,
@@ -120,6 +133,11 @@ returns signed-calldata-ready `Hex`:
   and `buildSetTreasuryWithdrawalRecipientCall`;
 - lending: `buildBorrowCall`, `buildRepayCall`, `buildExtendCall`,
   `buildRecoverCall`, `buildFlashLoanCall`;
+- Morpho: `buildDeployMorphoCollateralCall`, `buildRecallMorphoCollateralCall`,
+  `buildWithdrawUntrackedMorphoCollateralCall`, `buildBorrowMorphoUsdCall`,
+  `buildRepayMorphoUsdCall`, `buildSyncMorphoCall`, and
+  `buildClaimMorphoSyncBountiesCall`, plus the PositionNFT-authorized raw-token
+  sweep `buildRecoverMorphoAccountTokenCall`;
 - liquidity: `buildBorrowAndProvideLiquidityCall`,
   `buildBorrowAndStakeLiquidityCall`, `buildStakeLiquidityPositionCall`,
   `buildUnstakeLiquidityPositionCall`, `buildClaimLiquidityRewardsCall`,

@@ -11,6 +11,8 @@
     "check:abis": "node scripts/sync-abis.mjs --check",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:source": "node scripts/check-source-drift.mjs",
+    "check:examples": "node scripts/check-solidity-examples.mjs",
+    "test": "node --test scripts/source-checks.test.mjs",
     "verify": "npm run check:links && npm run typecheck && npm run build",
     "postbuild": "pagefind --site out && node scripts/generate-agent-output.mjs"
   },
@@ -28,11 +30,17 @@
     "remark-gfm": "^4.0.1",
     "shiki": "^4.3.1"
   },
+  "overrides": {
+    "solc": {
+      "tmp": "0.2.7"
+    }
+  },
   "devDependencies": {
     "@types/node": "^22.15.17",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "pagefind": "^1.5.2",
+    "solc": "0.8.33",
     "typescript": "^5.8.3"
   }
 }

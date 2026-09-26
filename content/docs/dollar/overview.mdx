@@ -4,7 +4,7 @@ slug: dollar/overview
 label: Overview
 title: Statics Dollar
 description: The Statics Dollar (USDstx) is a senior dollar minted from volatile or pegged collateral, governed by the Dollar Core diamond.
-updated: 2026-08-04
+updated: 2026-09-05
 order: 210
 ---
 
@@ -47,8 +47,14 @@ burns Dollar and returns proportional collateral less its fee.
 Users never call the Core diamond directly for ordinary actions. `StaticsDiamond`
 exposes a typed gateway: `depositETH`/`depositWETH`, `recombineToWETH`/
 `recombineToETH`, pegged mint and redeem, pairing vault redemption, and the
-atomic mint-and-recompose helpers. Each typed entrypoint carries its own permit
-variant.
+atomic mint-and-recompose helpers. Permit variants exist only on the ERC-20
+routes that expose them: volatile recombination and pegged mint/redeem. Native
+`depositETH` and WETH-funded `depositWETH` do not have a corresponding
+permit variant.
+
+Risk Share suppliers use the separate [Risk liquidity and incentives](/docs/dollar/risk-liquidity)
+flow to attach consumable shares to a PositionNFT, withdraw remaining effective
+liquidity, and claim proceeds. It is not ordinary passive staking.
 
 :::note
 Expired volatile-series risk recovery is separately permissionless. It burns the

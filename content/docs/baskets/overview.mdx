@@ -4,7 +4,7 @@ slug: baskets/overview
 label: Overview
 title: Static baskets
 description: A static basket is a fixed-bundle ERC-20 token of up to 16 assets with a deliberate non-ERC-4626 mint and redemption model.
-updated: 2026-08-05
+updated: 2026-09-05
 order: 110
 ---
 
@@ -73,8 +73,24 @@ assume sorted or unique tiers.
 
 Every basket has a separate position-reward denominator. The fixed reward-asset
 set is the BasketToken plus every constituent, so a sixteen-asset basket has at
-most seventeen reward books and needs no reward-asset opt-in loop. See
-[Basket position rewards](/docs/rewards/global-rewards).
+most seventeen reward books and needs no reward-asset opt-in loop. These are
+separate books from [global STATICS rewards](/docs/rewards/global-rewards).
+
+## Basket position reward eligibility
+
+Depositing BasketTokens does not earn fees immediately. A fresh deposit enters
+pending weight and activates at an hourly boundary at least 24 hours later
+(24–25 hours). Top-ups merge into existing pending shares using a weighted age,
+following the [pending-age calculation](/docs/rewards/global-rewards#the-24-hour-eligibility-delay).
+Already matured shares remain eligible; a pending tranche cannot capture fees
+from before its activation index.
+
+Withdrawal removes pending shares before eligible shares. There is no separate
+next-block withdrawal cooldown in current source, but loan locks and Morpho
+deployments restrict the available balance. Locking matured shares for a
+self-backed loan does not remove their reward eligibility; it also does not
+accelerate pending shares into eligibility. Morpho collateral loss can reduce
+recorded deposits and uncrystallized rewards on synchronization.
 
 ## What baskets are not
 

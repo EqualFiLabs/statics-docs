@@ -1,0 +1,128 @@
+---
+id: morpho
+slug: lending/morpho
+label: Morpho credit
+title: Morpho credit
+description: External Morpho Blue markets let positions deploy approved basket or staked STATICS collateral to borrow USDstx under oracle and liquidation risk.
+updated: 2026-09-05
+order: 345
+---
+
+Morpho credit is an external, oracle-based lending rail. It is separate from
+[self-backed basket lending](/docs/lending/overview): approved Morpho Blue
+markets define an oracle, LLTV, interest model, and USDstx liquidity, while the
+Statics position tracks deployed collateral, debt shares, rewards, and losses.
+
+The calls below are defined by `IStaticsMorpho` at `StaticsDiamond`. They describe
+current source, not the [earlier public deployment](/docs/reference/robinhood-testnet-deployment).
+
+## Discover approved markets
+
+Index `MorphoMarketRegistered` events to discover market IDs, then read each
+registered market through `morphoMarket` and inspect its
+asset pair, oracle, LLTV, and enabled mode before using it. A position tracks at
+most **16 historical Morpho markets**; this is a bounded accounting inventory,
+not a promise that every market is safe or liquid. The September rehearsal
+registered separate staked-STATICS/USDstx and TPA1/USDstx markets, but deployment
+manifests—not this page—are authoritative for addresses and availability.
+
+Governance registers markets and changes their mode through the Diamond owner
+(the timelock). `Active` permits new deployments and borrows; `ExitOnly` stops
+those increases but retains repayment, recall, surplus withdrawal, and
+synchronization. `Disabled` is an enum sentinel, not an accepted registration or
+mode-setting value. A basket quarantine or global pause is not a substitute for
+changing the Morpho market mode: these entrypoints use their own market gate.
+
+## Collateral and borrowing
+
+The PositionNFT authorizes `deployMorphoCollateral` and
+`recallMorphoCollateral` for eligible basket collateral or staked STATICS.
+Deploying moves collateral into Morpho's external custody;
+ordinary `unstake`, basket collateral withdrawal, and self-backed borrowing can
+use only the undeployed remainder. Recall must satisfy Morpho's withdrawal and
+health requirements.
+
+For a registered market, the ordinary flow is:
+
+1. Deposit BasketTokens or stake STATICS into an authorized PositionNFT.
+2. Call `deployMorphoCollateral(positionId, marketId, assets)` using only the
+   available balance. Basket availability excludes both self-backed loan locks
+   and existing Morpho deployments; STATICS availability excludes existing
+   Morpho deployments.
+3. Call `borrowMorphoUsd(positionId, marketId, assets, maxBorrowShares, receiver)`.
+   Morpho sends USDstx to the receiver; the wrapper enforces the debt-share cap
+   and an exact receiver credit. The receiver cannot be zero, the Diamond, or a
+   known Statics Morpho account.
+4. Approve USDstx to the Diamond and call
+   `repayMorphoUsd(positionId, marketId, assets, shares, maxAssets)`. Set exactly
+   one of `assets` or `shares` nonzero. The wrapper pulls **all `maxAssets`** from
+   the authorized caller, repays, and refunds the unused amount. Fund and approve
+   the cap, not just the estimated repayment; taxed receipts are rejected.
+5. Call `recallMorphoCollateral(positionId, marketId, assets)` to restore tracked
+   collateral to Diamond custody, then withdraw or unstake through its original
+   module. Recall does not send collateral directly to the wallet.
+
+Borrow and repay USDstx through `borrowMorphoUsd` and `repayMorphoUsd`.
+Borrowing increases Morpho
+debt shares; interest accrues according to the market's model, and caller
+slippage/debt-share limits must be checked against the market view, the SDK's
+`quoteMorphoHealth`, and transaction simulation. Unlike basket
+loan repayment, the Statics wrapper repayment is PositionNFT-authorized; it is
+not a permissionless “any payer” repayment path.
+
+## Liquidation and synchronization
+
+Oracle movement, accrued interest, and LLTV determine borrowing health; available
+USDstx market liquidity separately limits borrowing. Liquidation can reduce
+collateral and rewards. Anyone may call
+`syncMorpho` (or the module-specific lazy synchronization path) before actions
+that depend on current Morpho state. Read views may expose tracked and actual
+values separately; a view call itself does not mutate or synchronize.
+The lazy `syncMorphoForModule` entrypoint is Diamond-only; external keepers use
+`syncMorpho(positionId, marketId)`. Synchronization can record loss in both
+collateral and reward accounting. There is no fixed promise that principal or
+uncrystallized rewards survive liquidation.
+
+Keepers may receive a configured portion of forfeited, uncrystallized rewards
+through the synchronization bounty path; it is not a general collateral
+settlement bounty. That incentive does not remove Morpho's external
+oracle, IRM, liquidity, smart-contract, or governance risks.
+
+`liquidateMorphoAndSync(positionId, marketId, seizedAssets, repaidShares,
+maxRepayAssets, minSeizedAssets, receiver)` is permissionless when Morpho permits
+liquidation. Choose exactly one of seized assets or repaid shares, approve the
+USDstx cap, and bound both repayment and received collateral. It repays the debt,
+sends seized collateral to the receiver, refunds unused USDstx, and synchronizes
+the affected position. Liquidations performed directly on Morpho must also be
+reconciled. Keepers read `morphoSyncBounty(keeper, asset)` and pull their credits
+with `claimMorphoSyncBounties(assets, receiver)`; synchronization does not pay
+the bounty immediately.
+
+## Account and surplus reads
+
+`morphoAccount(positionId)` returns the deterministic account address and whether
+it has been deployed. Collateral supplied to Morpho is held by Morpho and
+attributed to that account, not held as a raw balance at the account address.
+`morphoPositionMarket` separates tracked collateral, actual collateral, untracked
+surplus, debt shares, and the tracked debt-active flag. External donations are
+not new deposits and do not increase reward weight. Use
+`withdrawUntrackedMorphoCollateral(positionId, marketId, assets, receiver)` for
+supplied surplus, subject to Morpho health checks; do not treat it as a recall of
+tracked collateral. Enumerate historical markets with `morphoMarketIdsOfPosition`
+at a single block.
+
+## Position closure and recovery
+
+`isPositionClosable` is an aggregate view and does **not** guarantee that
+`closePosition` will succeed: close additionally requires every tracked historical
+Morpho market to have zero tracked collateral, actual collateral, and borrow
+shares. Recover raw account tokens before closure with
+`recoverMorphoAccountToken(positionId, token, amount, receiver, minReceived)`;
+this authorized call sweeps tokens held directly at the deployed account, not
+collateral supplied to Morpho. The account-empty guard
+does not enumerate arbitrary ERC-20 balances. Treat `closePosition` as a
+state-changing check, not a quote.
+
+The Morpho performance-fee router is separately configured. In the September
+rehearsal manifest it is intentionally unset, so that rehearsal does not
+demonstrate an operating lender-reward product.

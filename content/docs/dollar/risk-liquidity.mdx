@@ -1,0 +1,82 @@
+---
+id: dollar-risk-liquidity
+slug: dollar/risk-liquidity
+label: Risk liquidity
+title: Dollar Risk liquidity and incentives
+description: Supply consumable Risk Shares, receive accrued three-asset proceeds, and fund bounded series incentives.
+updated: 2026-09-05
+order: 260
+---
+
+Dollar Risk liquidity is a series-scoped position leg, not ordinary passive
+staking. A supplier deposits Risk Shares for a volatile Dollar series and makes
+them available for consumption by the protocol's senior/junior settlement
+flows. Consumption reduces effective shares; the original deposit is not a
+guaranteed withdrawable balance. The interface is `IStaticsDollarRiskLiquidity`
+at `StaticsDiamond`.
+
+## Supply and withdraw
+
+Approve the ERC-1155 Risk Share token with `setApprovalForAll(StaticsDiamond,
+true)`, then choose the path that fits
+the position lifecycle:
+
+```text
+createAndStakeRiskShares(seriesId, amount, receiver) payable
+stakeRiskShares(positionId, seriesId, amount)
+riskLiquidity(positionId, seriesId) -> effective shares and accrued proceeds
+unstakeRiskShares(positionId, seriesId, amount, receiver)
+```
+
+`createAndStakeRiskShares` creates the PositionNFT and attaches the liquidity in
+one action and requires the exact current `positionCreationFee()` in native
+currency. `stakeRiskShares` adds to an existing authorized position. Both pull
+Risk Shares from the caller and require an active series. Unstake requires
+PositionNFT authorization and returns `principalOut`, which can differ from the
+requested amount because of share rounding. Only remaining effective shares in
+the current book epoch can be removed; an old-epoch leg cannot withdraw consumed
+principal. Accrued proceeds remain separate claims. Read `riskLiquidity` at the
+current block and simulate before withdrawal.
+
+## Claim proceeds
+
+Use `claimRiskProceeds(positionId, seriesId, receiver)` after reading the accrued
+amount; it returns collateral, USDstx, and STATICS amounts and has no
+per-asset-minimum parameters. It requires PositionNFT authorization and settles
+the leg before paying; a claim with no proceeds reverts with `NoRiskProceeds`.
+Proceeds are tracked across the series lifecycle and can include the three
+allowed incentive assets: the series collateral, `USDstx`, and the configured
+staking token. Claims settle the position's accrued proceeds; they are distinct
+from global STATICS reward allocations and do not earn ordinary passive
+mint/recombination-fee allocations.
+
+## Fund incentives and finalize
+
+`IStaticsDollarRiskIncentives` exposes the funding and finalization surface at
+the same Diamond. Funders approve the relevant ERC-20 to the Diamond and call
+one of the permissionless paths
+`fundRiskCollateralIncentives(seriesId, amount)`,
+`fundRiskDollarIncentives(seriesId, amount)`, or
+`fundRiskStaticsIncentives(seriesId, amount)`. These accept only the series
+collateral, `USDstx`, or configured STATICS respectively. Funding requires an
+active series in an `Active` or `ReduceOnly` profile and credits the measured
+received amount. There is no funder refund function. Incentives are released
+proportionally to effective Risk liquidity consumed in fills, not simply for
+elapsed staking time.
+
+Read `riskIncentives(seriesId)` for the three reserves, token bindings,
+destination, and finalized flag. Permissionless `finalizeRiskIncentives(seriesId)`
+routes only **unspent incentive reserves**, under these lifecycle conditions:
+
+| Profile and old series | Destination |
+| --- | --- |
+| Profile not retired; old series `Recoverable` or `Closed`; a distinct active successor exists | Successor series incentive reserves |
+| Profile `Retired`; old series `Recoverable`, `Retired`, or `Closed` | Global non-swap reward/treasury accounting |
+
+It returns `(destinationSeriesId, routedGlobal)` and returns the recorded route
+on repeated finalization. Already attributed position proceeds are not swept by
+this routing; claim them through `claimRiskProceeds` for their original series.
+
+Risk liquidity inherits Dollar oracle, health, series, rollover, and successor
+risks. A successful approval or funding transaction is not a promise of
+principal recovery, proceeds, or a particular liquidation outcome.

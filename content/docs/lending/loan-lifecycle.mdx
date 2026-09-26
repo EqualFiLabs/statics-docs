@@ -4,7 +4,7 @@ slug: lending/loan-lifecycle
 label: Loan lifecycle
 title: Loan lifecycle
 description: Loans carry independent tranches with separate maturities, extension charges, and exact-principal repayment.
-updated: 2026-08-25
+updated: 2026-09-05
 order: 320
 ---
 
@@ -34,7 +34,9 @@ The returned `principals` are stored on the tranche and must be repaid exactly.
 
 ## Extend
 
-Extension is PositionNFT-authorized. It measures the full inbound vector,
+Extension is PositionNFT-authorized and only succeeds through the existing
+maturity (not during grace), while the basket is Active and extension is not
+paused. It measures the full inbound vector,
 requires at least the extension quote, and routes the complete measured receipt
 through global non-swap fees. Extension changes the tranche maturity but not its
 principal or collateral.
@@ -51,8 +53,9 @@ extension quote_i = ceil(storedPrincipal_i * extensionFeeBps / 10000)
 ## Repay
 
 Repayment is permissionless and pulls the stored principal vector for the
-tranche. Because principal is stored exactly, repayment restores the same vector
-regardless of intervening fee-on-transfer behavior on the inbound side.
+tranche. The stored principal defines the amount owed, but does not make every
+token compatible: if an inbound transfer tax causes the measured receipt to be
+less than principal, repayment reverts (there is no caller gross-up vector).
 
 ```solidity
 for (uint256 i; i < assets.length; ++i) {
