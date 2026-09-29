@@ -34,6 +34,7 @@ const SMALL_SLUGS = new Set([
   "genesis/rewards",
   "genesis/secured-credit",
   "reference/integration",
+  "reference/robinhood-mainnet-genesis",
   "reference/robinhood-testnet-deployment",
 ]);
 
@@ -80,12 +81,13 @@ const pages = findMdxFiles(contentDir)
 // ---- key facts from public/addresses.json ----
 const addresses = JSON.parse(fs.readFileSync(path.join(ROOT, "public", "addresses.json"), "utf8"));
 const facts = [
-  `Chain: ${addresses.network.name} (chainId ${addresses.network.chainId}) — ${addresses.network.status}`,
-  `Integration address (StaticsDiamond): ${addresses.integrationAddress}`,
-  `Statics Dollar (USDstx): ${addresses.tokens.USDstx.address}`,
-  `Source commit: ${addresses.source.commit}`,
-  `Explorer: ${addresses.network.explorer}`,
-  `Machine-readable addresses: ${SITE_URL}/addresses.json`,
+  `Live Genesis: Robinhood Chain mainnet (chainId 4663). Addresses: ${SITE_URL}/docs/reference/robinhood-mainnet-genesis/`,
+  `Testnet integration record in /addresses.json: ${addresses.network.name} (chainId ${addresses.network.chainId}) — ${addresses.network.status}`,
+  `Testnet StaticsDiamond: ${addresses.integrationAddress}`,
+  `Testnet Statics Dollar (USDstx): ${addresses.tokens.USDstx.address}`,
+  `Testnet protocol commit: ${addresses.source.currentProtocolCommit}`,
+  `Testnet explorer: ${addresses.network.explorer}`,
+  `Machine-readable testnet addresses: ${SITE_URL}/addresses.json`,
   `ABIs: ${SITE_URL}/abi/index.json (diamond, hook, manager, faucet, basket token)`,
 ];
 

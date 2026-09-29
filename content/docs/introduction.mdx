@@ -20,6 +20,16 @@ Launchpads help tokens launch. Statics helps make onchain assets useful afterwar
 
 Volume, fees, rewards, and liquidity growth are **possible outcomes of real activity**, not guarantees.
 
+## What is live
+
+| Surface | Network | Status |
+| --- | --- | --- |
+| STATICS supply, six-curve market, and Operators | Robinhood Chain, chain ID `4663` | Live. [Addresses](/docs/reference/robinhood-mainnet-genesis) |
+| Baskets, Statics Dollar, lending, and protocol pools | Robinhood Chain Testnet, chain ID `46630` | Integration reference. [Addresses](/docs/reference/robinhood-testnet-deployment) |
+| Baskets, Statics Dollar, lending, and protocol pools | Robinhood Chain mainnet | Not in the recorded deployment |
+
+Use the mainnet page for Genesis contracts. Use the testnet page only for the basket, Dollar, lending, and pool suite. The two address sets are not interchangeable.
+
 ## How a basket works
 
 A **static basket** is a fixed bundle of one to sixteen ERC-20 constituents. Each basket has its own BasketToken:
@@ -89,9 +99,12 @@ None of that is automatic depth: seed liquidity bootstraps markets; **activity**
 
 ## Mainnet launch and protocol rollout
 
-The STATICS Genesis launch is live on Robinhood mainnet. It established the
-fixed token supply, six-curve STATICS/WETH market, Operators collection,
-backing, vesting, fee ingress, and launch rewards described in these docs.
+The STATICS Genesis launch is live on Robinhood mainnet. Contract addresses for
+that deployment are on
+[Robinhood mainnet Genesis](/docs/reference/robinhood-mainnet-genesis). It
+established the fixed token supply, six-curve STATICS/WETH market, Operators
+collection, backing, vesting, fee ingress, and launch rewards described in
+these docs.
 
 The broader basket, Dollar, lending, and general-pool suite has its own rollout
 and governance controls. Basket creation is owner-only whenever
