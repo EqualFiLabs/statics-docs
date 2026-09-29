@@ -3,29 +3,35 @@ id: rollout
 slug: rollout
 label: Rollout
 title: Rollout and availability
-description: The live Robinhood mainnet Genesis launch, the separate basket-protocol rollout, and which outcomes remain conditional on real activity.
+description: The recorded Robinhood mainnet Genesis launch, the separate basket-protocol rollout, and which outcomes remain conditional on real activity.
 status: Protocol docs
-updated: 2026-08-27
+updated: 2026-09-30
 order: 15
-badge: Live
+badge: Deployment
 ---
 
-The **STATICS Genesis launch is live on Robinhood mainnet**. It established the
+The [Genesis manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json)
+records the **STATICS launch on Robinhood mainnet on August 27, 2026**. It established the
 fixed STATICS supply, the six-curve STATICS/WETH market, the 5,555 Operators
 collection, reserve backing, treasury vesting, fee ingress, and launch reward
 system documented here.
 
-The broader Statics basket, Dollar, lending, and general-pool suite follows a
-separate deployment and governance lifecycle. The Robinhood testnet snapshot is
-retained as an integration reference and must not be used as a source of
-mainnet Genesis addresses.
+The broader Statics basket, Dollar, lending, and pool suite follows a separate
+deployment and governance lifecycle. The [earlier public testnet beta](/docs/reference/robinhood-testnet-deployment)
+is an integration reference; current availability is unverified. A later
+[September 2–3 full-stack rehearsal](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-testnet-46630-rehearsal-20260903T033729Z.json)
+was disposable and used different addresses; its deployment timestamp is September 3,
+03:37 UTC. The [protocol deployment record](https://github.com/EqualFiLabs/statics/blob/master/deployment.md)
+says the permanent Statics Diamond has not been deployed. Neither testnet address
+set is a Robinhood mainnet basket-suite deployment. Mainnet Genesis addresses are on
+[Robinhood mainnet Genesis](/docs/reference/robinhood-mainnet-genesis).
 
-## Live Genesis system
+## Recorded Genesis deployment
 
-| Field | Production status |
+| Field | Recorded value |
 | --- | --- |
 | Network | Robinhood mainnet |
-| Genesis launch | Live |
+| Genesis launch | August 27, 2026 |
 | Fixed STATICS supply | 1,000,000,000 |
 | Doppler market inventory | 800,000,000 across six curves and 56 positions |
 | STATICS Operators | Fixed 5,555-token collection |
@@ -76,7 +82,8 @@ Statics Dollar minting remain bounded by their configured risk parameters.
 
 - [Tokenomics](/docs/tokenomics) — fixed supply, allocation, launch curves, and backing
 - [Launch and vesting](/docs/genesis/launch-and-vesting) — Genesis deployment sequence
-- [Operators overview](/docs/genesis/overview) — live Operator mechanics
+- [Operators overview](/docs/genesis/overview) — Operator mechanics
 - [Formal verification](/docs/reference/verification) — machine-checked properties and proof boundaries
 - [Basket creation](/docs/baskets/creation) — creation fee switch and technical path
+- [Robinhood mainnet Genesis](/docs/reference/robinhood-mainnet-genesis) — Genesis deployment addresses
 - [Robinhood testnet snapshot](/docs/reference/robinhood-testnet-deployment) — separate integration environment

@@ -136,6 +136,54 @@ export default function HomePage() {
         </section>
 
         <section className="landing-section">
+          <h2>Deployment status</h2>
+          <p>Based on the protocol deployment records. Check current onchain state before transacting.</p>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Surface</th>
+                  <th>Network</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>STATICS Genesis: supply, six-curve market, and Operators</td>
+                  <td>Robinhood Chain mainnet, chain ID 4663</td>
+                  <td>
+                    Launched August 27, 2026.{" "}
+                    <Link href="/docs/reference/robinhood-mainnet-genesis">Mainnet addresses</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Earlier public basket, Dollar, lending, and pool beta</td>
+                  <td>Robinhood Chain Testnet, chain ID 46630</td>
+                  <td>
+                    Recorded integration release; current availability unverified.{" "}
+                    <Link href="/docs/reference/robinhood-testnet-deployment">Testnet addresses</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Later full-stack rehearsal</td>
+                  <td>Robinhood Chain Testnet, chain ID 46630</td>
+                  <td>
+                    September 2–3, 2026 (deployed September 3 at 03:37 UTC); disposable,
+                    not the public beta.{" "}
+                    <a href="https://github.com/EqualFiLabs/statics/blob/master/deployment.md">Deployment record</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Full protocol suite (StaticsDiamond and StaticsDollarCoreDiamond)</td>
+                  <td>Robinhood Chain mainnet</td>
+                  <td>No deployment recorded in the protocol repository</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="landing-section">
           <h2>What Statics provides</h2>
           <div className="card-grid">
             {capabilities.map((capability) => (

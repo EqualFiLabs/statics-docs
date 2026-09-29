@@ -26,7 +26,7 @@ export function SiteHeader({ leading }: { leading?: ReactNode }) {
           <Link href="/docs/introduction">Protocol</Link>
           <Link href="/docs/rollout">Rollout</Link>
           <Link href="/docs/reference/integration">Builders</Link>
-          <Link href="/docs/reference/robinhood-testnet-deployment">Addresses</Link>
+          <Link href="/docs/reference/robinhood-mainnet-genesis">Addresses</Link>
           <a href={DOCS_SOURCE_URL} target="_blank" rel="noreferrer">
             Edit docs ↗
           </a>

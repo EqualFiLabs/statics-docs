@@ -1,0 +1,77 @@
+---
+id: robinhood-mainnet-genesis
+slug: reference/robinhood-mainnet-genesis
+label: Robinhood mainnet
+title: Robinhood mainnet Genesis
+description: Contract addresses for the STATICS Genesis deployment launched August 27, 2026, on Robinhood Chain. These are not testnet basket, Dollar, or lending addresses.
+updated: 2026-09-30
+order: 735
+badge: Mainnet
+---
+
+This page records the STATICS Genesis deployment launched August 27, 2026, on Robinhood Chain. It covers the fixed STATICS token, the STATICS/WETH market, Operators, the Genesis vault, vesting, and launch rewards. The manifest records the launch, not current contract health.
+
+It does not include `StaticsDiamond` or `StaticsDollarCoreDiamond`, the two Diamonds used by the broader basket, Dollar, lending, and pool suite. An earlier public beta of those contracts is recorded on the [Robinhood testnet deployment](/docs/reference/robinhood-testnet-deployment). Do not use testnet addresses on this network.
+
+The canonical file is [`deployments/robinhood-mainnet-genesis.json`](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json) in the protocol repository. Availability of the rest of the protocol is on [Rollout](/docs/rollout).
+
+## Network
+
+| Field | Value |
+| --- | --- |
+| Network | Robinhood Chain |
+| Chain ID | `4663` |
+| Explorer | https://robinhoodchain.blockscout.com |
+| RPC | https://rpc.mainnet.chain.robinhood.com |
+| Launch source commit | `43018f109006aa2c2eef2808adc2aa74dfc9a6d4` |
+| Launch block | `47690074` |
+| Finalize end block | `47690599` |
+| Launched | 2026-08-27T19:24:28Z |
+| Launch transaction | [0x4ab656be8c63583735636694b029b43b052a01b3169e674c94adc5ec542ebd8e](https://robinhoodchain.blockscout.com/tx/0x4ab656be8c63583735636694b029b43b052a01b3169e674c94adc5ec542ebd8e) |
+
+## Contracts
+
+| Contract | Address |
+| --- | --- |
+| STATICS | [0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd](https://robinhoodchain.blockscout.com/address/0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd) |
+| Operators (`STATOPS`) | [0xad5E9F96A91D1A6F550580b157af2068A0e8F0BE](https://robinhoodchain.blockscout.com/address/0xad5E9F96A91D1A6F550580b157af2068A0e8F0BE) |
+| Genesis vault | [0x8AAAF9a22f439589987B8f1e69d79ca4f648C297](https://robinhoodchain.blockscout.com/address/0x8AAAF9a22f439589987B8f1e69d79ca4f648C297) |
+| Activation registry | [0xfC62e99CaE93878f83801f3d6Bb4f1762E720B30](https://robinhoodchain.blockscout.com/address/0xfC62e99CaE93878f83801f3d6Bb4f1762E720B30) |
+| Fee receiver | [0x4aa7237527A120c5aFD8Eb89718b57DaB3EDb6cc](https://robinhoodchain.blockscout.com/address/0x4aa7237527A120c5aFD8Eb89718b57DaB3EDb6cc) |
+| Launch distributor | [0xB6583f04e8C606e9F07E39e754Aba77B250Dc3FD](https://robinhoodchain.blockscout.com/address/0xB6583f04e8C606e9F07E39e754Aba77B250Dc3FD) |
+| Treasury vesting | [0xBcf0e357c359858aB166aEBb74f0E527aAb3d6ee](https://robinhoodchain.blockscout.com/address/0xBcf0e357c359858aB166aEBb74f0E527aAb3d6ee) |
+| Genesis renderer | [0xBbF960f837166ab687FA5d69b605c2E70a83a017](https://robinhoodchain.blockscout.com/address/0xBbF960f837166ab687FA5d69b605c2E70a83a017) |
+| Avatar SVG | [0x39601dFDDad3aa66303E231b0445Cd4Cb2D60204](https://robinhoodchain.blockscout.com/address/0x39601dFDDad3aa66303E231b0445Cd4Cb2D60204) |
+
+## Roles
+
+| Role | Address |
+| --- | --- |
+| Deployer | [0x4CF8e4D37F561815F208565a5b6Ca8a85b143205](https://robinhoodchain.blockscout.com/address/0x4CF8e4D37F561815F208565a5b6Ca8a85b143205) |
+| Governance | [0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff](https://robinhoodchain.blockscout.com/address/0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff) |
+| Treasury | [0x0Ce4140f3Ab03024623a75F248D467912C7E1725](https://robinhoodchain.blockscout.com/address/0x0Ce4140f3Ab03024623a75F248D467912C7E1725) |
+
+The recorded manifest marks governance ownership as not yet accepted on the fee receiver, activation registry, Genesis vault, Operators NFT, and launch distributor.
+
+## STATICS/WETH pool
+
+| Field | Value |
+| --- | --- |
+| Pool id | 0xe79228d6cae086a58bf5b22220b454e5d1ca4f13da767ea5bbe032d5a1e82e8a |
+| WETH | [0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73](https://robinhoodchain.blockscout.com/address/0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73) |
+| STATICS | [0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd](https://robinhoodchain.blockscout.com/address/0x2d8d6F4A93AcD7a916A5a654ec8b690bA3B3EAdd) |
+| Fee | 15000 pips |
+| Tick spacing | 100 |
+| Hooks | [0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544](https://robinhoodchain.blockscout.com/address/0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544) |
+
+## Chain dependencies
+
+| Dependency | Address |
+| --- | --- |
+| Uniswap v4 PoolManager | [0x8366a39CC670B4001A1121B8F6A443A643e40951](https://robinhoodchain.blockscout.com/address/0x8366a39CC670B4001A1121B8F6A443A643e40951) |
+| StateView | [0xF3334192D15450CdD385c8B70e03f9A6bD9E673b](https://robinhoodchain.blockscout.com/address/0xF3334192D15450CdD385c8B70e03f9A6bD9E673b) |
+| Quoter | [0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94](https://robinhoodchain.blockscout.com/address/0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94) |
+| Universal Router | [0x8876789976dEcBfCbBbe364623C63652db8C0904](https://robinhoodchain.blockscout.com/address/0x8876789976dEcBfCbBbe364623C63652db8C0904) |
+| Permit2 | [0x000000000022D473030F116dDEE9F6B43aC78BA3](https://robinhoodchain.blockscout.com/address/0x000000000022D473030F116dDEE9F6B43aC78BA3) |
+| Doppler airlock | [0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862](https://robinhoodchain.blockscout.com/address/0xeb7C034704eF8Dcd2D32324c1545f62fB4aD0862) |
+| Doppler pool initializer | [0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544](https://robinhoodchain.blockscout.com/address/0x4e3468951D49f2EEa976eD0D6e75fFCb44a9a544) |

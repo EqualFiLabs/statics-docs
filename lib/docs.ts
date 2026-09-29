@@ -90,7 +90,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   },
   {
     title: "Reference",
-    pageIds: ["robinhood-testnet-deployment", "testnet-onboarding"],
+    pageIds: ["robinhood-mainnet-genesis", "robinhood-testnet-deployment", "testnet-onboarding"],
   },
 ];
 

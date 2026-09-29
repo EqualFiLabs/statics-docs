@@ -4,7 +4,7 @@ slug: core/architecture
 label: Architecture
 title: Architecture
 description: Statics is two coordinated EIP-2535 diamonds behind one ordinary user-action address, with custody and solvency split across clear boundaries.
-updated: 2026-08-27
+updated: 2026-09-29
 order: 20
 ---
 
@@ -93,13 +93,13 @@ reservation equation and deficit handling.
 
 ## Canonical deployment shape
 
-Current `master` source and fresh-deployment tests expect **30 facets / 254
+Current `master` source and fresh-deployment tests expect **36 facets / 280
 selectors** on `StaticsDiamond` and **11 facets / 95 selectors** on
 `StaticsDollarCoreDiamond`. These counts include the Operators integration,
 general-pool lifecycle, and batched-claim selectors.
 
 The public Robinhood Chain testnet manifest is an earlier deployment snapshot
-and currently records a different shape. Do not treat the PR source count as a
+and currently records a different shape. Do not treat the source count as a
 live-address or deployed-bytecode claim; refresh `addresses.json` and the
 canonical ABI only when the matching deployment is published.
 

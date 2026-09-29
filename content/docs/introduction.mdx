@@ -6,7 +6,7 @@ eyebrow: Protocol docs
 title: Statics Protocol
 description: Statics turns onchain assets into redeemable baskets that connect liquidity, fee generation, self-backed credit, and the Statics Dollar. Built as post-launch financial infrastructure, the protocol begins with curated baskets before expanding creation to approved partners and, ultimately, open participation.
 status: Protocol docs
-updated: 2026-08-27
+updated: 2026-09-30
 order: 10
 ---
 
@@ -19,6 +19,19 @@ Launchpads help tokens launch. Statics helps make onchain assets useful afterwar
 > Statics turns onchain assets into redeemable financial markets with connected liquidity, arbitrage paths, fee earning, and self-backed credit. It begins with curated baskets and can expand into utility infrastructure for token projects before open creation is enabled.
 
 Volume, fees, rewards, and liquidity growth are **possible outcomes of real activity**, not guarantees.
+
+## Deployment status
+
+Based on the [protocol deployment record](https://github.com/EqualFiLabs/statics/blob/master/deployment.md) and [mainnet Genesis manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json). Check current onchain state before transacting.
+
+| Surface | Network | Recorded status |
+| --- | --- | --- |
+| STATICS Genesis: supply, six-curve market, and Operators | Robinhood Chain mainnet, chain ID `4663` | Launched August 27, 2026. [Mainnet addresses](/docs/reference/robinhood-mainnet-genesis) |
+| Earlier public basket, Dollar, lending, and pool beta | Robinhood Chain Testnet, chain ID `46630` | Integration reference; current availability unverified. [Testnet addresses](/docs/reference/robinhood-testnet-deployment) |
+| Later full-stack rehearsal | Robinhood Chain Testnet, chain ID `46630` | September 2–3, 2026 (deployed September 3 at 03:37 UTC); disposable, not the public integration release. [Rehearsal record](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-testnet-46630-rehearsal-20260903T033729Z.json) |
+| Full protocol suite (`StaticsDiamond` and `StaticsDollarCoreDiamond`) | Robinhood Chain mainnet | No permanent deployment recorded in the protocol repository |
+
+Use the mainnet page for Genesis contracts and the testnet page for the earlier public basket-suite beta. The address sets are not interchangeable. The September rehearsal has different, disposable addresses.
 
 ## How a basket works
 
@@ -89,9 +102,13 @@ None of that is automatic depth: seed liquidity bootstraps markets; **activity**
 
 ## Mainnet launch and protocol rollout
 
-The STATICS Genesis launch is live on Robinhood mainnet. It established the
-fixed token supply, six-curve STATICS/WETH market, Operators collection,
-backing, vesting, fee ingress, and launch rewards described in these docs.
+The [Genesis manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json)
+records the STATICS launch on Robinhood mainnet on August 27, 2026. Contract addresses for
+that deployment are on
+[Robinhood mainnet Genesis](/docs/reference/robinhood-mainnet-genesis). It
+established the fixed token supply, six-curve STATICS/WETH market, Operators
+collection, backing, vesting, fee ingress, and launch rewards described in
+these docs.
 
 The broader basket, Dollar, lending, and general-pool suite has its own rollout
 and governance controls. Basket creation is owner-only whenever
@@ -100,8 +117,8 @@ The recorded Robinhood testnet deployment remains available as a separate
 integration reference; its fixture addresses are not the mainnet Genesis
 deployment.
 
-See [Rollout](/docs/rollout) for production availability and the distinction
-between the live Genesis system and the basket-suite test environment.
+See [Rollout](/docs/rollout) for recorded deployment status and the distinction
+between mainnet Genesis and the basket-suite test environment.
 
 ## Risks and limitations
 
