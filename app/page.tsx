@@ -168,12 +168,13 @@ export default function HomePage() {
                   <td>Later full-stack rehearsal</td>
                   <td>Robinhood Chain Testnet, chain ID 46630</td>
                   <td>
-                    September 2, 2026; disposable, not the public integration release.{" "}
+                    September 2–3, 2026 (deployed September 3 at 03:37 UTC); disposable,
+                    not the public beta.{" "}
                     <a href="https://github.com/EqualFiLabs/statics/blob/master/deployment.md">Deployment record</a>
                   </td>
                 </tr>
                 <tr>
-                  <td>Permanent basket, Dollar, lending, and pool Diamonds</td>
+                  <td>Full protocol suite (StaticsDiamond and StaticsDollarCoreDiamond)</td>
                   <td>Robinhood Chain mainnet</td>
                   <td>No deployment recorded in the protocol repository</td>
                 </tr>

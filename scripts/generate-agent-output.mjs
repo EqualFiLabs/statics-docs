@@ -81,7 +81,7 @@ const pages = findMdxFiles(contentDir)
 // ---- key facts from public/addresses.json ----
 const addresses = JSON.parse(fs.readFileSync(path.join(ROOT, "public", "addresses.json"), "utf8"));
 const facts = [
-  `Live Genesis: Robinhood Chain mainnet (chainId 4663). Addresses: ${SITE_URL}/docs/reference/robinhood-mainnet-genesis/`,
+  `Genesis launched August 27, 2026, on Robinhood Chain mainnet (chainId 4663), per the deployment manifest. Addresses: ${SITE_URL}/docs/reference/robinhood-mainnet-genesis/`,
   `Testnet integration record in /addresses.json: ${addresses.network.name} (chainId ${addresses.network.chainId}) — ${addresses.network.status}`,
   `Testnet StaticsDiamond: ${addresses.integrationAddress}`,
   `Testnet Statics Dollar (USDstx): ${addresses.tokens.USDstx.address}`,
