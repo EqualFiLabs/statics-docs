@@ -136,7 +136,8 @@ export default function HomePage() {
         </section>
 
         <section className="landing-section">
-          <h2>What is live</h2>
+          <h2>Deployment status</h2>
+          <p>Based on the protocol deployment records. Check current onchain state before transacting.</p>
           <div className="table-wrap">
             <table>
               <thead>
@@ -148,24 +149,33 @@ export default function HomePage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>STATICS supply, six-curve market, and Operators</td>
-                  <td>Robinhood Chain, chain ID 4663</td>
+                  <td>STATICS Genesis: supply, six-curve market, and Operators</td>
+                  <td>Robinhood Chain mainnet, chain ID 4663</td>
                   <td>
-                    Live. <Link href="/docs/reference/robinhood-mainnet-genesis">Addresses</Link>
+                    Launched August 27, 2026.{" "}
+                    <Link href="/docs/reference/robinhood-mainnet-genesis">Mainnet addresses</Link>
                   </td>
                 </tr>
                 <tr>
-                  <td>Baskets, Statics Dollar, lending, and protocol pools</td>
+                  <td>Earlier public basket, Dollar, lending, and pool beta</td>
                   <td>Robinhood Chain Testnet, chain ID 46630</td>
                   <td>
-                    Integration reference.{" "}
-                    <Link href="/docs/reference/robinhood-testnet-deployment">Addresses</Link>
+                    Recorded integration release; current availability unverified.{" "}
+                    <Link href="/docs/reference/robinhood-testnet-deployment">Testnet addresses</Link>
                   </td>
                 </tr>
                 <tr>
-                  <td>Baskets, Statics Dollar, lending, and protocol pools</td>
+                  <td>Later full-stack rehearsal</td>
+                  <td>Robinhood Chain Testnet, chain ID 46630</td>
+                  <td>
+                    September 2, 2026; disposable, not the public integration release.{" "}
+                    <a href="https://github.com/EqualFiLabs/statics/blob/master/deployment.md">Deployment record</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Permanent basket, Dollar, lending, and pool Diamonds</td>
                   <td>Robinhood Chain mainnet</td>
-                  <td>Not in the recorded deployment</td>
+                  <td>No deployment recorded in the protocol repository</td>
                 </tr>
               </tbody>
             </table>
