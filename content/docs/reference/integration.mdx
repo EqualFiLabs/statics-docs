@@ -3,15 +3,30 @@ id: integration
 slug: reference/integration
 label: Integration
 title: Integration guide
-description: The single StaticsDiamond address, the approvals and interfaces to call, and the common flows with their failure conditions.
-updated: 2026-08-27
+description: Choose a deployment and matching ABI before using the StaticsDiamond, Genesis, basket, Dollar, or lending examples.
+updated: 2026-09-30
 order: 710
 ---
 
-Statics is integrated through a single address — `StaticsDiamond`. It is the
-basket action surface, the PositionNFT contract, the Dollar gateway, the Core
-periphery, the fee receiver, and the managed recovery holder. There is no
-separate user router.
+## Choose a target first
+
+The recorded Robinhood mainnet Genesis launch is a standalone token, Operators
+NFT, vault, and market deployment. It has **no `StaticsDiamond` address**. The
+earlier public Robinhood testnet beta has a Diamond for baskets, positions,
+Dollar, and lending. Current protocol source contains later APIs that are not
+deployed at either of those address sets.
+
+| Target | Chain ID | Address and interface source | Use this guide for |
+| --- | --- | --- | --- |
+| [Mainnet Genesis](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json) | `4663` | Genesis manifest and its launch-source commit | Standalone Genesis contracts only; no Diamond or basket-suite ABI |
+| [Earlier public testnet beta](/docs/reference/robinhood-testnet-deployment) | `46630` | [Testnet addresses](/addresses.json) and [deployment-pinned ABIs](/abi/index.json) | The basket, position, Dollar, lending, and flash examples below |
+| [Later testnet rehearsal](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-testnet-46630-rehearsal-20260903T033729Z.json) | `46630` | Its own disposable deployment manifest | Historical rehearsal only; do not reuse the public beta addresses |
+| [Current protocol source](https://github.com/EqualFiLabs/statics) | Depends on deployment | Interfaces from the exact source commit being built; no permanent Diamond deployment recorded | Genesis-to-Diamond integration and general-pool examples below |
+
+For the earlier public testnet beta, `StaticsDiamond` is the basket action
+surface, PositionNFT contract, Dollar gateway, Core periphery, fee receiver,
+and managed recovery holder. There is no separate user router. Check the
+target chain, address, and ABI together before submitting a transaction.
 
 ## Disciplines
 
@@ -22,7 +37,13 @@ separate user router.
   by the permit paths but not required.
 - **Reconcile indexed events against current views** after reorgs.
 
-## Create a PositionNFT and stake STATICS
+## Earlier public testnet beta examples
+
+These examples illustrate the earlier beta's `StaticsDiamond` flows. Check
+each call against the deployment-pinned ABI before use. They are not
+instructions for the mainnet Genesis contracts.
+
+### Create a PositionNFT and stake STATICS
 
 ```solidity
 address[] memory rewardAssets = new address[](2);
@@ -41,7 +62,7 @@ uint256 positionId = globalRewards.createAndStake{value: creationFee}(
 `creationFee` is the exact native amount returned by `positionCreationFee()`
 (`0.001 ETH` on testnet). The fee forwards immediately to the treasury.
 
-## Mint and redeem a basket
+### Mint and redeem a basket
 
 ```solidity
 uint256 shares = 10e18;
@@ -57,7 +78,7 @@ uint256[] memory minOut = basket.quoteRedeem(basketId, shares);
 basket.redeem(basketId, shares, msg.sender, minOut);
 ```
 
-## Deposit basket collateral and borrow
+### Deposit basket collateral and borrow
 
 ```solidity
 IERC20(basketToken).approve(staticsDiamond, collateralShares);
@@ -74,7 +95,7 @@ basketCollateral.depositBasketCollateral(positionId, basketId, collateralShares)
 lending.repay(loanId);
 ```
 
-## Mint Statics Dollar from native ETH
+### Mint Statics Dollar from native ETH
 
 ```solidity
 (uint256 seriesId, uint256 dollarOut, uint256 riskSharesOut) =
@@ -86,7 +107,7 @@ lending.repay(loanId);
     );
 ```
 
-## Flash-loan a constituent vector
+### Flash-loan a constituent vector
 
 ```solidity
 (address[] memory assets, uint256[] memory amounts, uint256[] memory fees) =
@@ -97,11 +118,26 @@ flashLender.flashLoan(basketId, shares, address(receiver), routeData);
 // keccak256("IStaticsFlashBorrower.onStaticsFlashLoan") and restore principal + fees.
 ```
 
-## Integrate Genesis
+## Mainnet Genesis: standalone contracts
+
+Use the [mainnet Genesis manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json)
+to find the launched token, Operators NFT, Genesis vault, activation registry,
+and launch distributor. Call their matching standalone interfaces directly;
+the mainnet Genesis deployment does not include `StaticsDiamond`. The
+[Genesis overview](/docs/genesis/overview) and
+[secured-credit guide](/docs/genesis/secured-credit) describe those flows.
+
+## Current-source Genesis integration
+
+The Diamond linkage and batch paths in this section describe current protocol
+source. They are not part of the recorded mainnet Genesis address set or the
+earlier public testnet beta. Use them only against a deployment with matching
+interfaces and a completed Genesis integration handoff.
 
 Genesis is the contract/API name for the **STATICS Operators** collection. It
 has a standalone NFT/vault lifecycle and a permanent integration at
-`StaticsDiamond`. Applications should discover the `StaticsGenesis`,
+`StaticsDiamond`. For a matching full-stack deployment, applications should
+discover the `StaticsGenesis`,
 `StaticsGenesisVault`, `GenesisActivationRegistry`, and
 `GenesisLaunchDistributor` addresses from the matching deployment manifest,
 then use `StaticsDiamond` for permanent registration, linkage, rewards, and
@@ -149,7 +185,7 @@ source split sends 10% to permanent Genesis reserve backing and 90% to treasury.
 See [Genesis secured credit](/docs/genesis/secured-credit) for lock, pause,
 repayment, and recovery semantics.
 
-## Create and discover general pools
+## Create and discover general pools (current source)
 
 Current source supports permissionless general pools, but the recorded testnet
 deployment exposes the earlier governed-pool version. Against a matching future
@@ -164,6 +200,9 @@ with `claimCreatorRevenue(asset, receiver, minReceived)`. See
 [General protocol pools](/docs/liquidity/protocol-pools).
 
 ## Canonical interfaces
+
+This inventory spans the earlier beta and current source; it is not one
+deployed ABI. Use the interface set pinned to the target deployment.
 
 | Surface | Interface |
 | --- | --- |
@@ -190,8 +229,9 @@ launch actions.
 
 ## Failure conditions
 
-The flows above are illustrative. Read the live interfaces for complete structs,
-approvals, return values, and failure conditions. Common revert causes include:
+The flows above are illustrative. Read the target deployment's interfaces for
+complete structs, approvals, return values, and failure conditions. Common
+revert causes include:
 stale quotes, exceeded per-asset bounds, missing or insufficient approvals,
 deferred health exits, lifecycle restrictions (Quarantined / ExitOnly), and
 inbound/outbound tax on incompatible tokens.
