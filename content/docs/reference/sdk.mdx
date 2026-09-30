@@ -3,14 +3,26 @@ id: sdk
 slug: reference/sdk
 label: SDK
 title: SDK
-description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-27
+description: Choose the SDK and ABI revision that matches the target Statics deployment before building transactions.
+updated: 2026-09-30
 order: 720
 ---
 
 The Statics SDK is a TypeScript package (`@statics-protocol/sdk`) that ships the
 onchain ABIs, chain bindings, math helpers, quote functions, decoders, and
 calldata builders needed to integrate without recomputing protocol math.
+
+## Match the SDK to the target
+
+| Target | Address and ABI source | SDK revision |
+| --- | --- | --- |
+| Robinhood mainnet Genesis, chain ID `4663` | [Standalone Genesis deployment manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json); the docs site's `/abi/*.json` files are for the testnet basket suite | Use interfaces matching the manifest's launch-source commit; no `StaticsDiamond` was deployed there |
+| Earlier public Robinhood testnet beta, chain ID `46630` | [Testnet addresses](/addresses.json) and [deployed ABIs](/abi/index.json) | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
+| Later Robinhood testnet rehearsal, chain ID `46630` | [Separate disposable manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-testnet-46630-rehearsal-20260903T033729Z.json) | Do not reuse the public beta SDK/ABI pin without checking this rehearsal's protocol commit |
+| Protocol source at `a2e7ad43f868b9ac59d70ac885d55e5b33ad88cb` | No permanent Diamond deployment recorded | Matching `sdk` gitlink: `5cda662583e02f860b475c2f1eba1912f9b4dd40` (development only) |
+
+The mainnet Genesis deployment has no `StaticsDiamond`. A source SDK revision
+does not make its newer APIs available at the recorded testnet beta address.
 
 ## Package
 
@@ -22,18 +34,18 @@ calldata builders needed to integrate without recomputing protocol math.
 | Types | `dist/index.d.ts` |
 | Peer dependency | `viem` `>=2` |
 
-Install from GitHub (not npm registry):
+For the earlier public testnet beta, install its pinned revision from GitHub
+(not the npm registry):
 
 ```bash
-npm install github:EqualFiLabs/statics-sdk
+npm install github:EqualFiLabs/statics-sdk#135b68b8c404a1f567ae834c2e46e517e5788e28
 ```
 
-Equivalent forms:
+For development against protocol source commit
+`a2e7ad43f868b9ac59d70ac885d55e5b33ad88cb`, use its matching SDK gitlink:
 
 ```bash
-npm install git+https://github.com/EqualFiLabs/statics-sdk.git
-# or pin a commit / tag
-npm install github:EqualFiLabs/statics-sdk#master
+npm install github:EqualFiLabs/statics-sdk#5cda662583e02f860b475c2f1eba1912f9b4dd40
 ```
 
 ```ts
@@ -42,24 +54,16 @@ import { /* builders, quotes, ABIs */ } from "@statics-protocol/sdk";
 
 Source, issues, and local build live in that repository (`npm run build`, `npm test`).
 
-## Match the SDK to the target
-
-These docs track two deliberate revisions:
-
-| Target | SDK revision |
-| --- | --- |
-| Recorded Robinhood testnet deployment and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
-| Current `statics` master source | `f4b88bf43a130fbd5fa8aebd2b784da16fa54b6f` |
-
-Pin the deployment revision when submitting transactions to the recorded live
-addresses. Current master includes Operators launch/vesting, redrawable Genesis
-credit, and permissionless general-pool APIs that are not deployed there.
+Always verify the `sdk` gitlink at the exact protocol source commit you use.
+Pin the beta revision when building transactions for the recorded beta
+addresses. The later source revision is for local development and does not
+replace their deployed ABI.
 
 ## Chain bindings
 
-The SDK ships generated per-chain address bindings. The tracked binding is
-`robinhoodChain`, exposing the verified contract addresses for the Robinhood
-deployment family.
+The SDK ships generated per-chain address bindings. Check the binding's chain ID
+and addresses against the selected deployment manifest before signing; a
+binding for one release does not identify another release on the same chain.
 
 ## Math and constants
 
@@ -80,7 +84,8 @@ rounding helpers so integrators do not re-derive them:
 
 ## Quote functions
 
-Quotes mirror the onchain quote functions and return the same per-asset legs:
+Quotes mirror the matching onchain revision's quote functions and return the
+same per-asset legs:
 
 | Function | Returns |
 | --- | --- |
@@ -96,8 +101,8 @@ Quotes mirror the onchain quote functions and return the same per-asset legs:
 
 ## Calldata builders
 
-Every ordinary user action has a `build*Call` / `build*Transaction` helper that
-returns signed-calldata-ready `Hex`:
+The current-source SDK has `build*Call` / `build*Transaction` helpers that
+return signed-calldata-ready `Hex`:
 
 - baskets: `buildCreateBasketTransaction`, `buildMintCall`, `buildRedeemCall`,
   collateral deposit/withdraw/redeem;
@@ -151,5 +156,7 @@ testnet faucet. See [Testnet onboarding](/docs/start/testnet-onboarding).
 Genesis batch claims accept caller-supplied token IDs rather than enumerating a
 wallet. The owner batch settles both STATICS and WETH, accepts an empty list for
 prior-owner credits only, and lazily harvests the active launch distributor
-before settlement. Onchain quotes and the deployed ABI remain authoritative;
+before settlement. These batch helpers describe current-source development,
+not the earlier public testnet beta. Onchain quotes and the matching deployed
+ABI remain authoritative;
 the SDK does not make an unreleased PR branch a live deployment.
