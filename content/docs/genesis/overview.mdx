@@ -2,16 +2,26 @@
 id: genesis-overview
 slug: genesis/overview
 label: Operators overview
-title: STATICS Operators and protocol integration
-description: How the fixed STATICS Operators collection moves from vault or treasury vesting into activation, direct rewards, PositionNFT linkage, and permanent protocol integration.
-updated: 2026-08-27
+title: "STATICS Operators: Genesis launch and later integration"
+description: The standalone Operators launch on Robinhood mainnet and the separate Genesis features in current protocol source.
+updated: 2026-09-30
 order: 250
 ---
 
 **STATICS Operators** is the public identity of Statics' fixed 5,555-token NFT
 collection. Contracts and APIs retain the `Genesis` vocabulary. The collection
-is a reserve-backed access and reward layer with a lifecycle separate from
-basket creation.
+has a vault-backed lifecycle separate from basket creation.
+
+The [recorded Robinhood mainnet Genesis launch](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json)
+on chain ID `4663` deployed standalone contracts. Its manifest does **not**
+include `StaticsDiamond` or a PositionNFT. The registration, PositionNFT
+linkage, and permanent protocol rewards described below require a separate
+deployment with matching interfaces; they are not available at the recorded
+mainnet Genesis addresses.
+
+## Standalone Genesis launch
+
+### Operator custody and backing
 
 All token IDs exist at construction, but initial custody is split:
 
@@ -25,7 +35,7 @@ so the Vault receives exactly 99,900,000 STATICS of backing before they become
 active. The remaining 100,100,000-token treasury allocation follows a separate
 Doppler-native 60-day vesting schedule. See [Launch and vesting](/docs/genesis/launch-and-vesting).
 
-## Acquisition and redemption
+### Acquisition and redemption
 
 During the immutable Genesis Epoch, a vault-owned token can be acquired for the
 configured STATICS price plus the native acquisition fee. After the epoch,
@@ -39,56 +49,72 @@ redeemed token returns to vault inventory and may later be acquired again.
 Native reserve accounting uses the vault's accounted `reserveETH`, not its raw
 balance, so forced or accidental ETH is not treated as redeemable reserve.
 
-## Activation and direct rewards
+### Activation and launch rewards
 
-After the governed Genesis integration handoff, an owner registers a Genesis
-token once for the permanent reward interval. Registration follows the token
-across ordinary owner-changing transfers; it is not the same thing as
-activation. A transfer settles the previous owner's attributed rewards and
-resets activation to Tier 0 for the new owner.
+The mainnet manifest records a standalone `GenesisActivationRegistry` and
+`GenesisLaunchDistributor`. Activation is distinct from registration in the
+later Diamond integration. Launch reward claims use the launch distributor;
+they do not require a `StaticsDiamond` address. See
+[Genesis rewards](/docs/genesis/rewards) for the separate launch and permanent
+reward books.
 
-Activation increases the Genesis multiplier used by the global STATICS reward
-weight. It does not change raw stake, withdrawable principal, collateral,
-liquidity rewards, or the Genesis token's direct reward weight.
-
-Direct Genesis rewards are a distinct rail from PositionNFT global rewards.
-They use the Genesis reward books and may be paid in STATICS and WETH. See
-[Genesis rewards](/docs/genesis/rewards) for launch/permanent claims and
-lazy accrual.
-
-## Onchain identity
+### Onchain identity
 
 The ERC-721 name is `Statics Operators` and the symbol is `STATOPS`; the
 collection-level onchain metadata presents the brand as **STATICS Operators**.
 Per-token JSON and SVG artwork are generated fully onchain. Token identity does
 not depend on an offchain metadata server.
 
-## PositionNFT linkage
+## Later protocol integration (current source)
 
-The same owner must hold both NFTs to call `linkGenesis(positionId, genesisId)`;
-ERC-721 approvals do not authorize linking or unlinking. While linked, both NFTs
-are locked against owner-changing transfers. The relationship is an accounting
-link, not a transfer of Genesis registration.
+Current protocol source describes a governed handoff to `StaticsDiamond` for
+permanent registration, direct rewards, and PositionNFT linkage. The
+[deployment record](https://github.com/EqualFiLabs/statics/blob/master/deployment.md)
+says the permanent Diamond has not been deployed. Use these flows only after
+finding a separate deployment record and matching ABI for that integration.
 
-If secured credit is recovered, the protocol severs only the recovered
-Genesis-to-Position relationship and clears its boost. The former owner keeps
-the PositionNFT, raw stake, pending maturity, claims, and unrelated legs. The
-Genesis token returns to vault inventory and can later be acquired through the
-ordinary post-epoch path.
+After a matching handoff, an owner registers a Genesis token once for the
+permanent reward interval. Registration follows the token across ordinary
+owner-changing transfers; it is not the same thing as activation. A transfer
+settles the previous owner's attributed rewards and resets activation to Tier
+0 for the new owner.
 
-## Integration surfaces
+Activation increases the Genesis multiplier used by global STATICS reward
+weight. It does not change raw stake, withdrawable principal, collateral,
+liquidity rewards, or the Genesis token's direct reward weight. Direct Genesis
+rewards are a distinct rail from PositionNFT global rewards and may be paid in
+STATICS and WETH.
 
-Applications normally discover these addresses from the deployment manifest:
+### PositionNFT linkage
 
-| Surface | Responsibility |
-| --- | --- |
-| `StaticsGenesis` | ERC-721 ownership, metadata, and transfer locks |
-| `StaticsGenesisVault` | Acquisition, redemption, reserve accounting, inventory, and secured-credit lifecycle |
-| `GenesisActivationRegistry` | Activation tiers, multipliers, and transfer reset |
-| `GenesisLaunchDistributor` | Temporary launch fee ingress and launch reward books |
-| `StaticsTreasuryVesting` | Immutable 555-Operator vesting and bootstrap backing handoff |
-| `StaticsDiamond` | Permanent Genesis registration, linkage, rewards, and recovery |
+In a deployment with the matching Diamond integration, the same owner must
+hold both NFTs to call `linkGenesis(positionId, genesisId)`; ERC-721 approvals
+do not authorize linking or unlinking. While linked, both NFTs are locked
+against owner-changing transfers. The relationship is an accounting link,
+not a transfer of Genesis registration.
 
-The public deployment manifest must only list these contracts after the
-corresponding deployment is published. Do not combine an unreleased branch ABI
-with an older live testnet address set.
+If secured credit is recovered after linkage, the protocol severs only the
+recovered Genesis-to-Position relationship and clears its boost. The former
+owner keeps the PositionNFT, raw stake, pending maturity, claims, and unrelated
+legs. The Genesis token returns to vault inventory and can later be acquired
+through the ordinary post-epoch path.
+
+## Contract discovery
+
+For the recorded mainnet launch, read addresses from the
+[Genesis deployment manifest](https://github.com/EqualFiLabs/statics/blob/master/deployments/robinhood-mainnet-genesis.json)
+and use interfaces matching its `launchSourceCommit`:
+
+| Manifest key | Contract | Responsibility |
+| --- | --- | --- |
+| `staticsToken` | STATICS ERC-20 | Doppler-launched token |
+| `operatorsNft` | `StaticsGenesis` | ERC-721 ownership and metadata |
+| `genesisVault` | `StaticsGenesisVault` | Acquisition, redemption, reserve accounting, and secured credit |
+| `activationRegistry` | `GenesisActivationRegistry` | Activation state |
+| `launchDistributor` | `GenesisLaunchDistributor` | Launch reward books |
+| `treasuryVesting` | `StaticsTreasuryVesting` | Vesting of 555 Operators |
+
+`StaticsDiamond` is absent from that manifest. Discover its address and ABI
+from a separate, matching deployment record before using permanent Genesis
+registration, PositionNFT linkage, or Diamond reward calls. Do not combine
+current-source interfaces with the older public testnet beta addresses.
