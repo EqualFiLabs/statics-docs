@@ -1,65 +1,22 @@
 ---
 id: canonical-pools
 slug: liquidity/canonical-pools
-label: Canonical pools
-title: Canonical v4 pools
-description: Each basket constituent gets one canonical Uniswap v4 pool with zero native LP fee, created with protocol-owned liquidity.
-updated: 2026-08-27
+label: Basket canonical pools
+title: Basket canonical v4 pools
+description: Phase 2 creates one BasketToken/constituent pool per asset with a creator-funded seed and managed POL.
+updated: 2026-10-10
 order: 410
+badge: Phase 2
 ---
 
-**In plain language:** each basket launches with one trading pool per
-constituent so BasketTokens can be bought and sold against the underlying
-assets immediately. Protocol-owned liquidity seeds the pool; extra depth depends
-on later activity and LP participation.
-
-Every basket constituent gets exactly one canonical Uniswap v4 pool, paired
-against the BasketToken. Canonical pools are created atomically during
-[basket creation](/docs/baskets/creation) and seeded with permanent
-protocol-owned liquidity.
-
-## Pool parameters
-
-| Parameter | Value |
-| --- | --- |
-| Currencies | BasketToken / constituent |
-| Native v4 LP fee | 0 |
-| Tick spacing | 10 |
-
-The installed hook rejects native currency and nonzero native LP fees for
-registered canonical pools. Unregistered pools are not canonical.
-
-## Immediate swappability
-
-A successful basket creation makes every canonical pool immediately swappable
-and available to the typed borrow-to-liquidity and protocol-pool LP reward paths.
-
-Current source also supports [general protocol pools](/docs/liquidity/protocol-pools)
-between compatible ERC-20s. Those pools share the hook, manager, and LP reward
-machinery but have no basket backing, basket-staker rewards, or lending role.
-There is no standalone initialization, activation, checkpoint, or manager-sync
-action — pools are live the moment the basket exists.
-
-:::note
-Revenue on a canonical pool comes entirely from the [swap-fee hook](/docs/liquidity/swap-fee-hook),
-not from native v4 LP fees. User v4 positions therefore do not earn ordinary
-native LP fees; their swaps still pay the hook's configured input and output
-fees.
+:::warning Release scope
+Basket creation and its canonical pools are Phase 2 of the staged Statics Diamond. The historical testnet deployment has older basket pools; the Phase 1 mainnet cut does not install these selectors. Match the ABI and deployment before transacting.
 :::
 
-## Liquidity entry
+Each basket constituent gets one canonical Uniswap v4 pool against its BasketToken. [Basket creation](/docs/baskets/creation) atomically initializes these pools and supplies the creator-funded launch seed; successful creation makes them immediately available. The creator selects the static native v4 LP fee (0 through 999,999 pips), tick spacing, initial price, and paired-asset budget for each pool.
 
-Liquidity entry uses current pool state and stays bounded by caller-supplied
-token caps and deadlines. The canonical paths are:
+The separate [Statics public hook fee](/docs/liquidity/swap-fee-hook) charges input and output swap legs and routes the basket allocation profile. Native v4 LP fees belong to ordinary liquidity providers. Basket launch POL and later activated fee inventory use explicit [managed POL](/docs/liquidity/permanent-liquidity) positions under protocol custody; they are not a hook-owned full-range position.
 
-- ordinary full-range PositionManager NFT creation through the liquidity manager
-  (optionally staked for [protocol-pool LP rewards](/docs/liquidity/canonical-lp-rewards));
-- typed [borrow-to-liquidity](/docs/liquidity/canonical-lp-rewards#borrow-to-liquidity)
-  convenience paths; and
-- hook-owned permanent liquidity seeded at launch and compounded from swap fees.
+A user can hold an external PositionManager NFT or opt a range into a PositionNFT [gauge](/docs/liquidity/canonical-lp-rewards). Phase 2 also adds typed borrow-to-liquidity paths using basket credit. General [Phase 1 public pools](/docs/liquidity/protocol-pools) use the same public hook and gauge machinery without becoming basket backing or collateral.
 
-## Exit-only unwind
-
-After a basket enters `ExitOnly`, anyone may call `unwindBasketLiquidity` once
-per constituent. See [Permanent liquidity](/docs/liquidity/permanent-liquidity)
-for the unwind flow.
+When a basket enters its Phase 2 `ExitOnly` state, canonical pool unwind follows the configured lifecycle only after managed POL positions are closed. User-owned v4 principal is not consumed by protocol unwind. Read the deployed basket and pool status before any entry or exit.

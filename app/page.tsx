@@ -15,49 +15,49 @@ const capabilities = [
     href: "/docs/tokenomics",
   },
   {
-    title: "Redeemable baskets",
-    body: "Fixed-bundle tokens of up to 16 assets. Mint and redeem the same constituent vector — deliberately not ERC-4626 yield vaults.",
-    href: "/docs/baskets/overview",
+    title: "Phase 1 public markets",
+    body: "Curated hooked markets at launch, with ERC-20 and native ETH pairs, separate v4 LP and bilateral hook fees, and a governed path to open creation.",
+    href: "/docs/liquidity/protocol-pools",
   },
   {
-    title: "Connected liquidity",
-    body: "One canonical Uniswap v4 pool per constituent at launch, with bilateral hook fees and paths that arbitrageurs may use when prices diverge.",
-    href: "/docs/liquidity/canonical-pools",
+    title: "Phase 1 permissioned venues",
+    body: "Creator-authorized terms, venue controllers, a separate hook, trusted routing, and non-transferable approved liquidity positions.",
+    href: "/docs/liquidity/permissioned-pools",
   },
   {
-    title: "Permanent protocol liquidity",
-    body: "Full-range POL can compound from matched fee inventory. Growth depends on activity; there is no ordinary withdrawal while a pool is active.",
+    title: "Managed protocol liquidity",
+    body: "Optional managed POL uses explicit custody-constrained v4 positions. A general pool begins with POL disabled until its creator activates future funding.",
     href: "/docs/liquidity/permanent-liquidity",
   },
   {
-    title: "Self-backed credit",
-    body: "Deposit BasketTokens and borrow the proportional constituent vector at the basket LTV — no price-oracle liquidation model.",
-    href: "/docs/lending/overview",
+    title: "Range rewards",
+    body: "PositionNFT-managed liquidity keeps native v4 LP fees separate from funded gauge and allocator rewards.",
+    href: "/docs/liquidity/canonical-lp-rewards",
   },
   {
-    title: "Statics Dollar",
-    body: "Senior USDstx from volatile or pegged collateral, with series-scoped Risk Shares on volatile paths and explicit solvency gates.",
-    href: "/docs/dollar/overview",
-  },
-  {
-    title: "Shared PositionNFT",
-    body: "One transferable ERC-721 account for deposits, loans, Dollar legs, reward selections, and staked protocol-pool LP positions.",
-    href: "/docs/core/position-nft",
-  },
-  {
-    title: "Fee participation",
-    body: "Routed swap and non-swap fees can accrue to creators, deposited baskets, eligible LPs, STATICS stakers, POL, and treasury when activity occurs.",
+    title: "STATICS staking",
+    body: "Stake in a PositionNFT, select reward assets, and claim earned shares after the eligibility delay.",
     href: "/docs/rewards/global-rewards",
   },
   {
-    title: "Staged creation access",
-    body: "Protocol-curated baskets first, optional partner deployments while owner-gated, then fee-gated open creation when readiness allows.",
+    title: "Shared PositionNFT",
+    body: "A transferable account for Phase 1 stake, claims, and managed LP ranges. Later cuts add basket, loan, and Dollar legs.",
+    href: "/docs/core/position-nft",
+  },
+  {
+    title: "Later phases stay documented",
+    body: "Phase 2 adds baskets and credit, Phase 3 adds Dollar, and Phase 4 adds Morpho to the same staged protocol.",
+    href: "/docs/start/phase-one-launch",
+  },
+  {
+    title: "Verify availability",
+    body: "Standalone Genesis is live. Check the matching deployment manifest and installed selectors before using Diamond features.",
     href: "/docs/rollout",
   },
   {
     title: "Governed lifecycle",
-    body: "Shared timelock ownership, guardian quarantine, and ExitOnly wind-down while repayment and recovery paths stay available.",
-    href: "/docs/governance/basket-lifecycle",
+    body: "Timelocked configuration and guardian stops bound the launch markets and staking paths.",
+    href: "/docs/governance/timelock-and-roles",
   },
 ];
 
@@ -72,26 +72,26 @@ const personas = [
     ],
   },
   {
-    title: "Token projects & partners",
-    body: "After launching elsewhere, inventory or treasury capital can seed a Statics basket when creation access allows. Current source gives the immutable creator a fixed 5% hook-fee share but no admin rights.",
+    title: "Market creators & partners",
+    body: "Explore Phase 1 public and permissioned pool creation, fee policy, and creator revenue. Basket creation follows in Phase 2.",
     links: [
-      { label: "How Statics helps tokens", href: "/docs/introduction#already-launched-tokens" },
-      { label: "Basket creation policy", href: "/docs/baskets/creation" },
-      { label: "Rollout phases", href: "/docs/rollout" },
+      { label: "Public pools", href: "/docs/liquidity/protocol-pools" },
+      { label: "Permissioned venues", href: "/docs/liquidity/permissioned-pools" },
+      { label: "Launch status", href: "/docs/rollout" },
     ],
   },
   {
-    title: "Lenders, LPs & Dollar users",
-    body: "Deposit baskets for self-backed credit, provide or stake canonical liquidity, and mint or redeem Statics Dollar within profile limits.",
+    title: "LPs & STATICS stakers",
+    body: "Use Phase 1 positions, native LP fees, range gauges, and separately funded rewards. Baskets, lending, and Dollar are documented for later phases.",
     links: [
-      { label: "Self-backed lending", href: "/docs/lending/overview" },
-      { label: "Canonical pools", href: "/docs/liquidity/canonical-pools" },
-      { label: "Statics Dollar", href: "/docs/dollar/overview" },
+      { label: "Range gauges", href: "/docs/liquidity/canonical-lp-rewards" },
+      { label: "Global staking", href: "/docs/rewards/global-rewards" },
+      { label: "Later phases", href: "/docs/start/phase-one-launch" },
     ],
   },
   {
     title: "Builders & indexers",
-    body: "Integrate against StaticsDiamond, follow measured-custody approvals, and index PositionNFT and basket state from the published surfaces.",
+    body: "Match the ABI and manifest to the target deployment, then feature-detect the installed phase and use current onchain quotes.",
     links: [
       { label: "Integration", href: "/docs/reference/integration" },
       { label: "SDK", href: "/docs/reference/sdk" },
@@ -115,16 +115,14 @@ export default function HomePage() {
           </div>
           <h1>Build lasting utility around onchain assets.</h1>
           <p className="lede">
-            Statics turns existing assets into redeemable, productive markets. Each basket connects spot
-            trading, protocol fees, permanent protocol-owned liquidity, self-backed credit, and access to
-            the Statics Dollar within a single Position NFT. Rather than launching new assets, Statics gives
-            established assets and communities durable financial infrastructure after launch. Creation
-            begins with curated baskets, expands through approved partners, and ultimately opens through
-            permissionless, fee-gated deployment.
+            The first Statics Diamond phase brings hooked public and permissioned markets, PositionNFTs,
+            STATICS staking, range rewards, and managed protocol liquidity. The standalone Genesis system
+            is already live. Baskets, lending, Dollar, and Morpho follow in later Diamond phases and remain
+            documented here.
           </p>
           <div className="landing-actions">
-            <Link className="cta" href="/docs/tokenomics">
-              Explore tokenomics
+            <Link className="cta" href="/docs/start/phase-one-launch">
+              Explore Phase 1
             </Link>
             <Link className="cta-secondary" href="/docs/introduction">
               How Statics works

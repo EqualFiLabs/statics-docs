@@ -1,68 +1,30 @@
 ---
 id: permanent-liquidity
 slug: liquidity/permanent-liquidity
-label: Permanent liquidity
-title: Permanent protocol liquidity
-description: Matched protocol-owned inventory becomes hook-owned full-range liquidity with no ordinary withdrawal path while its protocol pool is active.
-updated: 2026-08-27
+label: Managed POL
+title: Managed protocol-owned liquidity
+description: Phase 1 claim-backed POL inventory, creator activation, operator-managed positions, native ETH, and decommissioning.
+updated: 2026-10-10
 order: 430
+badge: Phase 1
 ---
 
-Permanent liquidity is the protocol-owned side of every Statics protocol pool.
-Basket canonical pools receive mandatory creator-funded seed liquidity at
-launch. General pools may begin with zero liquidity and form their first POL
-position from bilateral hook-fee allocations. POL is hook-owned, full-range,
-and intentionally non-withdrawable while its pool remains active.
+Public-pool protocol-owned liquidity (POL) is managed through explicit Uniswap v4 PositionManager NFTs. PoolId-specific inventory is backed by PoolManager claims and reserved in the Diamond. The `StaticsLiquidityManager` holds protocol positions with fixed custody recipients; the authorized operator can manage positions but cannot redirect principal, refunds, or NFTs.
 
-## Hook-owned and locked
+## General pools begin without POL
 
-Matched protocol-owned inventory converts into the hook's own full-range
-position. It has:
+A general pool can be created and traded without a liquidity seed. Managed POL is disabled by default. While disabled, its allocation routes to Treasury. The creator can pay the exact governed activation fee during creation or later to enable **future** POL funding. Activation is permanent; it does not move historical Treasury allocations into POL.
 
-- no PositionManager token ID;
-- no 24-hour epoch, seven-day ramp, minimum epoch size, or primary basket-fee
-  reserve; and
-- no ordinary withdrawal path.
+After activation, anyone may settle the pool's claim-backed POL share with `settleProtocolPoolPol(poolId, asset, maximumAmount)`. Settlement reserves the released currency for that PoolId. An authorized operator uses the typed `openProtocolPolPosition`, `increaseProtocolPolPosition`, `decreaseProtocolPolPosition`, `collectProtocolPolFees`, and `closeProtocolPolPosition` lifecycle. These are explicit transactions, not swap-callback compounding.
 
-:::warning
-Hook permanent liquidity cannot be released before pool decommissioning. It has
-no protocol PositionManager token ID, and no routine operation withdraws it.
-:::
+Basket canonical pools arrive in Phase 2 and have their own creator-funded launch seed. Their POL uses the same managed position and custody machinery.
 
-## Compounding from swap fees
+## Native assets and LP fees
 
-The [swap-fee hook's](/docs/liquidity/swap-fee-hook) permanent-liquidity share
-stays in the hook. During swap settlement, when both pool currencies are
-available, the hook compounds matched inventory into its full-range position.
-Unmatched amounts remain pending until someone calls
-`compoundPermanentLiquidity`. Fees earned by the hook's position are collected
-back into pending inventory and may be compounded again.
+For a native ETH pair, POL principal and position proceeds remain native ETH. The manager forwards only the authorized input to Uniswap and returns unused value to protocol custody. Native LP fees earned by a managed POL position are classified as Treasury revenue; they do not become POL principal. User LP NFTs separately earn their native v4 fee through ordinary Uniswap accounting.
 
-## Terminal unwind
+## Closure and limitations
 
-After a basket enters `ExitOnly`, anyone may call `unwindBasketLiquidity` once
-per constituent. The flow:
+Only governance can begin general-pool decommissioning. It stops swaps and the range gauge. The operator then closes each active POL position in bounded transactions. `finalizeGeneralPoolDecommission` requires zero active POL positions before remaining inventory is classified as Treasury revenue. User LP principal and accrued creator or reward claims are not consumed by this process. Governance can use `replaceLiquidityManager` for new positions; existing positions keep their recorded originating manager.
 
-1. marks the pool decommissioned;
-2. releases full-range hook liquidity and pending inventory to the Diamond;
-3. burns returned BasketTokens and reduces their represented backing; and
-4. accrues the released constituent and backing reclassification to global
-   treasury fees.
-
-User-owned PositionManager NFTs are untouched. No position, LP, or staker claim
-is created by the unwind — released value accrues to global treasury.
-
-General pools use the separate owner-only `decommissionGeneralPool` transition.
-It stops swaps and managed LP actions, releases POL to treasury accounting, and
-preserves creator credits, earned LP rewards, and user-owned LP principal. A
-general-pool creator has no decommissioning authority.
-
-## Dependency and recovery
-
-The hook, PoolManager, PositionManager, and Permit2 bindings are version-level
-dependencies. Current source allows timelocked replacement of the standalone
-liquidity manager, including approval revocation and grant during the handoff.
-A critical immutable-dependency failure after final
-immutability is handled by guardian containment, terminal V1 `ExitOnly`
-wind-down and liability settlement where executable, followed by a separately
-deployed and governed V2. Users and external LPs are not force-migrated.
+POL accumulation depends on activated allocation and real swap activity. Creating or activating a pool does not guarantee liquidity depth. There is no automatic background keeper, epoch, ramp, or single permanent full-range hook position. See [Public pools](/docs/liquidity/protocol-pools) for creation and [Public hook fees](/docs/liquidity/swap-fee-hook) for allocation.

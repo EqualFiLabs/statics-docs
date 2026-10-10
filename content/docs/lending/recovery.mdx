@@ -4,9 +4,14 @@ slug: lending/recovery
 label: Recovery
 title: Recovery
 description: After maturity and a one-hour grace period, anyone can permissionlessly recover an expired tranche and claim a recovery bounty.
-updated: 2026-08-04
+updated: 2026-10-10
 order: 330
+badge: Phase 2
 ---
+
+:::warning Release scope
+This describes the Phase 2 basket and credit surface of the staged Statics Diamond. The historical testnet deployment has older basket flows; the Phase 1 mainnet cut does not install these selectors. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+:::
 
 When a loan tranche matures and its one-hour grace period lapses, recovery
 becomes permissionless. Recovery settles the expired tranche only — sibling

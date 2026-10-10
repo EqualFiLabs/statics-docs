@@ -3,10 +3,13 @@ id: position-nft
 slug: core/position-nft
 label: PositionNFT
 title: Shared PositionNFT
-description: One transferable ERC-721 position owns every Dollar leg, basket collateral, loan, reward selection, staked liquidity position, and optional Genesis link.
-updated: 2026-08-27
+description: A transferable Phase 1 account for STATICS staking, rewards, and managed LP ranges; later cuts add basket, Dollar, and Genesis integration legs.
+updated: 2026-10-10
 order: 30
+badge: Phase 1
 ---
+
+Phase 1 installs the PositionNFT account and its STATICS staking, reward, and public-pool range-gauge legs. Basket collateral and loans, Diamond-side Genesis links, and Dollar legs are added in later cuts. Check the [rollout](/docs/rollout) and installed selectors before building against those later legs.
 
 One PositionNFT can own several independent legs at once. The ERC-721
 collection is named `Statics Position` with symbol `STXPOS`, and the contract
@@ -22,7 +25,7 @@ A single PositionNFT may bundle any of the following legs:
 - immediately consumable Statics Dollar Risk Share liquidity, funded incentives,
   fill proceeds, and series-migration credits;
 - pairing-vault state; and
-- voluntarily custodied full-range v4 LP NFTs and their hook-fee claims.
+- voluntarily managed full-range or concentrated v4 LP NFTs and their separately funded gauge claims.
 
 A position may also be linked to one registered Genesis NFT. The link applies
 the Genesis activation multiplier to the position's global STATICS reward weight

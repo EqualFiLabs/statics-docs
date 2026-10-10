@@ -4,9 +4,14 @@ slug: dollar/oracle-model
 label: Oracle model
 title: Oracle model
 description: Dollar profiles rely on Chainlink-compatible ETH/USD and sequencer-uptime feeds with enforced peg bands and grace periods.
-updated: 2026-08-04
+updated: 2026-10-10
 order: 250
+badge: Phase 3
 ---
+
+:::warning Release scope
+This describes the Phase 3 Statics Dollar surface of the staged Statics Diamond. The historical testnet deployment has an earlier Dollar implementation; the Phase 1 mainnet cut does not install these selectors. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+:::
 
 Statics Dollar volatile profiles value collateral through a Chainlink-compatible
 ETH/USD adapter. The adapter applies explicit staleness, range, and sequencer

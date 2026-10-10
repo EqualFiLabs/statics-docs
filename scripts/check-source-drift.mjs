@@ -52,14 +52,38 @@ const docsText = [
   .replace(/\s+/g, " ");
 
 const architecture = read(staticsRoot, "docs/architecture.md");
-const shape = requireMatch(
+const phaseOneShape = requireMatch(
   architecture,
-  /installs (\d+) facets and (\d+) selectors on\s+`StaticsDiamond`, and (\d+) facets and (\d+) selectors on\s+`StaticsDollarCoreDiamond`/,
+  /The staged Phase 1 launcher installs (\d+) facets and (\d+) selectors/,
+  "Phase 1 deployment shape",
+);
+const fullShape = requireMatch(
+  architecture,
+  /full-stack fresh-deployment launcher installs (\d+) facets and (\d+) selectors\s+on\s+`StaticsDiamond`, and (\d+) facets and (\d+) selectors on\s+`StaticsDollarCoreDiamond`/,
   "fresh deployment shape",
 );
-if (shape) {
-  requireText(docsText, `**${shape[1]} facets / ${shape[2]} selectors**`, "StaticsDiamond shape");
-  requireText(docsText, `**${shape[3]} facets / ${shape[4]} selectors**`, "Core Diamond shape");
+if (phaseOneShape) {
+  requireText(docsText, `**${phaseOneShape[1]} facets / ${phaseOneShape[2]} selectors**`, "Phase 1 Diamond shape");
+}
+if (fullShape) {
+  requireText(docsText, `**${fullShape[1]} facets / ${fullShape[2]} selectors**`, "full StaticsDiamond shape");
+  requireText(docsText, `Core has ${fullShape[3]} facets / ${fullShape[4]} selectors`, "Core Diamond shape");
+}
+
+const phasePlan = read(staticsRoot, "docs/adr/staged-phase-one-launch.md");
+const rollout = read(ROOT, "content/docs/rollout.mdx");
+for (const [phase, expression] of [
+  [2, /Phase 2 adds \d+ selectors for a cumulative (\d+) selectors across (\d+) facets/],
+  [3, /Phase 3 adds \d+ selectors for a cumulative (\d+) selectors across (\d+) facets/],
+  [4, /Phase 4 adds \d+ selectors for the final (\d+) selectors across (\d+) facets/],
+]) {
+  const match = requireMatch(phasePlan, expression, `Phase ${phase} selector count`);
+  if (match) requireText(rollout, `${match[2]} facets, ${match[1]} selectors`, `Phase ${phase} rollout count`);
+}
+
+const launchGuide = read(ROOT, "content/docs/start/phase-one-launch.mdx");
+for (const phrase of ["native ETH/ERC-20", "Permissioned venues", "Range gauges", "Managed POL", "Phase 2", "Phase 3", "Phase 4"]) {
+  requireText(launchGuide, phrase, `Phase 1 launch guide ${phrase}`);
 }
 
 const launcher = read(staticsRoot, "script/DeployStaticsGenesis.s.sol");

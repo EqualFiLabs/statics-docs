@@ -29,27 +29,28 @@ const docsDirectory = path.join(process.cwd(), "content", "docs");
 const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   {
     title: "Start here",
-    pageIds: ["introduction", "tokenomics", "rollout", "glossary"],
+    pageIds: ["phase-one-launch", "rollout", "introduction", "tokenomics", "glossary"],
   },
   {
-    title: "Core",
-    pageIds: ["architecture", "position-nft", "custody"],
-  },
-  {
-    title: "Genesis",
+    title: "Phase 1 · markets and rewards",
     pageIds: [
-      "genesis-overview",
-      "genesis-launch-vesting",
-      "genesis-rewards",
-      "genesis-secured-credit",
+      "protocol-pools", "permissioned-pools", "swap-fee-hook", "canonical-lp-rewards",
+      "permanent-liquidity", "position-nft", "global-rewards",
     ],
   },
   {
-    title: "Baskets",
-    pageIds: ["baskets-overview", "creation", "mint-and-redemption"],
+    title: "Live standalone Genesis",
+    pageIds: ["genesis-overview", "genesis-launch-vesting", "genesis-rewards", "genesis-secured-credit"],
   },
   {
-    title: "Dollar",
+    title: "Phase 2 · baskets and credit",
+    pageIds: [
+      "baskets-overview", "creation", "mint-and-redemption", "canonical-pools",
+      "lending-overview", "loan-lifecycle", "recovery", "flash-composition", "basket-lifecycle",
+    ],
+  },
+  {
+    title: "Phase 3 · Statics Dollar",
     pageIds: [
       "dollar-overview",
       "volatile-profiles",
@@ -59,26 +60,8 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
     ],
   },
   {
-    title: "Lending",
-    pageIds: ["lending-overview", "loan-lifecycle", "recovery", "flash-composition"],
-  },
-  {
-    title: "Liquidity",
-    pageIds: [
-      "canonical-pools",
-      "protocol-pools",
-      "swap-fee-hook",
-      "permanent-liquidity",
-      "canonical-lp-rewards",
-    ],
-  },
-  {
-    title: "Rewards",
-    pageIds: ["global-rewards"],
-  },
-  {
     title: "Governance",
-    pageIds: ["timelock-and-roles", "basket-lifecycle"],
+    pageIds: ["timelock-and-roles", "architecture", "custody"],
   },
   {
     title: "Build",
@@ -89,7 +72,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
     pageIds: ["security-model", "verification"],
   },
   {
-    title: "Reference",
+    title: "Historical testnet",
     pageIds: ["robinhood-testnet-deployment", "testnet-onboarding"],
   },
 ];

@@ -39,7 +39,9 @@ const sourceFiles = [
 
 for (const file of sourceFiles) {
   const source = fs.readFileSync(file, "utf8");
-  for (const match of source.matchAll(/\/docs\/([A-Za-z0-9_./-]+)/g)) {
+  // A docs path inside an external URL (for example a GitHub source link) is
+  // not a local route. Local links begin at a string, Markdown, or JSX boundary.
+  for (const match of source.matchAll(/(?<![A-Za-z0-9])\/docs\/([A-Za-z0-9_./-]+)/g)) {
     const slug = match[1].replace(/\/$/, "");
     if (slugs.has(slug)) continue;
     const line = source.slice(0, match.index).split("\n").length;

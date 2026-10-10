@@ -4,9 +4,14 @@ slug: baskets/overview
 label: Overview
 title: Static baskets
 description: A static basket is a fixed-bundle ERC-20 token of up to 16 assets with a deliberate non-ERC-4626 mint and redemption model.
-updated: 2026-08-05
+updated: 2026-10-10
 order: 110
+badge: Phase 2
 ---
+
+:::warning Release scope
+This describes the Phase 2 basket and credit surface of the staged Statics Diamond. The historical testnet deployment has older basket flows; the Phase 1 mainnet cut does not install these selectors. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+:::
 
 A static basket is a fixed-composition multi-asset token. Each basket is defined
 once at creation by an immutable constituent vector, and every BasketToken

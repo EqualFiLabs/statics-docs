@@ -1,71 +1,33 @@
 ---
 id: canonical-lp-rewards
 slug: liquidity/canonical-lp-rewards
-label: Protocol-pool LP rewards
-title: Protocol-pool LP rewards
-description: Stake eligible full-range PositionManager NFTs from either protocol-pool class to accrue next-block liquidity weight and claim hook rewards.
-updated: 2026-08-27
+label: Range gauges
+title: Range gauges and LP rewards
+description: Phase 1 PositionNFT-managed v4 liquidity, native LP fees, protocol STATICS incentives, direct-funded slots, and allocator claims.
+updated: 2026-10-10
 order: 440
+badge: Phase 1
 ---
 
-Users can stake their own full-range PositionManager NFTs for active basket
-canonical or general pools into a PositionNFT and earn the hook's LP allocation.
-This is separate from the global Statics staking rail.
+A public pool can hold ordinary Uniswap v4 liquidity without enrolling in Statics rewards. A user who opts into the Phase 1 range gauge binds an approved PositionManager NFT to a Statics PositionNFT and transfers the v4 NFT into the `StaticsLiquidityManager` while the managed leg is active. Both full-range and concentrated ranges can participate.
 
-## Staking a v4 NFT
+## Two separate earnings rails
 
-Any unsubscribed, nonzero, full-range PositionManager NFT for an active
-registered protocol pool may be attached to a PositionNFT and transferred into voluntary
-Diamond custody — but only when the LP NFT and PositionNFT have the **same
-current owner**. PositionNFT authorization or ERC-721 approval alone does not
-substitute for that ownership match.
+- **Native v4 LP fees** belong to the Uniswap position under its creator-selected static LP fee. `collectNativeFees` and `previewNativeLpFees` use the position's ordinary fee accounting.
+- **Gauge rewards** are separately funded and accounted by the Diamond. They do not replace, duplicate, or promise native LP fees.
 
-Eligibility does not depend on whether the NFT originated from
-`borrowAndProvideLiquidity`. Initial liquidity becomes reward eligible in the
-next block; an in-custody increase preserves the existing eligible weight and
-delays only the added liquidity until the next block.
+Each public-pool gauge has five slots. Slot 0 is reserved for protocol STATICS funded from a permissionless reserve and routed by raw-stake PoolId allocations on an anchored weekly budget. Slots 1–4 accept direct reward funding, subject to asset policy. A creator-selected share of future direct funding can go to valid PoolId allocators; funders receive the protected split in effect when they fund.
 
-## No unstake cooldown
+A PositionNFT can allocate its raw STATICS stake across PoolIds after the configured cooldown. Allocation and LP range eligibility are different: staking alone does not make a user an LP, and holding a v4 NFT alone does not enroll it in the gauge.
 
-There is no LP unstake cooldown. The PositionNFT owner may withdraw the NFT in
-the staking block or in any basket lifecycle state. Withdrawal settles earned
-rewards to the PositionNFT before returning the NFT, so a later reward-token
-failure cannot trap the external position.
+## Managing a position
 
-:::note
-Unclaimed rewards remain attached to the PositionNFT, and transferring that
-PositionNFT transfers claim and custody authority. Users must unstake before
-decreasing or burning the v4 NFT.
-:::
+The typed manager supports providing or attaching liquidity, increasing, decreasing, rebalancing, collecting native fees, and exiting. Native ETH input requires the exact payable budget; ERC-20 pools send no native value. Review the connected account's approvals, current pool state, tick range, maximum inputs, minimum outputs, and deadline before signing.
 
-## Borrow-to-liquidity
+`claimLpRewards` and allocator-claim paths pay earned rewards. A user can explicitly forfeit an unclaimable LP reward slot to unblock exit. Principal-first exit and independent claim records keep a failed reward-token transfer from trapping v4 principal. Once a gauge is stopped, new activity is restricted but previously accrued claims remain.
 
-Statics provides two typed convenience paths that combine an ordinary
-position-owned borrow with **basket canonical** LP creation. General pools have
-no basket backing or borrow-to-liquidity path.
+## Batches and later-phase paths
 
-`borrowAndProvideLiquidity` performs an ordinary borrow, applies the origination
-fee, mints BasketTokens from retained principal, and creates one **user-owned**
-PositionManager NFT per supplied canonical pool. Those NFTs receive no automatic
-reward eligibility — the recipient may later stake them through the ordinary
-protocol-pool LP reward entrypoint.
+Phase 1 also installs atomic typed reward batches for global, LP, and allocator claims. A batch is bounded to 16 claim groups and 64 asset or slot entries; each group retains its own authorization and minimum-received check. Simulate and estimate gas for the complete batch.
 
-`borrowAndStakeLiquidity` is the PositionNFT-owned alternative. It requires
-full-range positions, mints the NFTs directly to the Diamond, and records them as
-pending LP legs under the borrowing PositionNFT. LP weight activates in the next
-block, while the locked BasketToken collateral keeps earning basket rewards.
-
-For both paths the caller supplies one aligned entry per constituent with tick
-range, exact liquidity, per-currency maximums, and deadline. Every pool must be
-active, manager-synced, unique, and associated with the basket constituent. Any
-stale price, bad pool, cap, deadline, range, approval, or principal requirement
-reverts the loan, mint, and every LP creation atomically.
-
-| Path | NFT recipient | Reward eligibility |
-| --- | --- | --- |
-| `borrowAndProvideLiquidity` | caller-chosen `lpRecipient` | None automatic; stake later |
-| `borrowAndStakeLiquidity` | Diamond (LP leg under the position) | Next block |
-
-`borrowAndStakeLiquidity` has no caller-selected recipient: the current
-PositionNFT owner receives unused principal and PositionManager refunds even when
-an approved operator submits the call.
+Basket borrow-to-liquidity and canonical basket pools are **Phase 2** features. Their pages remain at [Basket liquidity](/docs/liquidity/canonical-pools) and [Basket lending](/docs/lending/overview). They are not prerequisites for Phase 1 public-pool gauges.

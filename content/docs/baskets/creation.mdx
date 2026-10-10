@@ -4,9 +4,14 @@ slug: baskets/creation
 label: Creation
 title: Basket creation
 description: How basket creation works onchain, what is enabled now, how partner baskets fit while creation is owner-only, and the technical atomic launch path.
-updated: 2026-08-27
+updated: 2026-10-10
 order: 120
+badge: Phase 2
 ---
+
+:::warning Release scope
+This describes the Phase 2 basket and credit surface of the staged Statics Diamond. The historical testnet deployment has older basket flows; the Phase 1 mainnet cut does not install these selectors. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+:::
 
 :::warning Not permissionless at initial launch
 Basket creation is currently restricted to the protocol. On the Robinhood Chain Testnet integration beta, `creationFee = 0`, so only the Diamond owner can create baskets. Access may expand through owner-created partner baskets, then to fee-gated open creation when governance raises the fee. See [Rollout](/docs/rollout).

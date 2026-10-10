@@ -4,13 +4,20 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-27
+updated: 2026-10-10
 order: 720
 ---
 
 The Statics SDK is a TypeScript package (`@statics-protocol/sdk`) that ships the
 onchain ABIs, chain bindings, math helpers, quote functions, decoders, and
 calldata builders needed to integrate without recomputing protocol math.
+
+:::warning Match the target release
+The vendored `/abi/*.json` and `public/addresses.json` in this docs site are
+**historical Robinhood testnet artifacts**. They are not the ABI or addresses
+for a Phase 1 mainnet Diamond. Pin an SDK and ABI to the exact deployment
+manifest and installed selector set before sending transactions.
+:::
 
 ## Package
 
@@ -22,18 +29,11 @@ calldata builders needed to integrate without recomputing protocol math.
 | Types | `dist/index.d.ts` |
 | Peer dependency | `viem` `>=2` |
 
-Install from GitHub (not npm registry):
+For a development checkout, pin an audited SDK revision from GitHub (not the
+moving `master` branch). The exact pin depends on the deployment you target:
 
 ```bash
-npm install github:EqualFiLabs/statics-sdk
-```
-
-Equivalent forms:
-
-```bash
-npm install git+https://github.com/EqualFiLabs/statics-sdk.git
-# or pin a commit / tag
-npm install github:EqualFiLabs/statics-sdk#master
+npm install github:EqualFiLabs/statics-sdk#<verified-commit-for-target-release>
 ```
 
 ```ts
@@ -44,16 +44,19 @@ Source, issues, and local build live in that repository (`npm run build`, `npm t
 
 ## Match the SDK to the target
 
-These docs track two deliberate revisions:
+These docs keep the historical testnet revision separate from the current
+protocol source and eventual Phase 1 release:
 
 | Target | SDK revision |
 | --- | --- |
 | Recorded Robinhood testnet deployment and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
-| Current `statics` master source | `f4b88bf43a130fbd5fa8aebd2b784da16fa54b6f` |
+| Current `statics` master source | Resolve its `sdk` submodule gitlink and verify its contents against the exact source commit; do not use the historical testnet ABI for Phase 1 |
+| Phase 1 mainnet deployment | Publish the matching SDK revision with the verified Phase 1 manifest; not yet listed on this site |
 
-Pin the deployment revision when submitting transactions to the recorded live
-addresses. Current master includes Operators launch/vesting, redrawable Genesis
-credit, and permissionless general-pool APIs that are not deployed there.
+Pin the deployment revision when submitting transactions to the recorded
+testnet addresses. The staged current source has additional public and
+permissioned pool, range-gauge, and reward interfaces that are not represented
+by those older ABIs.
 
 ## Chain bindings
 

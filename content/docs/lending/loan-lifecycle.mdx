@@ -4,9 +4,14 @@ slug: lending/loan-lifecycle
 label: Loan lifecycle
 title: Loan lifecycle
 description: Loans carry independent tranches with separate maturities, extension charges, and exact-principal repayment.
-updated: 2026-08-25
+updated: 2026-10-10
 order: 320
+badge: Phase 2
 ---
+
+:::warning Release scope
+This describes the Phase 2 basket and credit surface of the staged Statics Diamond. The historical testnet deployment has older basket flows; the Phase 1 mainnet cut does not install these selectors. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+:::
 
 Every loan is an independent tranche owned by a PositionNFT. The tranche keeps
 its own stored principal vector and maturity; borrowing, extending, and repaying

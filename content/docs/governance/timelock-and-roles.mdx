@@ -3,15 +3,15 @@ id: timelock-and-roles
 slug: governance/timelock-and-roles
 label: Timelock & roles
 title: Timelock and roles
-description: A shared Statics timelock owns both diamonds and defines proposer, canceller, executor, guardian, and treasury roles.
-updated: 2026-08-04
+description: Timelocked governance of the Phase 1 Diamond and the later shared Dollar Core, with guardian and treasury roles.
+updated: 2026-10-10
 order: 610
 ---
 
-One `StaticsTimelock` owns both `StaticsDiamond` and `StaticsDollarCoreDiamond`.
-It is the single governance root for the protocol: every Diamond cut, economic
-configuration change, lifecycle release, hook fee change, and treasury or
-guardian change flows through it.
+In Phase 1, `StaticsTimelock` owns `StaticsDiamond`. The separate
+`StaticsDollarCoreDiamond` arrives in Phase 3 under the intended shared
+governance. Diamond cuts, economic configuration, lifecycle release, hook-fee
+changes, and treasury or guardian changes flow through the timelock.
 
 ## Delay
 

@@ -5,14 +5,14 @@ import { MobileDocsMenu } from "@/components/mobile-docs-menu";
 import { PageTools } from "@/components/page-tools";
 import { SiteHeader } from "@/components/site-header";
 import { Toc } from "@/components/toc";
-import { type DocPage as DocPageType, getAllPages, getNavigationGroups, getPageHref } from "@/lib/docs";
+import { type DocPage as DocPageType, getNavigationGroups, getPageHref } from "@/lib/docs";
 
 export function DocsPage({ page }: { page: DocPageType }) {
-  const allPages = getAllPages();
   const navigationGroups = getNavigationGroups();
-  const pageIndex = allPages.findIndex((entry) => entry.id === page.id);
-  const previousPage = pageIndex > 0 ? allPages[pageIndex - 1] : null;
-  const nextPage = pageIndex >= 0 && pageIndex < allPages.length - 1 ? allPages[pageIndex + 1] : null;
+  const navigationPages = navigationGroups.flatMap((group) => group.pages);
+  const pageIndex = navigationPages.findIndex((entry) => entry.id === page.id);
+  const previousPage = pageIndex > 0 ? navigationPages[pageIndex - 1] : null;
+  const nextPage = pageIndex >= 0 && pageIndex < navigationPages.length - 1 ? navigationPages[pageIndex + 1] : null;
   const crumbSegments = page.slug.slice(0, -1);
   const groupTitleFor = (pageId: string) =>
     navigationGroups.find((group) => group.pages.some((entry) => entry.id === pageId))?.title;
