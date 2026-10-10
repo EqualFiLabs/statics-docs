@@ -15,7 +15,7 @@ import matter from "gray-matter";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.staticsprotocol.com";
 const SITE_NAME = "Statics Protocol Docs";
 const SITE_DESCRIPTION =
-  "Documentation for Statics: live standalone Genesis, Phase 1 markets, positions, staking, rewards, and later basket, Dollar, and Morpho phases.";
+  "Documentation for Statics: Statics Genesis, Phase 1 markets, positions, staking, rewards, and later basket, Dollar, and Morpho phases.";
 
 const ROOT = process.cwd();
 const contentDir = path.join(ROOT, "content", "docs");
@@ -78,7 +78,7 @@ const pages = findMdxFiles(contentDir)
 
 // ---- release facts ----
 const facts = [
-  "Standalone STATICS Genesis is live on Robinhood mainnet.",
+  "Statics Genesis is live on Robinhood mainnet.",
   "Phase 1 source and deployment tooling are implemented; this site does not yet publish a verified Phase 1 mainnet address or matching ABI.",
   "Baskets and credit are Phase 2; Statics Dollar is Phase 3; Morpho integration is Phase 4.",
 ];

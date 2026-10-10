@@ -51,7 +51,7 @@ const capabilities = [
   },
   {
     title: "Verify availability",
-    body: "Standalone Genesis is live. Check launch status and verified addresses before using Phase 1 features.",
+    body: "Statics Genesis is live. Check launch status and verified addresses before using Phase 1 features.",
     href: "/docs/rollout",
   },
   {
@@ -116,7 +116,7 @@ export default function HomePage() {
           <h1>Build lasting utility around onchain assets.</h1>
           <p className="lede">
             Statics Phase 1 brings hooked public and permissioned markets, PositionNFTs, STATICS staking,
-            range rewards, and managed protocol liquidity. The standalone Genesis system is already live.
+            range rewards, and managed protocol liquidity. Statics Genesis is already live.
             Later Statics phases add baskets, lending, Dollar, and Morpho; those features remain documented here.
           </p>
           <div className="landing-actions">

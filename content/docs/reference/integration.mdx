@@ -123,10 +123,10 @@ flashLender.flashLoan(basketId, shares, address(receiver), routeData);
 // keccak256("IStaticsFlashBorrower.onStaticsFlashLoan") and restore principal + fees.
 ```
 
-## Standalone Genesis and later Diamond integration
+## Statics Genesis and later protocol integration
 
 Genesis is the contract/API name for the **STATICS Operators** collection. It
-has a standalone NFT/vault lifecycle. Diamond-side registration and linkage
+has its own NFT/vault lifecycle. Diamond-side registration and linkage
 arrive with Phase 2. Applications should discover the `StaticsGenesis`,
 `StaticsGenesisVault`, `GenesisActivationRegistry`, and
 `GenesisLaunchDistributor` addresses from the matching deployment manifest,
@@ -200,7 +200,7 @@ PoolIds and economics must be read from the permissioned registry.
 | Phase 1 public pools, fees, and creator revenue | `IStaticsProtocolPools`, `IStaticsProtocolRevenue`, `IStaticsSwapFeeHook` |
 | Phase 1 permissioned venues | `IStaticsPermissionedPools`, permissioned hook, router, and position-manager interfaces |
 | Phase 1 positions, staking, gauges, and claims | `IStaticsPosition`, `IStaticsGlobalRewards`, `IStaticsRangeGauge`, `IStaticsBatchRewards` |
-| Standalone Genesis | `IStaticsGenesis`, `IStaticsGenesisVault`, `IGenesisActivationRegistry` |
+| Statics Genesis | `IStaticsGenesis`, `IStaticsGenesisVault`, `IGenesisActivationRegistry` |
 | Baskets | `IStaticsBasket`, `IStaticsBasketAdmin`, `IStaticsBasketCollateral`, `IStaticsBasketRewards` |
 | Genesis NFT and vault | `IStaticsGenesis`, `IStaticsGenesisVault`, `IERC5192` |
 | Genesis treasury vesting | `IStaticsTreasuryVesting` |
