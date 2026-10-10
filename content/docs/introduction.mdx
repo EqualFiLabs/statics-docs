@@ -4,153 +4,32 @@ slug: introduction
 label: Introduction
 eyebrow: Protocol docs
 title: Statics Protocol
-description: Statics turns onchain assets into redeemable baskets that connect liquidity, fee generation, self-backed credit, and the Statics Dollar. Built as post-launch financial infrastructure, the protocol begins with curated baskets before expanding creation to approved partners and, ultimately, open participation.
+description: Statics Genesis, the Phase 1 market and reward launch, and the later basket, credit, Dollar, and Morpho phases.
 status: Protocol docs
-updated: 2026-08-27
+updated: 2026-10-10
 order: 10
 ---
 
-## What Statics does
+Statics is staged financial infrastructure for onchain assets. **Statics Genesis** established the STATICS token, Doppler market, Operators collection, and backing system on Robinhood mainnet. Statics Phase 1 adds public and permissioned Uniswap v4 markets, PositionNFT accounts, STATICS staking, rewards, range gauges, and managed protocol-owned liquidity.
 
-Statics is **post-launch financial infrastructure**, not a launchpad.
+The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what Phase 1 includes. The [rollout](/docs/rollout) separates source readiness from a verified deployment. This site does not yet publish a verified Phase 1 mainnet protocol address.
 
-Launchpads help tokens launch. Statics helps make onchain assets useful afterward: redeemable multi-asset baskets, connected trading pools, self-backed credit, fee sharing, permanent protocol-owned liquidity, and a senior/junior Statics Dollar system.
+## What Phase 1 enables
 
-> Statics turns onchain assets into redeemable financial markets with connected liquidity, arbitrage paths, fee earning, and self-backed credit. It begins with curated baskets and can expand into utility infrastructure for token projects before open creation is enabled.
+- **Create and trade public pools:** two compatible ERC-20s or native ETH with an ERC-20, subject to the current [creation-fee switch](/docs/liquidity/protocol-pools). Initially, only protocol governance can create these pools; a positive fee can later enable public creation.
+- **Run a permissioned venue:** governance creates a pool with creator-authorized terms, a separate hook, controller, trusted routing, and approved liquidity positions. See [Permissioned pools](/docs/liquidity/permissioned-pools).
+- **Provide liquidity:** earn the creator-selected native v4 LP fee, and optionally manage a v4 NFT under a [PositionNFT range gauge](/docs/liquidity/canonical-lp-rewards) for separately funded rewards.
+- **Stake STATICS:** choose reward assets, pass the eligibility delay, claim accrued fees, and allocate raw stake to protocol-funded pool incentives. See [Global rewards](/docs/rewards/global-rewards).
+- **Build protocol liquidity:** a public pool may activate claim-backed [managed POL](/docs/liquidity/permanent-liquidity). Activation and market activity determine whether any inventory becomes available.
 
-Volume, fees, rewards, and liquidity growth are **possible outcomes of real activity**, not guarantees.
+A market's registration does not make its assets basket backing, Dollar collateral, or borrowable. Trading volume, rewards, arbitrage, and POL growth depend on actual funding and activity.
 
-## How a basket works
+## What follows
 
-A **static basket** is a fixed bundle of one to sixteen ERC-20 constituents. Each basket has its own BasketToken:
+Phase 2 adds fixed-composition, redeemable [baskets](/docs/baskets/overview), basket pools, self-backed [credit](/docs/lending/overview), flash composition, and protocol-side Genesis integration. Phase 3 adds the [Statics Dollar](/docs/dollar/overview) and its separate Core custody boundary. Phase 4 adds Morpho integration. These pages remain in the site so builders can study the full design, but those features are not part of Phase 1.
 
-- **Mint** — deposit the fixed constituent bundle (plus any mint fee) and receive BasketTokens.
-- **Redeem** — burn BasketTokens and receive the same bundle back (less any redemption fee).
-- **Trade** — swap BasketToken against each constituent on canonical Uniswap v4 pools created at launch.
-- **Hold productively** — deposit BasketTokens into a PositionNFT to earn routed basket fee shares and to borrow self-backed credit.
+Baskets are deliberately not ERC-4626. A BasketToken represents a fixed vector of one to sixteen assets; its mint and redemption path appears only in Phase 2. See the [glossary](/docs/glossary) for terms and the [integration guide](/docs/reference/integration) for release-aware developer steps.
 
-Baskets are deliberately **not ERC-4626**. Historical fees do not change the conversion rate, and new minters do not buy accrued yield. One BasketToken is always a claim on the same fixed bundle.
+## Statics Genesis
 
-### Example (testnet fixture)
-
-On Robinhood Chain Testnet, the genesis basket **TPA1** is a tokenized-stock-style example:
-
-| Per BasketToken | Asset |
-| --- | --- |
-| 0.01 | TSLA |
-| 0.01 | PLTR |
-| 0.01 | AMD |
-
-Treat live launch compositions as **TBD until finalized**. Statics itself is asset-generic: any compatible ERC-20 set can define a basket when creation is allowed.
-
-## What users can do
-
-| You want to… | Start here |
-| --- | --- |
-| Understand STATICS supply and launch allocation | [Tokenomics](/docs/tokenomics) |
-| Understand availability | [Rollout](/docs/rollout) |
-| Hold or trade a basket | [Mint & redemption](/docs/baskets/mint-and-redemption), [Canonical pools](/docs/liquidity/canonical-pools) |
-| Borrow against a basket | [Self-backed lending](/docs/lending/overview) |
-| Use Genesis activation, rewards, or secured credit | [Genesis overview](/docs/genesis/overview) |
-| Use Statics Dollar | [Dollar overview](/docs/dollar/overview) |
-| Earn fee shares | [Global rewards](/docs/rewards/global-rewards), [LP rewards](/docs/liquidity/canonical-lp-rewards) |
-| Integrate contracts | [Integration](/docs/reference/integration) |
-
-All of these flows run through a shared **PositionNFT** account when you deposit, borrow, stake, or hold Dollar legs. See the [glossary](/docs/glossary) for term definitions.
-
-## Already-launched tokens
-
-Statics is not where a token has to launch. After a token exists elsewhere, a project can put **token inventory or treasury capital** to work by seeding a basket and its pools (when creation access allows).
-
-A basket can add:
-
-- redeemable multi-asset utility;
-- connected canonical liquidity;
-- additional mint/redeem and pool paths that arbitrageurs may use;
-- fee-earning participation for depositors, LPs, and stakers;
-- self-backed constituent credit against deposited BasketTokens.
-
-:::note Creator economics
-Creation records an immutable creator address. The creator receives **no admin
-power**, but current source assigns that address a fixed **5% of bilateral hook
-fees** from its basket pools. The share is pull-based and remains claimable
-after decommissioning. The permissionless general-pool source uses the same
-fixed creator share. These newer economics are not yet deployed at the recorded
-Robinhood testnet addresses.
-:::
-
-On the current beta, public creation is closed. Partner baskets, if any, are an operational choice while the protocol retains owner-only creation. Details: [Rollout](/docs/rollout) and [Basket creation](/docs/baskets/creation).
-
-## Fees and permanent liquidity
-
-When people mint, redeem, swap, borrow, flash-borrow, or use Dollar flows, the protocol can charge configured fees. Swap fees on Statics protocol pools are bilateral hook fees. A share of eligible fees can accumulate as protocol-owned inventory and **may** compound into more full-range permanent liquidity when sides match.
-
-None of that is automatic depth: seed liquidity bootstraps markets; **activity** determines whether fees and POL grow.
-
-## Mainnet launch and protocol rollout
-
-The STATICS Genesis launch is live on Robinhood mainnet. It established the
-fixed token supply, six-curve STATICS/WETH market, Operators collection,
-backing, vesting, fee ingress, and launch rewards described in these docs.
-
-The broader basket, Dollar, lending, and general-pool suite has its own rollout
-and governance controls. Basket creation is owner-only whenever
-`creationFee()` is zero and becomes open when governance sets a positive fee.
-The recorded Robinhood testnet deployment remains available as a separate
-integration reference; its fixture addresses are not the mainnet Genesis
-deployment.
-
-See [Rollout](/docs/rollout) for production availability and the distinction
-between the live Genesis system and the basket-suite test environment.
-
-## Risks and limitations
-
-- **Recorded testnet software** is an integration environment: its addresses and parameters can change and are not production defaults.
-- **Token compatibility** is not certified by inclusion in a basket.
-- **No guaranteed** volume, arb profit, reward APY, peg, or liquidity growth.
-- **Self-backed credit** is not oracle-liquidated cross-margin; read lending and recovery rules before borrowing.
-- **Upgradeability** remains until a final immutability ceremony; ExitOnly is a governed software state on upgradeable diamonds.
-
-Read the [security model](/docs/reference/security-model) before integrating or depositing value.
-
-## Technical architecture
-
-Statics is implemented as two coordinated EIP-2535 diamonds:
-
-```text Statics two-diamond layout
-ETH / WETH / pegged collateral
-        |
-        v
-StaticsDollarCoreDiamond   collateral + issuance + solvency + recovery
-        |
-   USDstx + Risk Shares
-        v
-StaticsDiamond (EIP-2535)  user gateway + PositionNFT + shared custody
-        |
-   one pool per basket constituent
-        v
-Uniswap v4 PoolManager + StaticsSwapFeeHook + LiquidityManager
-```
-
-| Surface | Purpose |
-| --- | --- |
-| Static baskets | Fixed-bundle ERC-20 basket tokens of up to 16 assets with action-size fee tiers. |
-| Statics Dollar | Senior dollar (`USDstx`) from volatile or pegged collateral, plus series-scoped Risk Shares (`ethLEV`). |
-| Shared PositionNFT | One transferable ERC-721 for dollar legs, basket collateral, loans, rewards, and staked liquidity. |
-| Global rewards | Stake `STATICS` and opt into up to 64 reward assets per position. |
-| Self-backed lending | Borrow a basket's constituent vector against deposited basket collateral. |
-| Flash composition | Borrow a basket's constituents atomically through a typed callback. |
-| Canonical v4 liquidity | One zero-native-fee Uniswap v4 pool per constituent with a bilateral swap-fee hook. |
-| Permanent liquidity | Matched protocol-owned inventory becomes hook-owned full-range liquidity. |
-
-`StaticsDiamond` is the ordinary integration address, the PositionNFT contract, and the custody boundary for basket and Dollar periphery assets. `StaticsDollarCoreDiamond` is a separate custody and solvency boundary. Both are owned by the same `StaticsTimelock`.
-
-Deeper module docs:
-
-- [Architecture](/docs/core/architecture)
-- [PositionNFT](/docs/core/position-nft)
-- [Custody](/docs/core/custody)
-- [Baskets](/docs/baskets/overview)
-- [Dollar](/docs/dollar/overview)
-- [Lending](/docs/lending/overview)
-- [Liquidity](/docs/liquidity/canonical-pools)
+The [Operators and Vault](/docs/genesis/overview) are part of Statics Genesis, which is already live. Genesis direct rewards and secured credit have their own contracts. Registering or linking an Operator through the Statics protocol is a later, Phase 2 integration step.

@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "sync-abis": "node scripts/sync-abis.mjs",
-    "check:abis": "node scripts/sync-abis.mjs --check",
     "check:links": "node scripts/check-internal-links.mjs",
     "check:source": "node scripts/check-source-drift.mjs",
     "verify": "npm run check:links && npm run typecheck && npm run build",

@@ -1,0 +1,28 @@
+---
+id: permissioned-pools
+slug: liquidity/permissioned-pools
+label: Permissioned venues
+title: Permissioned pools and venues
+description: Phase 1 creator-authorized venue terms, separate hook, controller, trusted router, and approved LP positions.
+updated: 2026-10-10
+order: 418
+badge: Phase 1
+---
+
+Phase 1 has a separate permissioned Uniswap v4 path for venues whose access and liquidity rules differ from public pools. It uses `StaticsPermissionedSwapFeeHook`, a PoolId-local controller, trusted exact-input router, and non-transferable approved LP positions. Permissioned pools do **not** use the public hook or its managed POL allocation.
+
+## Creation and control
+
+Only protocol governance, through the timelock, creates a permissioned pool. Its creator must authorize the exact initial terms with an EIP-712 or ERC-1271 signature. `quotePermissionedPool(params)` returns the PoolKey, PoolId, normalized price, and authorization digest before `createPermissionedPool(params, creatorAuthorization)` is scheduled. Creation records the creator, controller, native LP fee, tick spacing, and venue agreement hash.
+
+The creator selects a venue controller. The default controller supports operator-managed admission, and another compatible controller may implement different venue rules. Later terms or controller replacement require creator authorization and governance execution; the replacement path installs a compatible halted controller first. A stale nonce, wrong agreement hash, or wrong controller invalidates the authorization.
+
+## Swaps, positions, and fees
+
+External swaps use the trusted exact-input permissioned router and must pass the active controller. Liquidity uses the dedicated `StaticsPermissionedPositionManager`; approved positions are non-transferable. The companion claims contract records owner credits for forced unwind proceeds. Integrators must use the venue's exact hook, router, controller, and position manager from the matching deployment manifest.
+
+The permissioned hook charges a PoolId-local **output** venue fee and does not build POL. Rewardable pairs initially route 80% of that fee to the creator, 10% to Treasury, and 10% to STATICS stakers. A pair with two restricted currencies routes 80% to the creator and 20% to Treasury, without a staker liability. Governance and venue configuration can change terms for future activity; read the active registration and economics before quoting.
+
+## Keep the two pool paths separate
+
+[Public pools](/docs/liquidity/protocol-pools) can become fee-gated open creation and use bilateral hook fees, range gauges, and optional managed POL. Permissioned pools remain governance-created with creator-authorized venue terms and trusted periphery. A public-pool quote, ABI, or address cannot substitute for the permissioned path. See the [Phase 1 launch guide](/docs/start/phase-one-launch) for release status.

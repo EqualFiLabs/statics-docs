@@ -1,85 +1,30 @@
 ---
 id: global-rewards
 slug: rewards/global-rewards
-label: Global rewards
-title: Global multi-asset rewards
-description: Stake STATICS in a position and opt into up to 64 reward assets, with an eligibility delay that blocks capturing historical fees.
-updated: 2026-08-27
+label: STATICS staking
+title: Global STATICS staking and rewards
+description: Phase 1 PositionNFT staking, reward selection, eligibility timing, fee routing, and claims.
+updated: 2026-10-10
 order: 510
+badge: Phase 1
 ---
 
-Statics has one global staking rail. Users stake the configured staking token
-(`STATICS` on testnet) in a PositionNFT and opt into selected reward assets. Each
-reward asset indexes rewards only across positions that selected it, so the
-denominator stays bounded and honest.
+Phase 1 lets a user stake the configured STATICS token in a [PositionNFT](/docs/core/position-nft) and select reward assets. Each asset indexes only across positions that selected it. A reward requires eligible stake **and** actual fees or funding; staking by itself does not create a payout.
 
-## Staking token
+## Stake and select assets
 
-The staking-token address is immutable at initialization. The token must be a
-deployed contract and staking transfers must be exact — taxed or
-balance-changing staking tokens are rejected.
+`createAndStake` creates a PositionNFT and stakes in one action; `stake` adds to an existing authorized position. `optInRewardAssets` and `optOutRewardAssets` change selection. The current source starts with an active limit of **12 selected assets per position** and an immutable hard ceiling of 64. Read `maxRewardAssetsPerPosition()` and `hardMaxRewardAssetsPerPosition()` from the target deployment rather than hard-coding either.
 
-## Entering stake
+Initial stake, a new selection, and top-up deltas mature at the next hourly boundary at least 24 hours later, typically a 24–25 hour wait. Existing mature stake stays eligible. A position cannot select an asset immediately before a large fee and capture earlier accrual. `rewardSelection` reports pending and eligible amounts; `rewardSelectionWithTiming` adds the weighted pending start on releases that support that interface.
 
-| Method | Action |
-| --- | --- |
-| `createAndStake` | Create a PositionNFT, select initial reward assets, and stake in one call |
-| `stake` | Increase an existing authorized position |
-| `optInRewardAssets` / `optOutRewardAssets` | Manage the position's reward selections |
+Stake is withdrawable without a time cooldown, although stake deployed in a later Morpho phase must first be recalled. Withdrawals consume pending stake before mature stake. A full unstake clears selections but preserves earned claims.
 
-Stake is always withdrawable.
+## Pool allocations are a separate choice
 
-## The 24-hour eligibility delay
+A position may allocate its **raw** STATICS stake across PoolIds to direct the protocol-funded weekly [range-gauge incentive](/docs/liquidity/canonical-lp-rewards). Positive staking ingress starts or extends the governed allocation cooldown. Existing allocations can be reduced during cooldown, while increases, redirection, or a new destination wait until it expires. A Genesis activation multiplier, available after Phase 2 protocol integration, does not increase raw gauge allocation or withdrawable principal.
 
-Initial stake, new selections, and top-up deltas enter a per-asset pending
-tranche that matures at the next hourly boundary **at least 24 hours later** (a
-24–25 hour window). Mature stake remains eligible when a position is increased.
+## Fee routes and claims
 
-Each matured bucket records its activation index, so pending stake cannot capture
-historical fees. Fee accrual and position interactions roll the affected asset's
-bounded maturity ring before updating its index.
+Public-pool swaps can assign a configured bilateral hook-fee share to eligible STATICS stakers. For a native ETH pair, WETH is the reward-accounting identity: one WETH opt-in covers WETH and native-ETH hook revenue. Non-swap fees use a **governed** staker/Treasury split; the source default is 90%/10%, and the active value must be read with `nonSwapStakerShareBps()`. If no stake can accept an asset, its fallback destination applies rather than creating an unbacked claim.
 
-:::note
-This delay is the anti-fee-theft mechanism: a position that selects an asset
-right before a large fee distribution accrues only from its activation index
-onward, never retroactively.
-:::
-
-## Unstaking
-
-`unstake` removes pending stake before eligible stake and requires an exact
-outbound transfer. A full unstake clears the selection list while preserving
-already settled claims.
-
-## Non-swap fee routing
-
-Most BasketToken and Dollar fees — mint and redemption fees, BasketToken
-origination fee reclassification, BasketToken extension payments, repayment
-excess, flash-loan excess, recovery penalties, pegged fees, and the global share
-of volatile-series fees — enter the same non-swap ledger. Genesis secured-credit
-origination, additional-draw, and extension fees are a separate native-fee rail: they split
-between Genesis reserve backing and treasury and do not become global Position
-staking rewards. For a fee on asset `a` when `eligibleStake[a] > 0`:
-
-```text
-stakerAmount   = floor(grossFee * 9000 / 10000)   // 90%
-treasuryAmount = grossFee - stakerAmount           // 10%
-indexDelta[a]  = floor(stakerAmount * 1e27 / eligibleStake[a])
-```
-
-If `eligibleStake[a] == 0`, no staker liability is created and the entire fee
-accrues to treasury. Indexed whole-token value that never crystallizes to a
-position routes to treasury only when that asset's eligible stake returns to
-zero.
-
-## Claims and treasury
-
-Claims are pull-based, require PositionNFT authorization, and accept a per-asset
-minimum received amount. Claim settlement transfers from the global fee
-reservation and never reduces basket backing.
-
-Anyone may call `distributeTreasuryFees(asset)`, but the destination is always
-the configured treasury — the caller cannot choose a recipient.
-
-See [Genesis rewards](/docs/genesis/rewards) for the separate direct Genesis
-reward books, launch/permanent handoff, and dual-asset batch claims.
+`pendingRewards` previews selected-asset claims. `claimRewards` requires PositionNFT authorization, aligned assets, and per-asset minimum received amounts. Phase 1 also supports bounded atomic batches across global, LP, and allocator claims. Claims are pull-based. [Genesis direct rewards](/docs/genesis/rewards) use separate books, and Phase 2 basket rewards are another separate rail.

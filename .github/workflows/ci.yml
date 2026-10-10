@@ -23,13 +23,6 @@ jobs:
           ref: master
           path: .verification/statics
 
-      - name: Checkout deployment-pinned SDK
-        uses: actions/checkout@v4
-        with:
-          repository: EqualFiLabs/statics-sdk
-          ref: 135b68b8c404a1f567ae834c2e46e517e5788e28
-          path: .verification/statics-sdk
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -39,13 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check deployment ABI provenance
-        env:
-          SDK_PATH: ${{ github.workspace }}/.verification/statics-sdk/src/index.ts
-          SDK_COMMIT: 135b68b8c404a1f567ae834c2e46e517e5788e28
-        run: npm run check:abis
-
-      - name: Check current-source and deployment drift
+      - name: Check current-source drift
         env:
           STATICS_PATH: ${{ github.workspace }}/.verification/statics
         run: npm run check:source

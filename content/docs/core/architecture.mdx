@@ -2,117 +2,47 @@
 id: architecture
 slug: core/architecture
 label: Architecture
-title: Architecture
-description: Statics is two coordinated EIP-2535 diamonds behind one ordinary user-action address, with custody and solvency split across clear boundaries.
-updated: 2026-08-27
+title: Staged protocol architecture
+description: The staged Statics protocol, a separate later Dollar Core, and Statics Genesis.
+updated: 2026-10-10
 order: 20
 ---
 
-**In plain language:** users talk to one main contract for baskets, positions,
-lending, and swaps; Dollar collateral and solvency live in a second contract so
-those books stay isolated.
+Statics Genesis is live, while the Statics protocol follows a staged rollout. The main protocol keeps the same `StaticsDiamond` address as later selectors are added by timelocked cuts. A source file containing a facet does not mean a particular deployed Diamond exposes it.
 
-Statics is built as two EIP-2535 diamonds that share one timelock but keep
-distinct custody and solvency boundaries. Most user actions route through a
-single address — `StaticsDiamond` — while the Statics Dollar's collateral and
-health machinery stay isolated in a separate `StaticsDollarCoreDiamond`.
+## Deployment shape
 
-## Two coordinated diamonds
+| Release | Main Diamond surface |
+| --- | --- |
+| Statics Genesis | STATICS token, Doppler market, Operators, Vault, vesting, fee receiver, and direct reward contracts; no staged Diamond is required. |
+| Phase 1 | Public and permissioned pools, PositionNFT, global STATICS staking, range gauges, rewards, and managed POL. **32 facets / 226 selectors** in the source plan. |
+| Phase 2 | Baskets, self-backed lending, flash composition, and Diamond-side Genesis integration. **44 facets / 318 selectors** cumulatively. |
+| Phase 3 | Statics Dollar gateway and a separate Core Diamond for collateral and solvency. **49 facets / 376 selectors** on the main Diamond; Core has 11 facets / 95 selectors in the full plan. |
+| Phase 4 | Morpho integration. **54 facets / 403 selectors** on the main Diamond. |
 
-| Diamond | Role | Holds |
-| --- | --- | --- |
-| `StaticsDiamond` | User gateway, PositionNFT, baskets, rewards, lending, flash loans, protocol pools, and the Dollar gateway | Basket vaults, fee account, staking custody, voluntary LP custody |
-| `StaticsDollarCoreDiamond` | Dollar collateral, issuance, health, transitions, insurance, and recovery | Core collateral and insurance |
+The accepted [phase plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) and `StaticsProtocolPlan.sol` assign the selector sets. Later cuts reuse the same main Diamond; the separate Dollar Core is added in Phase 3. A release manifest and live selector/interface checks determine what is actually installed.
 
-`StaticsDiamond` is the ordinary integration address. It is simultaneously the
-basket action surface, the PositionNFT ERC-721 contract, the Dollar gateway, the
-Core periphery, the Core fee receiver, and the managed recovery holder. There is
-no separate user router or PositionNFT proxy.
+## Phase 1 call and custody paths
 
-## Why two diamonds
-
-Dollar solvency is a separate custody and accounting boundary even though the
-user-facing gateway lives on `StaticsDiamond`. Keeping the Dollar's collateral,
-insurance, and recovery state inside `StaticsDollarCoreDiamond` means a Diamond
-cut or failure on the user surface cannot directly restate Dollar books, and
-vice versa. Both diamonds are owned by the same `StaticsTimelock`, so governance
-stays unified while custody stays separated.
-
-:::note
-This separation does not merge Dollar collateral held by Core with Diamond
-custody. Only fees explicitly transferred to the periphery enter shared
-reservations.
-:::
-
-## Topology
-
-```text Statics two-diamond layout
+```text
 Users and integrators
-        |
-        v
-StaticsDiamond
-├── EIP-2535 dispatch and governance
-├── PositionNFT ERC-721
-├── basket creation, mint, redeem, collateral, lending, and flash loans
-├── global staking, reward claims, and treasury fee distribution
-├── Statics Dollar typed gateway, Risk liquidity, and funded incentives
-├── shared custody reservations
-└── basket canonical pools, general pools, and borrow-to-liquidity
-        |
-        +-------------------------> StaticsDollarCoreDiamond
-        |                           ├── collateral and issuance
-        |                           ├── health and transitions
-        |                           ├── insurance and recovery
-        |                           └── risk-series state
-        |
-        +-------------------------> StaticsSwapFeeHook
-        |                           ├── bilateral swap fees
-        |                           └── hook-owned permanent liquidity
-        |
-        +-------------------------> StaticsLiquidityManager
-                                    ├── normalized protocol-pool validation
-                                    └── typed user PositionManager NFT creation
+    ├── StaticsDiamond: PositionNFT, public-pool registry, staking, rewards, gauges
+    ├── ordinary Uniswap v4 periphery: external LP positions and native LP fees
+    └── trusted permissioned router/position manager: venue-approved actions
+
+Uniswap v4 PoolManager
+    ├── StaticsSwapFeeHook: public-pool bilateral fees and claim records
+    └── StaticsPermissionedSwapFeeHook: venue output fees and access path
+
+StaticsLiquidityManager
+    ├── PositionNFT-managed public LP positions
+    └── custody-constrained managed POL positions
 ```
 
-## What lives where
+The Diamond is the shared PositionNFT and protocol action address. The public liquidity manager binds the Diamond, PoolManager, PositionManager, and Permit2. Public hook revenue and POL reservations are accounted in the Diamond, while native v4 LP fees remain Uniswap position accounting. Permissioned pools have a separate hook and no POL.
 
-Physical token locations are intentionally split across contracts so each
-accounting boundary can be verified independently:
+`StaticsTimelock` owns the main Diamond. Governance changes and facet cuts follow its delay; a guardian can stop specified ingress or swaps. Later Phase 3 Core has a separate custody and solvency boundary under the intended shared governance. This does not merge its collateral with Diamond reservations.
 
-| Location | Holds |
-| --- | --- |
-| `StaticsDiamond` | Basket vault backing, the fee account, staking custody, and voluntarily custodied LP NFTs |
-| `StaticsDollarCoreDiamond` | Dollar collateral and insurance |
-| `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
-| `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
-| Uniswap v4 `PoolManager` | Basket-canonical and general-pool liquidity under v4 accounting |
+## Read a deployment, not a final-state diagram
 
-Direct donations to the Diamond are unreserved and do not inflate backing, fee
-claims, or stake. See [Custody and accounting](/docs/core/custody) for the
-reservation equation and deficit handling.
-
-## Canonical deployment shape
-
-Current `master` source and fresh-deployment tests expect **30 facets / 254
-selectors** on `StaticsDiamond` and **11 facets / 95 selectors** on
-`StaticsDollarCoreDiamond`. These counts include the Operators integration,
-general-pool lifecycle, and batched-claim selectors.
-
-The public Robinhood Chain testnet manifest is an earlier deployment snapshot
-and currently records a different shape. Do not treat the PR source count as a
-live-address or deployed-bytecode claim; refresh `addresses.json` and the
-canonical ABI only when the matching deployment is published.
-
-## Upgradeability
-
-Both diamonds are pre-release EIP-2535 diamonds owned by one timelock. Diamond
-cuts are the sole implementation upgrade mechanism. The intended release
-lifecycle is upgradeable development followed by an independent audit, reduction
-of retained powers, and a final reviewed cut that removes Diamond-cut authority
-from both diamonds. See [Governance and lifecycle](/docs/governance/timelock-and-roles).
-
-The hook, PoolManager, PositionManager, and Permit2 bindings remain
-version-level dependencies. Current source allows timelocked governance to
-replace `StaticsLiquidityManager` with `replaceLiquidityManager`; replacement
-revokes approval from the old manager, approves the new manager, and emits the
-handoff. It does not replace the hook or Uniswap contracts.
+The Statics Genesis mainnet manifest and eventual Phase 1 mainnet manifest are different artifacts. Match every address and ABI to its own release. See [Phase 1 launch](/docs/start/phase-one-launch) and [Rollout](/docs/rollout).

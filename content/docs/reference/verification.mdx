@@ -4,13 +4,19 @@ slug: reference/verification
 label: Verification status
 title: Formal verification and proof boundaries
 description: The machine-checked Genesis launch properties recorded in current source, the engines used, and the external and market assumptions they do not prove.
-updated: 2026-08-27
+updated: 2026-10-10
 order: 755
 ---
 
+This page records **Statics Genesis** proof targets. It does not certify the
+Phase 1 protocol's public and permissioned pools, staking, gauges, or POL.
+The [accepted Phase 1 plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md)
+defines a separate deployed review surface; release evidence must name the
+exact protocol commit, deployment manifest, and checks actually executed.
+
 Current `statics` master contains a dedicated formal-verification suite for the
-standalone Genesis launch and permanent Diamond integration. Halmos is the
-locally reproducible mandatory symbolic gate. Foundry fuzz, invariant, and
+Statics Genesis launch and permanent Diamond integration. Halmos is the
+repository's mandatory symbolic gate. Foundry fuzz, invariant, and
 real-flow tests remain executable regressions. Certora is used selectively for
 aggregate or cross-contract accounting properties.
 
@@ -22,7 +28,7 @@ specific release should use the `statics` CI run and hosted-prover reports for
 that exact commit as evidence.
 :::
 
-## Mandatory local and CI layer
+## Mandatory source and CI layer
 
 The source workflow runs `scripts/run-formal.sh all` with Halmos 0.3.3. Its
 targets cover:

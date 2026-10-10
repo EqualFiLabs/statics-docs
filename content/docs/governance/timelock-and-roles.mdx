@@ -3,25 +3,22 @@ id: timelock-and-roles
 slug: governance/timelock-and-roles
 label: Timelock & roles
 title: Timelock and roles
-description: A shared Statics timelock owns both diamonds and defines proposer, canceller, executor, guardian, and treasury roles.
-updated: 2026-08-04
+description: Timelocked governance of Statics Phase 1 and the later Dollar Core, with guardian and treasury roles.
+updated: 2026-10-10
 order: 610
 ---
 
-One `StaticsTimelock` owns both `StaticsDiamond` and `StaticsDollarCoreDiamond`.
-It is the single governance root for the protocol: every Diamond cut, economic
-configuration change, lifecycle release, hook fee change, and treasury or
-guardian change flows through it.
+In Phase 1, `StaticsTimelock` owns `StaticsDiamond`. The separate
+`StaticsDollarCoreDiamond` arrives in Phase 3 under the intended shared
+governance. Diamond cuts, economic configuration, lifecycle release, hook-fee
+changes, and treasury or guardian changes flow through the timelock.
 
 ## Delay
 
-The timelock constructor selects a two-minute minimum delay for Robinhood testnet
-and local development. Robinhood mainnet and other chains default to **seven
-days**.
+The timelock constructor sets a **24-hour** minimum delay on production chains. Local development uses a two-minute delay. Verify the deployed timelock delay before treating a governance operation as executable.
 
 :::warning
-The two-minute testnet delay is a fixture, not a production default. Production
-must verify the chain-selected governance delay.
+A local development delay is not a production governance setting. Check the deployed contract and scheduled operation before acting.
 :::
 
 ## Roles
@@ -34,8 +31,7 @@ must verify the chain-selected governance delay.
 | Guardian | Emergency role | Pause exposure-increasing actions and quarantine baskets |
 | Treasury | Configured | Receives terminal fee distributions |
 
-The emergency guardian is **not** a timelock canceller. The testnet timelock is
-its own admin.
+The emergency guardian is **not** a timelock canceller. The timelock is its own admin.
 
 ## What the timelock controls
 

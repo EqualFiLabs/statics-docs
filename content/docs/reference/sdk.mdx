@@ -4,13 +4,17 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-08-27
+updated: 2026-10-10
 order: 720
 ---
 
 The Statics SDK is a TypeScript package (`@statics-protocol/sdk`) that ships the
 onchain ABIs, chain bindings, math helpers, quote functions, decoders, and
 calldata builders needed to integrate without recomputing protocol math.
+
+:::warning Match the target release
+This docs site does not yet publish a verified Phase 1 mainnet address or matching deployment ABI. Pin an SDK and ABI to the exact release manifest and installed functions before sending transactions.
+:::
 
 ## Package
 
@@ -22,18 +26,11 @@ calldata builders needed to integrate without recomputing protocol math.
 | Types | `dist/index.d.ts` |
 | Peer dependency | `viem` `>=2` |
 
-Install from GitHub (not npm registry):
+For a development checkout, pin an audited SDK revision from GitHub (not the
+moving `master` branch). The exact pin depends on the deployment you target:
 
 ```bash
-npm install github:EqualFiLabs/statics-sdk
-```
-
-Equivalent forms:
-
-```bash
-npm install git+https://github.com/EqualFiLabs/statics-sdk.git
-# or pin a commit / tag
-npm install github:EqualFiLabs/statics-sdk#master
+npm install github:EqualFiLabs/statics-sdk#<verified-commit-for-target-release>
 ```
 
 ```ts
@@ -44,22 +41,11 @@ Source, issues, and local build live in that repository (`npm run build`, `npm t
 
 ## Match the SDK to the target
 
-These docs track two deliberate revisions:
-
-| Target | SDK revision |
-| --- | --- |
-| Recorded Robinhood testnet deployment and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
-| Current `statics` master source | `f4b88bf43a130fbd5fa8aebd2b784da16fa54b6f` |
-
-Pin the deployment revision when submitting transactions to the recorded live
-addresses. Current master includes Operators launch/vesting, redrawable Genesis
-credit, and permissionless general-pool APIs that are not deployed there.
+Resolve the `sdk` submodule gitlink from the exact `statics` source commit. For a live Phase 1 deployment, use the SDK revision and ABI published with its verified manifest. This site has not yet listed that release pair. Source APIs alone do not prove a feature is deployed.
 
 ## Chain bindings
 
-The SDK ships generated per-chain address bindings. The tracked binding is
-`robinhoodChain`, exposing the verified contract addresses for the Robinhood
-deployment family.
+The SDK may provide chain bindings. Match any binding to the verified deployment manifest for the exact release before using it.
 
 ## Math and constants
 
@@ -142,11 +128,6 @@ returns signed-calldata-ready `Hex`:
   `buildMintV4PositionCall` — canonical v4 swap and position construction;
 - `decodePositionInfo`, `positionSalt` — decode stored position state and derive
   the deterministic position salt.
-
-## Testnet faucet
-
-`buildTestnetFaucetClaimCall()` builds the claim calldata for the ownerless
-testnet faucet. See [Testnet onboarding](/docs/start/testnet-onboarding).
 
 Genesis batch claims accept caller-supplied token IDs rather than enumerating a
 wallet. The owner batch settles both STATICS and WETH, accepts an empty list for

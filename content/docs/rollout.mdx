@@ -1,82 +1,47 @@
 ---
 id: rollout
 slug: rollout
-label: Rollout
+label: Rollout and availability
 title: Rollout and availability
-description: The live Robinhood mainnet Genesis launch, the separate basket-protocol rollout, and which outcomes remain conditional on real activity.
-status: Protocol docs
-updated: 2026-08-27
+description: Track Statics Genesis and each stage of the Statics protocol.
+updated: 2026-10-10
 order: 15
-badge: Live
 ---
 
-The **STATICS Genesis launch is live on Robinhood mainnet**. It established the
-fixed STATICS supply, the six-curve STATICS/WETH market, the 5,555 Operators
-collection, reserve backing, treasury vesting, fee ingress, and launch reward
-system documented here.
+Statics Genesis is live, and the Statics protocol has its own staged rollout. Check the release before using an address, ABI, example, or security result.
 
-The broader Statics basket, Dollar, lending, and general-pool suite follows a
-separate deployment and governance lifecycle. The Robinhood testnet snapshot is
-retained as an integration reference and must not be used as a source of
-mainnet Genesis addresses.
+| Context | Status recorded in these repositories | What belongs there |
+| --- | --- | --- |
+| Statics Genesis on Robinhood mainnet | Launched | Fixed token supply, Doppler market, Operators collection, Vault backing, treasury vesting, fee ingress, and direct Genesis rewards. |
+| Statics Phase 1 protocol on Robinhood mainnet | Phase 1 source and deployment tooling are implemented; this site has no verified Phase 1 mainnet address yet | [Phase 1](/docs/start/phase-one-launch) includes markets, positions, staking, rewards, gauges, and POL. Later phases add baskets, Dollar, and Morpho. |
 
-## Live Genesis system
+## Genesis is a separate launch
 
-| Field | Production status |
+The [Genesis launch](/docs/genesis/launch-and-vesting) established the fixed 1B STATICS supply, six-curve STATICS/WETH market, 5,555 Operators, reserve backing, treasury vesting, and launch reward books. These contracts predate the staged Statics protocol. Phase 1 does not redeploy or reconfigure them. Protocol-side registration and linkage are scheduled for Phase 2.
+
+## The four Statics phases
+
+The [Phase 1 launch guide](/docs/start/phase-one-launch) covers the first stage. The later stages add these features to Statics:
+
+| Phase | What it adds |
 | --- | --- |
-| Network | Robinhood mainnet |
-| Genesis launch | Live |
-| Fixed STATICS supply | 1,000,000,000 |
-| Doppler market inventory | 800,000,000 across six curves and 56 positions |
-| STATICS Operators | Fixed 5,555-token collection |
-| Gross backing | 180,000 STATICS per circulating Operator |
-| Treasury-side allocation | 100.1M STATICS vesting plus 99.9M Operator backing |
-| Permanent market tail | 120M STATICS, 15% of launch inventory |
+| 1 | Public and permissioned pools, PositionNFTs, staking, range rewards, and managed protocol liquidity |
+| 2 | Baskets, lending, flash composition, and protocol-side Genesis integration |
+| 3 | Statics Dollar and its separate collateral system |
+| 4 | Morpho integration |
 
-The [Tokenomics](/docs/tokenomics) page records the exact allocation and curve
-geometry. [Launch and vesting](/docs/genesis/launch-and-vesting) explains the
-Prepare, Launch, and Finalize sequence, while the
-[Operators overview](/docs/genesis/overview) covers acquisition, redemption,
-activation, rewards, and protocol integration.
+Later phases remain documented for planning. Their presence in source code does not mean they are available on a given network. Check the active release before using them.
 
-## Basket protocol availability
+## Creation access in Phase 1
 
-Basket creation has two onchain modes, switched by `creationFee()`:
+Public general-pool creation has its own `poolCreationFee()` switch. Zero allows only protocol governance to create and requires zero payment. A positive value opens exact-fee creation to any caller. Permissioned venues always use governance execution and exact creator authorization. Basket creation has a separate `creationFee()` switch and belongs to Phase 2.
 
-| `creationFee()` | Who may create |
-| --- | --- |
-| **Zero** | Diamond owner only |
-| **Positive** | Any caller that pays the exact native fee |
+## Outcomes and deployment evidence
 
-There is no separate onchain partner role or asset allowlist. While creation is
-owner-only, governance may coordinate selected basket deployments through the
-same creation path. When the fee is positive, compatible ERC-20 baskets become
-permissionless to create subject to token-behavior and market risk.
+Supply, deployed bytecode, configuration, and transactions are verifiable facts. Future volume, rewards, POL growth, arbitrage, and token prices depend on market activity and funding. A source document or ABI alone does not establish deployment.
 
-Applications must read the active chain's deployed addresses and current
-onchain parameters before enabling basket, Dollar, lending, or general-pool
-actions. The [Robinhood testnet snapshot](/docs/reference/robinhood-testnet-deployment)
-and [testnet onboarding guide](/docs/start/testnet-onboarding) describe only the
-separate integration environment.
+Before Phase 1 deployment instructions become actionable, publish a Phase 1 mainnet manifest with verified addresses, runtime hashes, active selector/interface inventory, governance and fee configuration, matching ABI/SDK revision, transaction provenance, and release validation.
 
-## Outcomes remain conditional
+## For builders: source-plan counts
 
-The EVM fixes supply, allocation, backing rules, vesting, fee mathematics, and
-launch geometry. It does not guarantee market outcomes. Trading volume,
-rewards, liquidity growth, arbitrage participation, future valuation, and the
-USD value of Operator backing depend on real market activity and external
-prices.
-
-Additional mint, redeem, pool, and credit paths may create activity when market
-conditions support them. Fee shares may compound into permanent
-protocol-owned liquidity when inventory matches. Self-backed basket credit and
-Statics Dollar minting remain bounded by their configured risk parameters.
-
-## Related pages
-
-- [Tokenomics](/docs/tokenomics) — fixed supply, allocation, launch curves, and backing
-- [Launch and vesting](/docs/genesis/launch-and-vesting) — Genesis deployment sequence
-- [Operators overview](/docs/genesis/overview) — live Operator mechanics
-- [Formal verification](/docs/reference/verification) — machine-checked properties and proof boundaries
-- [Basket creation](/docs/baskets/creation) — creation fee switch and technical path
-- [Robinhood testnet snapshot](/docs/reference/robinhood-testnet-deployment) — separate integration environment
+The accepted [deployment plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) assigns functions to a staged contract. The current source plan is cumulative: Phase 1 has 32 facets, 226 selectors; Phase 2 has 44 facets, 318 selectors; Phase 3 has 49 facets, 376 selectors; and Phase 4 has 54 facets, 403 selectors. These counts describe source code, not a verified deployment. The main protocol contract is named `StaticsDiamond` in code.

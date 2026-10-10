@@ -24,9 +24,9 @@ export function SiteHeader({ leading }: { leading?: ReactNode }) {
 
         <nav className="top-links" aria-label="Site">
           <Link href="/docs/introduction">Protocol</Link>
-          <Link href="/docs/rollout">Rollout</Link>
+          <Link href="/docs/start/phase-one-launch">Phase 1</Link>
           <Link href="/docs/reference/integration">Builders</Link>
-          <Link href="/docs/reference/robinhood-testnet-deployment">Addresses</Link>
+          <Link href="/docs/rollout">Availability</Link>
           <a href={DOCS_SOURCE_URL} target="_blank" rel="noreferrer">
             Edit docs ↗
           </a>

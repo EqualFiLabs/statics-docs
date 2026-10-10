@@ -1,0 +1,51 @@
+---
+id: phase-one-launch
+slug: start/phase-one-launch
+label: Phase 1 launch
+title: Phase 1 launch guide
+description: What Statics Phase 1 includes, what follows later, and how to identify a matching deployment.
+updated: 2026-10-10
+order: 5
+badge: Phase 1
+---
+
+**Statics Genesis is already live on Robinhood mainnet.** Phase 1 is the first stage of the separate Statics protocol; it does not redeploy Genesis. The source implements four stages. Availability on a particular chain depends on a verified deployment and its enabled features, not on code being present in `master`.
+
+:::warning Deployment status
+This site does not yet publish a verified Robinhood mainnet Phase 1 protocol address or matching ABI. Wait for the release manifest before sending Phase 1 transactions.
+:::
+
+## In Phase 1
+
+| Surface | What it enables |
+| --- | --- |
+| [Public pools](/docs/liquidity/protocol-pools) | Curated creation initially, with a separate fee switch for later open creation; ERC-20/ERC-20 and native ETH/ERC-20 pairs, creator-selected static v4 LP fees, bilateral hook fees, and optional managed POL. |
+| [Permissioned venues](/docs/liquidity/permissioned-pools) | Governance-created pools with creator-authorized terms, a separate hook, venue controllers, trusted router, and non-transferable approved LP positions. |
+| [PositionNFTs](/docs/core/position-nft) and [global staking](/docs/rewards/global-rewards) | Transferable accounts, raw STATICS stake, reward-asset selection, eligibility, and claims. |
+| [Range gauges](/docs/liquidity/canonical-lp-rewards) | PositionNFT-managed v4 liquidity, native LP fees, protocol STATICS incentives, four direct-funded reward slots, allocator rewards, and claims. |
+| [Managed POL](/docs/liquidity/permanent-liquidity) | Claim-backed inventory and explicit custody-constrained position management outside the swap callback. |
+
+Phase 1 also includes timelocked configuration, guardian stops, treasury accounting, creator revenue, reward restrictions, bounded market views, and atomic reward batches. See the [protocol's accepted launch plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) for the exact selector and audit boundary.
+
+:::note Creation policy
+The initial general-pool creation fee is zero. Here, **zero means only protocol governance can create a pool**; it does not enable free public creation. A positive fee enables exact-fee public creation. Permissioned pool creation remains a timelocked governance action with creator authorization.
+:::
+
+## Available later, retained in these docs
+
+| Phase | Added to Statics | Read ahead |
+| --- | --- | --- |
+| 2 | Baskets, canonical basket pools, self-secured lending, flash loans, borrow-to-liquidity, and protocol-side Genesis integration | [Baskets](/docs/baskets/overview), [lending](/docs/lending/overview) |
+| 3 | Statics Dollar gateway and separate Dollar Core custody and solvency system | [Statics Dollar](/docs/dollar/overview) |
+| 4 | Morpho actions and account integration | [Rollout](/docs/rollout) |
+
+The [Statics Genesis collection and Vault](/docs/genesis/overview) have their own live history. Their **protocol-side** registration, linkage, and integration are Phase 2 features. Phase 3 adds Dollar, and Phase 4 adds Morpho. Reading a later-phase page does not mean its features are available in Phase 1.
+
+## Before using a deployment
+
+1. Obtain the network-specific deployment manifest and ABI for the exact release.
+2. Verify the protocol address, available functions, connected pool contracts, and governance configuration against that manifest.
+3. Read current onchain fees, pool state, and reward configuration immediately before preparing a transaction. Use `quotePool(params)` before public-pool creation.
+4. Treat rewards, POL growth, and trading volume as outcomes of actual funding and activity. No keeper or market activity is automatic.
+
+For builders, the phased protocol contract is named `StaticsDiamond`; the [architecture guide](/docs/core/architecture) explains its upgrade mechanism. The [integration guide](/docs/reference/integration) distinguishes Phase 1 paths from later-phase examples. The [rollout page](/docs/rollout) tracks the separate Genesis and phased-protocol releases.

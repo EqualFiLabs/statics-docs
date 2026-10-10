@@ -37,12 +37,6 @@ function requireText(source, expected, label) {
   if (!source.includes(expected)) errors.push(`docs drift: missing ${label}: ${expected}`);
 }
 
-function requireEqual(actual, expected, label) {
-  if (String(actual).toLowerCase() !== String(expected).toLowerCase()) {
-    errors.push(`deployment drift: ${label}: docs=${actual} source=${expected}`);
-  }
-}
-
 const docsText = [
   ...walk(path.join(ROOT, "content", "docs")).filter((file) => file.endsWith(".mdx")),
   ...walk(path.join(ROOT, "app")).filter((file) => /\.(ts|tsx)$/.test(file)),
@@ -52,14 +46,38 @@ const docsText = [
   .replace(/\s+/g, " ");
 
 const architecture = read(staticsRoot, "docs/architecture.md");
-const shape = requireMatch(
+const phaseOneShape = requireMatch(
   architecture,
-  /installs (\d+) facets and (\d+) selectors on\s+`StaticsDiamond`, and (\d+) facets and (\d+) selectors on\s+`StaticsDollarCoreDiamond`/,
+  /The staged Phase 1 launcher installs (\d+) facets and (\d+) selectors/,
+  "Phase 1 deployment shape",
+);
+const fullShape = requireMatch(
+  architecture,
+  /full-stack fresh-deployment launcher installs (\d+) facets and (\d+) selectors\s+on\s+`StaticsDiamond`, and (\d+) facets and (\d+) selectors on\s+`StaticsDollarCoreDiamond`/,
   "fresh deployment shape",
 );
-if (shape) {
-  requireText(docsText, `**${shape[1]} facets / ${shape[2]} selectors**`, "StaticsDiamond shape");
-  requireText(docsText, `**${shape[3]} facets / ${shape[4]} selectors**`, "Core Diamond shape");
+if (phaseOneShape) {
+  requireText(docsText, `**${phaseOneShape[1]} facets / ${phaseOneShape[2]} selectors**`, "Phase 1 Diamond shape");
+}
+if (fullShape) {
+  requireText(docsText, `**${fullShape[1]} facets / ${fullShape[2]} selectors**`, "full StaticsDiamond shape");
+  requireText(docsText, `Core has ${fullShape[3]} facets / ${fullShape[4]} selectors`, "Core Diamond shape");
+}
+
+const phasePlan = read(staticsRoot, "docs/adr/staged-phase-one-launch.md");
+const rollout = read(ROOT, "content/docs/rollout.mdx");
+for (const [phase, expression] of [
+  [2, /Phase 2 adds \d+ selectors for a cumulative (\d+) selectors across (\d+) facets/],
+  [3, /Phase 3 adds \d+ selectors for a cumulative (\d+) selectors across (\d+) facets/],
+  [4, /Phase 4 adds \d+ selectors for the final (\d+) selectors across (\d+) facets/],
+]) {
+  const match = requireMatch(phasePlan, expression, `Phase ${phase} selector count`);
+  if (match) requireText(rollout, `${match[2]} facets, ${match[1]} selectors`, `Phase ${phase} rollout count`);
+}
+
+const launchGuide = read(ROOT, "content/docs/start/phase-one-launch.mdx");
+for (const phrase of ["native ETH/ERC-20", "Permissioned venues", "Range gauges", "Managed POL", "Phase 2", "Phase 3", "Phase 4"]) {
+  requireText(launchGuide, phrase, `Phase 1 launch guide ${phrase}`);
 }
 
 const launcher = read(staticsRoot, "script/DeployStaticsGenesis.s.sol");
@@ -170,62 +188,9 @@ for (const formalTarget of [
   read(staticsRoot, formalTarget);
 }
 
-const sourceManifest = JSON.parse(read(staticsRoot, "deployments/robinhood-testnet-46630-statics.json") || "{}");
-const docsManifest = JSON.parse(read(ROOT, "public/addresses.json") || "{}");
-if (sourceManifest.source && docsManifest.source) {
-  requireEqual(docsManifest.source.initialProtocolCommit, sourceManifest.source.protocolDeploymentCommit, "initial protocol commit");
-  requireEqual(docsManifest.source.deploymentToolingCommit, sourceManifest.source.deploymentToolingCommit, "deployment tooling commit");
-  requireEqual(docsManifest.source.currentProtocolCommit, sourceManifest.source.currentProtocolCommit, "current deployed protocol commit");
-  requireEqual(docsManifest.source.staticsSdkCommit, sourceManifest.source.staticsSdkCommit, "deployment SDK commit");
-  requireEqual(docsManifest.network.lastUpgradeBlock, sourceManifest.network.lastUpgradeBlock, "last upgrade block");
-}
-
-const contractMap = {
-  StaticsDiamond: "staticsDiamond",
-  StaticsDollarCoreDiamond: "staticsDollarCoreDiamond",
-  StaticsSwapFeeHook: "swapFeeHook",
-  StaticsLiquidityManager: "liquidityManager",
-  StaticsTimelock: "timelock",
-  StaticsDollarOracle: "staticsDollarOracle",
-  PositionRenderer: "positionRenderer",
-  AvatarSVG: "avatarSvg",
-};
-for (const [docsKey, sourceKey] of Object.entries(contractMap)) {
-  requireEqual(
-    docsManifest.contracts?.[docsKey]?.address,
-    sourceManifest.contracts?.[sourceKey]?.address,
-    `contract ${docsKey}`,
-  );
-}
-requireEqual(docsManifest.tokens?.STATICS?.address, sourceManifest.contracts?.staticsToken?.address, "STATICS token");
-requireEqual(docsManifest.tokens?.USDstx?.address, sourceManifest.contracts?.staticsDollar?.address, "USDstx token");
-requireEqual(
-  docsManifest.tokens?.ethLEV?.address,
-  sourceManifest.contracts?.staticsDollarRiskShares?.address,
-  "ethLEV token",
-);
-
-const dependencyMap = {
-  WETH: "weth",
-  UniswapV4PoolManager: "poolManager",
-  UniswapV4PositionManager: "positionManager",
-  Permit2: "permit2",
-  Quoter: "quoter",
-  StateView: "stateView",
-  UniversalRouter: "universalRouter",
-};
-for (const [docsKey, sourceKey] of Object.entries(dependencyMap)) {
-  requireEqual(docsManifest.dependencies?.[docsKey], sourceManifest.externalDependencies?.[sourceKey], `dependency ${docsKey}`);
-}
-requireEqual(
-  docsManifest.interfaces?.IStaticsProtocolPools,
-  sourceManifest.configuration?.protocolPoolsInterfaceId,
-  "protocol-pools interface ID",
-);
-
 if (errors.length > 0) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("check-source-drift: current source facts and deployment manifest match the docs");
+console.log("check-source-drift: current source facts match the docs");

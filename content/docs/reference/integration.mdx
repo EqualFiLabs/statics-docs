@@ -3,15 +3,36 @@ id: integration
 slug: reference/integration
 label: Integration
 title: Integration guide
-description: The single StaticsDiamond address, the approvals and interfaces to call, and the common flows with their failure conditions.
-updated: 2026-08-27
+description: Release-aware Phase 1 integration, plus retained examples for later Statics phases.
+updated: 2026-10-10
 order: 710
 ---
 
-Statics is integrated through a single address — `StaticsDiamond`. It is the
-basket action surface, the PositionNFT contract, the Dollar gateway, the Core
-periphery, the fee receiver, and the managed recovery holder. There is no
-separate user router.
+`StaticsDiamond` is the user-facing protocol action and PositionNFT address.
+Phase 1 installs public and permissioned pools, STATICS staking, range gauges,
+rewards, and managed POL. The permissioned venue has a separate trusted router
+and position manager. Basket, credit, Dollar, and Diamond-side Genesis
+integration selectors arrive in later phases.
+
+:::warning Match the release
+This site does not yet publish a verified Phase 1 mainnet address and ABI. Check the active deployment manifest, selectors, dependencies, and onchain settings before submitting a call.
+:::
+
+## Phase 1 integration path
+
+1. For a public pool, read `poolCreationFee()`, call `quotePool(params)`, and
+   verify the PoolKey, PoolId, native v4 LP fee, bilateral hook-fee terms,
+   creator authorization digest, and exact native fee. At the initial zero fee,
+   only the Diamond owner can create. See [Public pools](/docs/liquidity/protocol-pools).
+2. For a permissioned venue, use `quotePermissionedPool` and the exact creator
+   authorization, then route external exact-input swaps through the trusted
+   periphery. See [Permissioned pools](/docs/liquidity/permissioned-pools).
+3. To earn global rewards, create a PositionNFT, stake the configured STATICS
+   token, select reward assets, and wait for eligibility. To earn pool rewards,
+   opt a v4 position into its [range gauge](/docs/liquidity/canonical-lp-rewards).
+4. Read current rates and balances immediately before a value-moving action.
+   Native ETH pool principal and LP fees stay native; reward accounting uses
+   configured WETH for native hook revenue.
 
 ## Disciplines
 
@@ -26,8 +47,8 @@ separate user router.
 
 ```solidity
 address[] memory rewardAssets = new address[](2);
-rewardAssets[0] = usdg;
-rewardAssets[1] = basketToken;
+rewardAssets[0] = rewardTokenA;
+rewardAssets[1] = rewardTokenB;
 
 IERC20(staticsToken).approve(staticsDiamond, 100e18);
 
@@ -38,10 +59,15 @@ uint256 positionId = globalRewards.createAndStake{value: creationFee}(
 );
 ```
 
-`creationFee` is the exact native amount returned by `positionCreationFee()`
-(`0.001 ETH` on testnet). The fee forwards immediately to the treasury.
+`creationFee` is the exact native amount returned by `positionCreationFee()` on
+the target release. The fee forwards to Treasury.
 
-## Mint and redeem a basket
+## Later-phase examples: baskets, credit, and Dollar
+
+The next examples describe Phase 2 basket and credit selectors and Phase 3 Dollar
+selectors. Match the structs and ABIs to the exact deployment before use.
+
+### Mint and redeem a basket
 
 ```solidity
 uint256 shares = 10e18;
@@ -57,7 +83,7 @@ uint256[] memory minOut = basket.quoteRedeem(basketId, shares);
 basket.redeem(basketId, shares, msg.sender, minOut);
 ```
 
-## Deposit basket collateral and borrow
+### Deposit basket collateral and borrow
 
 ```solidity
 IERC20(basketToken).approve(staticsDiamond, collateralShares);
@@ -74,7 +100,7 @@ basketCollateral.depositBasketCollateral(positionId, basketId, collateralShares)
 lending.repay(loanId);
 ```
 
-## Mint Statics Dollar from native ETH
+### Mint Statics Dollar from native ETH
 
 ```solidity
 (uint256 seriesId, uint256 dollarOut, uint256 riskSharesOut) =
@@ -86,7 +112,7 @@ lending.repay(loanId);
     );
 ```
 
-## Flash-loan a constituent vector
+### Flash-loan a constituent vector
 
 ```solidity
 (address[] memory assets, uint256[] memory amounts, uint256[] memory fees) =
@@ -97,11 +123,11 @@ flashLender.flashLoan(basketId, shares, address(receiver), routeData);
 // keccak256("IStaticsFlashBorrower.onStaticsFlashLoan") and restore principal + fees.
 ```
 
-## Integrate Genesis
+## Statics Genesis and later protocol integration
 
 Genesis is the contract/API name for the **STATICS Operators** collection. It
-has a standalone NFT/vault lifecycle and a permanent integration at
-`StaticsDiamond`. Applications should discover the `StaticsGenesis`,
+has its own NFT/vault lifecycle. Diamond-side registration and linkage
+arrive with Phase 2. Applications should discover the `StaticsGenesis`,
 `StaticsGenesisVault`, `GenesisActivationRegistry`, and
 `GenesisLaunchDistributor` addresses from the matching deployment manifest,
 then use `StaticsDiamond` for permanent registration, linkage, rewards, and
@@ -113,10 +139,7 @@ permanent integration boundary as part of settlement.
 Current source creates IDs `1..5000` in Vault custody and IDs `5001..5555` in
 `StaticsTreasuryVesting`. The latter 555 claims are backed by 99.9M STATICS at
 finalization and vest separately from the Doppler-native 100.1M treasury token
-schedule. The recorded Robinhood testnet deployment does not include these
-standalone launch contracts.
-
-After `genesisIntegrationReady()` is true, an owner can call
+schedule. After `genesisIntegrationReady()` is true, an owner can call
 `registerGenesis(genesisId)` once. Registration follows ordinary owner-changing
 transfers; activation resets on transfer and is distinct from registration.
 `linkGenesis(positionId, genesisId)` requires the same actual owner for both
@@ -149,26 +172,36 @@ source split sends 10% to permanent Genesis reserve backing and 90% to treasury.
 See [Genesis secured credit](/docs/genesis/secured-credit) for lock, pause,
 repayment, and recovery semantics.
 
-## Create and discover general pools
+## Create and discover public pools
 
-Current source supports permissionless general pools, but the recorded testnet
-deployment exposes the earlier governed-pool version. Against a matching future
-deployment, call `quotePool(params)` immediately before
-`createPool(params, creatorAuthorization)`. The quote provides the sorted
-PoolKey, PoolId, normalized price, exact creation fee, and EIP-712 digest.
+For the current Phase 1 source, call `quotePool(params)` immediately before
+`createPool(params, creatorAuthorization)`. The quote includes the sorted
+PoolKey, PoolId, normalized price, exact creation fee, optional managed-POL
+activation fee, total native fee, and EIP-712 digest. Public pools support
+ERC-20/ERC-20 and native ETH/ERC-20 pairs and creator-selected static native v4
+LP fees. At the initial zero `poolCreationFee()`, only the Diamond owner can
+create. A positive fee opens exact-fee creation to any caller.
 
-Index `ProtocolPoolCreated`; do not expect an unbounded pool array. Resolve a
-known PoolId with `protocolPool`, `isProtocolPool`, `protocolPoolCreator`, and
-`protocolPoolFeeRate`. Pool creators claim the fixed 5% bilateral-fee credit
-with `claimCreatorRevenue(asset, receiver, minReceived)`. See
-[General protocol pools](/docs/liquidity/protocol-pools).
+Index `ProtocolPoolCreated`; resolve a known PoolId with `protocolPool`,
+`isProtocolPool`, `poolCreatorConfiguration`, and `protocolPoolFeeRate`. The
+current creator fee recipient can claim the fixed 5% bilateral-fee credit with
+`claimCreatorRevenue(poolId, asset, receiver, minReceived)`. Creator succession
+and a separate revenue recipient setting can change the effective recipient;
+read it again before constructing the claim. See [Public pools](/docs/liquidity/protocol-pools).
 
-## Canonical interfaces
+Permissioned pools have separate `quotePermissionedPool` and
+`createPermissionedPool` entrypoints, hook, controller, and periphery. Their
+PoolIds and economics must be read from the permissioned registry.
+
+## Interfaces by release
 
 | Surface | Interface |
 | --- | --- |
+| Phase 1 public pools, fees, and creator revenue | `IStaticsProtocolPools`, `IStaticsProtocolRevenue`, `IStaticsSwapFeeHook` |
+| Phase 1 permissioned venues | `IStaticsPermissionedPools`, permissioned hook, router, and position-manager interfaces |
+| Phase 1 positions, staking, gauges, and claims | `IStaticsPosition`, `IStaticsGlobalRewards`, `IStaticsRangeGauge`, `IStaticsBatchRewards` |
+| Statics Genesis | `IStaticsGenesis`, `IStaticsGenesisVault`, `IGenesisActivationRegistry` |
 | Baskets | `IStaticsBasket`, `IStaticsBasketAdmin`, `IStaticsBasketCollateral`, `IStaticsBasketRewards` |
-| Global staking and rewards | `IStaticsGlobalRewards` |
 | Genesis NFT and vault | `IStaticsGenesis`, `IStaticsGenesisVault`, `IERC5192` |
 | Genesis treasury vesting | `IStaticsTreasuryVesting` |
 | Genesis activation and launch rewards | `IGenesisActivationRegistry`, `IGenesisLaunchDistributor` |
