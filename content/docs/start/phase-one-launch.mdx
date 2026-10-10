@@ -12,7 +12,7 @@ badge: Phase 1
 The standalone **STATICS Genesis system is already live on Robinhood mainnet**. Phase 1 is the first stage of the separate Statics protocol; it does not redeploy Genesis. The source implements four stages. Availability on a particular chain depends on a verified deployment and its enabled features, not on code being present in `master`.
 
 :::warning Deployment status
-This site does not yet publish a verified Robinhood mainnet Phase 1 protocol address or matching ABI. The [historical testnet address set](/docs/reference/robinhood-testnet-deployment) belongs to an earlier, different release. Do not use those addresses for Phase 1 calls just because a page describes the current source.
+This site does not yet publish a verified Robinhood mainnet Phase 1 protocol address or matching ABI. Wait for the release manifest before sending Phase 1 transactions.
 :::
 
 ## In Phase 1
@@ -43,9 +43,9 @@ The standalone [Genesis collection and Vault](/docs/genesis/overview) have their
 
 ## Before using a deployment
 
-1. Obtain the network-specific deployment manifest and ABI for the exact release. The testnet snapshot is a separate integration reference.
+1. Obtain the network-specific deployment manifest and ABI for the exact release.
 2. Verify the protocol address, available functions, connected pool contracts, and governance configuration against that manifest.
 3. Read current onchain fees, pool state, and reward configuration immediately before preparing a transaction. Use `quotePool(params)` before public-pool creation.
 4. Treat rewards, POL growth, and trading volume as outcomes of actual funding and activity. No keeper or market activity is automatic.
 
-For builders, the phased protocol contract is named `StaticsDiamond`; the [architecture guide](/docs/core/architecture) explains its upgrade mechanism. The [integration guide](/docs/reference/integration) distinguishes Phase 1 paths from later-phase examples. The [rollout page](/docs/rollout) tracks the separate Genesis, protocol, and historical testnet contexts.
+For builders, the phased protocol contract is named `StaticsDiamond`; the [architecture guide](/docs/core/architecture) explains its upgrade mechanism. The [integration guide](/docs/reference/integration) distinguishes Phase 1 paths from later-phase examples. The [rollout page](/docs/rollout) tracks the separate Genesis and phased-protocol releases.

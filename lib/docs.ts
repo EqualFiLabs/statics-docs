@@ -71,10 +71,6 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
     title: "Security",
     pageIds: ["security-model", "verification"],
   },
-  {
-    title: "Historical testnet",
-    pageIds: ["robinhood-testnet-deployment", "testnet-onboarding"],
-  },
 ];
 
 function findMdxFiles(directory: string): string[] {

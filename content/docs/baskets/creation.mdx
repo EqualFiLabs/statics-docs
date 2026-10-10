@@ -10,11 +10,11 @@ badge: Phase 2
 ---
 
 :::warning Release scope
-This describes baskets and credit in Statics Phase 2. The historical testnet deployment has older basket flows. Baskets and credit are not part of Phase 1. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+This describes baskets and credit in Statics Phase 2. Baskets and credit are not part of Phase 1. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
 :::
 
 :::warning Not permissionless at initial launch
-Basket creation is currently restricted to the protocol. On the Robinhood Chain Testnet integration beta, `creationFee = 0`, so only the Diamond owner can create baskets. Access may expand through owner-created partner baskets, then to fee-gated open creation when governance raises the fee. See [Rollout](/docs/rollout).
+Phase 2 begins with protocol-curated basket creation. When `creationFee = 0`, only protocol governance can create baskets. Access may expand through partner baskets created by governance, then to fee-gated open creation when the fee becomes positive. See [Rollout](/docs/rollout).
 :::
 
 Basket creation is a single atomic call that defines the basket, deploys its
@@ -22,12 +22,12 @@ BasketToken, launches every canonical pool, and seeds permanent liquidity. The
 creating caller chooses every economic parameter up front; after creation the
 constituent vector and bundle amounts are immutable.
 
-## Current creation policy
+## Creation access
 
-| Deployment | `creationFee()` | Who can create |
-| --- | --- | --- |
-| Robinhood testnet beta | `0` | Diamond owner only (genesis) |
-| Future open mode | Positive native amount | Any caller paying the exact fee |
+| `creationFee()` | Who can create |
+| --- | --- |
+| Zero | Protocol governance only |
+| Positive native amount | Any caller paying the exact fee |
 
 :::warning
 Zero never means free public creation. When the fee is zero, creation is
@@ -40,8 +40,7 @@ Creation records the creator for discovery but gives that address **no
 administrative authority**. In current source, the immutable creator receives a
 fixed **500 BPS (5%)** of bilateral hook fees from that basket's canonical
 pools. Accrual is pull-based, cannot be redirected by governance, and survives
-pool decommissioning. This creator allocation is source behavior, not a claim
-about the earlier Robinhood testnet deployment.
+pool decommissioning. This creator allocation describes the Phase 2 source plan; confirm the deployed configuration before relying on it.
 
 ## Approved-partner creation
 

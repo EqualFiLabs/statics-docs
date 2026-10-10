@@ -10,7 +10,7 @@ badge: Phase 2
 ---
 
 :::warning Release scope
-Basket creation and its canonical pools belong to Statics Phase 2. The historical testnet deployment has older basket pools. Basket pools are not part of Phase 1. Match the ABI and deployment before transacting.
+Basket creation and its canonical pools belong to Statics Phase 2. Basket pools are not part of Phase 1. Match the ABI and deployment before transacting.
 :::
 
 Each basket constituent gets one canonical Uniswap v4 pool against its BasketToken. [Basket creation](/docs/baskets/creation) atomically initializes these pools and supplies the creator-funded launch seed; successful creation makes them immediately available. The creator selects the static native v4 LP fee (0 through 999,999 pips), tick spacing, initial price, and paired-asset budget for each pool.

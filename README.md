@@ -40,8 +40,6 @@ The site is a Next.js static export. Documentation pages are MDX files in `conte
 | `npm run check:links` | Check page ids, slugs, and internal `/docs/` links |
 | `npm run verify` | Run the link check, typecheck, and production build |
 | `npm run check:source` | Compare the docs with a local checkout of the protocol repo. Requires `STATICS_PATH` |
-| `npm run sync-abis` | Regenerate `public/abi/` from the SDK. Requires `SDK_PATH` and `SDK_COMMIT` |
-| `npm run check:abis` | Check that `public/abi/` matches that SDK commit |
 
 `output: "export"` is set in `next.config.mjs`, so the site to publish is `out/`. After `npm run build`, the `postbuild` script writes the Pagefind search index and `llms.txt`, `llms-small.txt`, and `llms-full.txt` into `out/`.
 
@@ -53,9 +51,7 @@ lib/docs.ts       Page loading and sidebar groups
 lib/site.ts       Site name, description, and public URLs
 app/              Routes, including /docs
 components/       Site UI
-public/abi/       Contract ABIs served by the site
-public/addresses.json
-scripts/          Link, source, and ABI checks
+scripts/          Link, source, and agent-output checks
 .github/workflows/ci.yml
 ```
 

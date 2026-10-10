@@ -10,7 +10,7 @@ badge: Phase 3
 ---
 
 :::warning Release scope
-This describes Statics Dollar in Phase 3. The historical testnet deployment has an earlier Dollar implementation. Statics Dollar is not part of Phase 1. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
+This describes Statics Dollar in Phase 3. Statics Dollar is not part of Phase 1. The later-phase detail on this page is retained for planning; confirm current interfaces and economics against protocol master before using it. Check the [rollout](/docs/rollout) and matching deployment before transacting.
 :::
 
 Pegged profiles are direct collateral wrappers. They mint only senior Dollar,
@@ -28,10 +28,6 @@ collateral-denominated and route entirely to the global non-swap fee ledger.
 mint:    pull nominalCollateral + mintFee
 redeem:  burn Dollar, return nominalCollateral - redemptionFee
 ```
-
-The active testnet profile is Mock USDG profile `2`: 6 decimals, a `0.95–1.05`
-peg band, a 5-BPS mint fee, a 7-BPS redemption fee, and a `1,000,000 USDstx`
-debt ceiling.
 
 ## Debt ceiling and profile capacity
 

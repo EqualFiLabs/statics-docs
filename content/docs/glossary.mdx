@@ -44,7 +44,7 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Statics Dollar (`USDstx`)** | Senior fungible dollar token minted from configured collateral profiles. |
 | **Risk Shares (`ethLEV`)** | Junior, series-scoped claims issued with volatile-profile minting. Recombining equal senior and junior claims returns collateral. |
 | **Volatile profile** | Dollar path that mints equal USDstx + Risk Shares against assets such as WETH. |
-| **Pegged profile** | Dollar path that mints only USDstx against a pegged collateral (for example Mock USDG on testnet), with separate mint/redeem fees and no Risk Shares. |
+| **Pegged profile** | Dollar path that mints only USDstx against a pegged collateral (for example, a configured dollar-pegged asset), with separate mint/redeem fees and no Risk Shares. |
 | **Senior claim** | The USDstx side of a volatile mint — priority claim relative to Risk Shares under solvency rules. |
 | **Dollar Core** | The separate custody and solvency system for Dollar collateral (`StaticsDollarCoreDiamond` in code). |
 
@@ -63,7 +63,7 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 
 | Term | Meaning |
 | --- | --- |
-| **STATICS** | The configured staking token used for global multi-asset reward eligibility (testnet uses an owner-mintable fixture). |
+| **STATICS** | The configured staking token used for global multi-asset reward eligibility. |
 | **Global rewards** | Fee shares claimable by positions that stake STATICS and opt into selected reward assets after the eligibility delay. |
 | **Range-gauge rewards** | Separately funded rewards for opted-in PositionNFT-managed v4 liquidity, including concentrated ranges; native v4 LP fees remain separate. |
 

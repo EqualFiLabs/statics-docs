@@ -47,7 +47,7 @@ transfer. A position carries obligations (loans, Dollar legs) as well as assets.
 ## Creation and reuse
 
 Opening a PositionNFT requires the exact native amount returned by
-`positionCreationFee()`. The testnet fee is `0.001 ETH`. Protocol governance may
+`positionCreationFee()`. Protocol governance may
 change the raw amount without an artificial cap, and zero means free creation.
 Direct creation and every atomic create-and-use path enforce the same fee and
 forward it immediately, in full, to the canonical treasury — the protocol never

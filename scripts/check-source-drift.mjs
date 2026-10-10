@@ -37,12 +37,6 @@ function requireText(source, expected, label) {
   if (!source.includes(expected)) errors.push(`docs drift: missing ${label}: ${expected}`);
 }
 
-function requireEqual(actual, expected, label) {
-  if (String(actual).toLowerCase() !== String(expected).toLowerCase()) {
-    errors.push(`deployment drift: ${label}: docs=${actual} source=${expected}`);
-  }
-}
-
 const docsText = [
   ...walk(path.join(ROOT, "content", "docs")).filter((file) => file.endsWith(".mdx")),
   ...walk(path.join(ROOT, "app")).filter((file) => /\.(ts|tsx)$/.test(file)),
@@ -194,62 +188,9 @@ for (const formalTarget of [
   read(staticsRoot, formalTarget);
 }
 
-const sourceManifest = JSON.parse(read(staticsRoot, "deployments/robinhood-testnet-46630-statics.json") || "{}");
-const docsManifest = JSON.parse(read(ROOT, "public/addresses.json") || "{}");
-if (sourceManifest.source && docsManifest.source) {
-  requireEqual(docsManifest.source.initialProtocolCommit, sourceManifest.source.protocolDeploymentCommit, "initial protocol commit");
-  requireEqual(docsManifest.source.deploymentToolingCommit, sourceManifest.source.deploymentToolingCommit, "deployment tooling commit");
-  requireEqual(docsManifest.source.currentProtocolCommit, sourceManifest.source.currentProtocolCommit, "current deployed protocol commit");
-  requireEqual(docsManifest.source.staticsSdkCommit, sourceManifest.source.staticsSdkCommit, "deployment SDK commit");
-  requireEqual(docsManifest.network.lastUpgradeBlock, sourceManifest.network.lastUpgradeBlock, "last upgrade block");
-}
-
-const contractMap = {
-  StaticsDiamond: "staticsDiamond",
-  StaticsDollarCoreDiamond: "staticsDollarCoreDiamond",
-  StaticsSwapFeeHook: "swapFeeHook",
-  StaticsLiquidityManager: "liquidityManager",
-  StaticsTimelock: "timelock",
-  StaticsDollarOracle: "staticsDollarOracle",
-  PositionRenderer: "positionRenderer",
-  AvatarSVG: "avatarSvg",
-};
-for (const [docsKey, sourceKey] of Object.entries(contractMap)) {
-  requireEqual(
-    docsManifest.contracts?.[docsKey]?.address,
-    sourceManifest.contracts?.[sourceKey]?.address,
-    `contract ${docsKey}`,
-  );
-}
-requireEqual(docsManifest.tokens?.STATICS?.address, sourceManifest.contracts?.staticsToken?.address, "STATICS token");
-requireEqual(docsManifest.tokens?.USDstx?.address, sourceManifest.contracts?.staticsDollar?.address, "USDstx token");
-requireEqual(
-  docsManifest.tokens?.ethLEV?.address,
-  sourceManifest.contracts?.staticsDollarRiskShares?.address,
-  "ethLEV token",
-);
-
-const dependencyMap = {
-  WETH: "weth",
-  UniswapV4PoolManager: "poolManager",
-  UniswapV4PositionManager: "positionManager",
-  Permit2: "permit2",
-  Quoter: "quoter",
-  StateView: "stateView",
-  UniversalRouter: "universalRouter",
-};
-for (const [docsKey, sourceKey] of Object.entries(dependencyMap)) {
-  requireEqual(docsManifest.dependencies?.[docsKey], sourceManifest.externalDependencies?.[sourceKey], `dependency ${docsKey}`);
-}
-requireEqual(
-  docsManifest.interfaces?.IStaticsProtocolPools,
-  sourceManifest.configuration?.protocolPoolsInterfaceId,
-  "protocol-pools interface ID",
-);
-
 if (errors.length > 0) {
   console.error(errors.join("\n"));
   process.exit(1);
 }
 
-console.log("check-source-drift: current source facts and deployment manifest match the docs");
+console.log("check-source-drift: current source facts match the docs");

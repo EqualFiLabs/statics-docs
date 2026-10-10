@@ -12,7 +12,7 @@ order: 10
 
 Statics is staged financial infrastructure for onchain assets. Its standalone **STATICS Genesis** release established the token, Doppler market, Operators collection, and backing system on Robinhood mainnet. Statics Phase 1 adds public and permissioned Uniswap v4 markets, PositionNFT accounts, STATICS staking, rewards, range gauges, and managed protocol-owned liquidity.
 
-The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what Phase 1 includes. The [rollout](/docs/rollout) separates source readiness from a verified deployment. This site does not yet publish a Phase 1 mainnet protocol address; the [testnet snapshot](/docs/reference/robinhood-testnet-deployment) is an older integration deployment.
+The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what Phase 1 includes. The [rollout](/docs/rollout) separates source readiness from a verified deployment. This site does not yet publish a verified Phase 1 mainnet protocol address.
 
 ## What Phase 1 enables
 
@@ -30,8 +30,6 @@ Phase 2 adds fixed-composition, redeemable [baskets](/docs/baskets/overview), ba
 
 Baskets are deliberately not ERC-4626. A BasketToken represents a fixed vector of one to sixteen assets; its mint and redemption path appears only in Phase 2. See the [glossary](/docs/glossary) for terms and the [integration guide](/docs/reference/integration) for release-aware developer steps.
 
-## Separate Genesis and testnet contexts
+## Standalone Genesis
 
 The [Operators and Vault](/docs/genesis/overview) belong to the already launched standalone Genesis system. Genesis direct rewards and secured credit have their own contracts. Registering or linking an Operator through the Statics protocol is a later, Phase 2 integration step.
-
-Robinhood testnet hosts a historical basket-and-Dollar beta with its own addresses, mock fixtures, and ABI revision. Those addresses must not be combined with the current Phase 1 source examples. [Testnet onboarding](/docs/start/testnet-onboarding) is scoped to that recorded deployment.

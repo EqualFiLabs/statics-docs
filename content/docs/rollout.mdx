@@ -3,18 +3,17 @@ id: rollout
 slug: rollout
 label: Rollout and availability
 title: Rollout and availability
-description: Separate the live standalone Genesis release, the staged Statics protocol, and the historical testnet integration deployment.
+description: Separate the live standalone Genesis release from the staged Statics protocol.
 updated: 2026-10-10
 order: 15
 ---
 
-Statics has three distinct contexts. Check the network and release before using an address, ABI, example, or security result.
+Statics has a live standalone Genesis release and a separate staged protocol. Check the release before using an address, ABI, example, or security result.
 
 | Context | Status recorded in these repositories | What belongs there |
 | --- | --- | --- |
 | Standalone STATICS Genesis on Robinhood mainnet | Launched | Fixed token supply, Doppler market, Operators collection, Vault backing, treasury vesting, fee ingress, and direct Genesis rewards. |
 | Statics Phase 1 protocol on Robinhood mainnet | Phase 1 source and deployment tooling are implemented; this site has no verified Phase 1 mainnet address yet | [Phase 1](/docs/start/phase-one-launch) includes markets, positions, staking, rewards, gauges, and POL. Later phases add baskets, Dollar, and Morpho. |
-| Robinhood testnet integration beta | Historical deployed snapshot | Older basket, Dollar, and faucet flows, with its own [addresses and ABI revision](/docs/reference/robinhood-testnet-deployment). It is not a Phase 1 mainnet deployment manifest. |
 
 ## Genesis is a separate launch
 
@@ -41,7 +40,7 @@ Public general-pool creation has its own `poolCreationFee()` switch. Zero allows
 
 Supply, deployed bytecode, configuration, and transactions are verifiable facts. Future volume, rewards, POL growth, arbitrage, and token prices depend on market activity and funding. A source document or ABI alone does not establish deployment.
 
-Before Phase 1 deployment instructions become actionable, publish a Phase 1 mainnet manifest with verified addresses, runtime hashes, active selector/interface inventory, governance and fee configuration, matching ABI/SDK revision, transaction provenance, and release validation. Until then, use the [historical testnet guide](/docs/start/testnet-onboarding) only for its named testnet deployment.
+Before Phase 1 deployment instructions become actionable, publish a Phase 1 mainnet manifest with verified addresses, runtime hashes, active selector/interface inventory, governance and fee configuration, matching ABI/SDK revision, transaction provenance, and release validation.
 
 ## For builders: source-plan counts
 

@@ -3,7 +3,7 @@ id: integration
 slug: reference/integration
 label: Integration
 title: Integration guide
-description: Release-aware Phase 1 integration, plus retained examples for later Statics phases and historical testnet.
+description: Release-aware Phase 1 integration, plus retained examples for later Statics phases.
 updated: 2026-10-10
 order: 710
 ---
@@ -15,10 +15,7 @@ and position manager. Basket, credit, Dollar, and Diamond-side Genesis
 integration selectors arrive in later phases.
 
 :::warning Match the release
-The [historical testnet manifest](/docs/reference/robinhood-testnet-deployment)
-and its vendored ABIs describe an older beta. This site does not yet publish a
-verified Phase 1 mainnet Diamond address and ABI. Check the active deployment
-manifest, selectors, dependencies, and onchain settings before submitting a call.
+This site does not yet publish a verified Phase 1 mainnet address and ABI. Check the active deployment manifest, selectors, dependencies, and onchain settings before submitting a call.
 :::
 
 ## Phase 1 integration path
@@ -50,8 +47,8 @@ manifest, selectors, dependencies, and onchain settings before submitting a call
 
 ```solidity
 address[] memory rewardAssets = new address[](2);
-rewardAssets[0] = usdg;
-rewardAssets[1] = basketToken;
+rewardAssets[0] = rewardTokenA;
+rewardAssets[1] = rewardTokenB;
 
 IERC20(staticsToken).approve(staticsDiamond, 100e18);
 
@@ -63,14 +60,12 @@ uint256 positionId = globalRewards.createAndStake{value: creationFee}(
 ```
 
 `creationFee` is the exact native amount returned by `positionCreationFee()` on
-the target release. The historical testnet value is `0.001 ETH`; do not assume
-it is the Phase 1 mainnet setting. The fee forwards to Treasury.
+the target release. The fee forwards to Treasury.
 
 ## Later-phase examples: baskets, credit, and Dollar
 
 The next examples describe Phase 2 basket and credit selectors and Phase 3 Dollar
-selectors. They also resemble some older testnet flows, but structs and ABIs
-must be matched to the exact deployment before use.
+selectors. Match the structs and ABIs to the exact deployment before use.
 
 ### Mint and redeem a basket
 
@@ -144,10 +139,7 @@ permanent integration boundary as part of settlement.
 Current source creates IDs `1..5000` in Vault custody and IDs `5001..5555` in
 `StaticsTreasuryVesting`. The latter 555 claims are backed by 99.9M STATICS at
 finalization and vest separately from the Doppler-native 100.1M treasury token
-schedule. The recorded Robinhood testnet deployment does not include these
-standalone launch contracts.
-
-After `genesisIntegrationReady()` is true, an owner can call
+schedule. After `genesisIntegrationReady()` is true, an owner can call
 `registerGenesis(genesisId)` once. Registration follows ordinary owner-changing
 transfers; activation resets on transfer and is distinct from registration.
 `linkGenesis(positionId, genesisId)` requires the same actual owner for both

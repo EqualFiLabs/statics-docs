@@ -13,10 +13,7 @@ onchain ABIs, chain bindings, math helpers, quote functions, decoders, and
 calldata builders needed to integrate without recomputing protocol math.
 
 :::warning Match the target release
-The vendored `/abi/*.json` and `public/addresses.json` in this docs site are
-**historical Robinhood testnet artifacts**. They are not the ABI or addresses
-for a Phase 1 mainnet Diamond. Pin an SDK and ABI to the exact deployment
-manifest and installed selector set before sending transactions.
+This docs site does not yet publish a verified Phase 1 mainnet address or matching deployment ABI. Pin an SDK and ABI to the exact release manifest and installed functions before sending transactions.
 :::
 
 ## Package
@@ -44,25 +41,11 @@ Source, issues, and local build live in that repository (`npm run build`, `npm t
 
 ## Match the SDK to the target
 
-These docs keep the historical testnet revision separate from the current
-protocol source and eventual Phase 1 release:
-
-| Target | SDK revision |
-| --- | --- |
-| Recorded Robinhood testnet deployment and vendored `/abi/*.json` | `135b68b8c404a1f567ae834c2e46e517e5788e28` |
-| Current `statics` master source | Resolve its `sdk` submodule gitlink and verify its contents against the exact source commit; do not use the historical testnet ABI for Phase 1 |
-| Phase 1 mainnet deployment | Publish the matching SDK revision with the verified Phase 1 manifest; not yet listed on this site |
-
-Pin the deployment revision when submitting transactions to the recorded
-testnet addresses. The staged current source has additional public and
-permissioned pool, range-gauge, and reward interfaces that are not represented
-by those older ABIs.
+Resolve the `sdk` submodule gitlink from the exact `statics` source commit. For a live Phase 1 deployment, use the SDK revision and ABI published with its verified manifest. This site has not yet listed that release pair. Source APIs alone do not prove a feature is deployed.
 
 ## Chain bindings
 
-The SDK ships generated per-chain address bindings. The tracked binding is
-`robinhoodChain`, exposing the verified contract addresses for the Robinhood
-deployment family.
+The SDK may provide chain bindings. Match any binding to the verified deployment manifest for the exact release before using it.
 
 ## Math and constants
 
@@ -145,11 +128,6 @@ returns signed-calldata-ready `Hex`:
   `buildMintV4PositionCall` — canonical v4 swap and position construction;
 - `decodePositionInfo`, `positionSalt` — decode stored position state and derive
   the deterministic position salt.
-
-## Testnet faucet
-
-`buildTestnetFaucetClaimCall()` builds the claim calldata for the ownerless
-testnet faucet. See [Testnet onboarding](/docs/start/testnet-onboarding).
 
 Genesis batch claims accept caller-supplied token IDs rather than enumerating a
 wallet. The owner batch settles both STATICS and WETH, accepts an empty list for

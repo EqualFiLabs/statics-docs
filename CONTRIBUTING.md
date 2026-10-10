@@ -90,21 +90,13 @@ npm run verify
 
 That runs `check:links`, `typecheck`, and `build`.
 
-CI runs on pull requests and on pushes to `master`. It also checks out [EqualFiLabs/statics](https://github.com/EqualFiLabs/statics) at `master` and the SDK commit recorded in `.github/workflows/ci.yml`, then runs `check:source` and `check:abis`.
+CI runs on pull requests and on pushes to `master`. It also checks out [EqualFiLabs/statics](https://github.com/EqualFiLabs/statics) at `master` and runs `check:source`.
 
 To run those locally:
 
 ```bash
 STATICS_PATH=/path/to/statics npm run check:source
 ```
-
-```bash
-SDK_PATH=/path/to/statics-sdk/src/index.ts \
-SDK_COMMIT=<commit in .github/workflows/ci.yml> \
-npm run check:abis
-```
-
-Do not edit `public/abi/` by hand. Regenerate it with `npm run sync-abis` using the same `SDK_PATH` and `SDK_COMMIT`.
 
 ## Pull requests
 

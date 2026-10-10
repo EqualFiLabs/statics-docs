@@ -4,7 +4,7 @@
 //   out/llms-full.txt  — full clean concatenated corpus
 //
 // Reads clean markdown pre-rendered by the /raw/docs route handler during
-// `next build`, plus public/addresses.json for machine-readable facts.
+// `next build`.
 // Runs in postbuild (after next build + pagefind).
 
 import fs from "node:fs";
@@ -15,7 +15,7 @@ import matter from "gray-matter";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://docs.staticsprotocol.com";
 const SITE_NAME = "Statics Protocol Docs";
 const SITE_DESCRIPTION =
-  "Documentation for Statics — post-launch financial infrastructure for redeemable asset baskets, connected liquidity, self-backed credit, and the Statics Dollar. Starts with curated baskets; creation expands over time.";
+  "Documentation for Statics: live standalone Genesis, Phase 1 markets, positions, staking, rewards, and later basket, Dollar, and Morpho phases.";
 
 const ROOT = process.cwd();
 const contentDir = path.join(ROOT, "content", "docs");
@@ -27,14 +27,13 @@ const SMALL_SLUGS = new Set([
   "introduction",
   "rollout",
   "glossary",
-  "start/testnet-onboarding",
+  "start/phase-one-launch",
   "core/architecture",
   "core/position-nft",
   "genesis/overview",
   "genesis/rewards",
   "genesis/secured-credit",
   "reference/integration",
-  "reference/robinhood-testnet-deployment",
 ]);
 
 function findMdxFiles(directory) {
@@ -77,16 +76,11 @@ const pages = findMdxFiles(contentDir)
   })
   .sort((left, right) => left.order - right.order);
 
-// ---- key facts from public/addresses.json ----
-const addresses = JSON.parse(fs.readFileSync(path.join(ROOT, "public", "addresses.json"), "utf8"));
+// ---- release facts ----
 const facts = [
-  `Chain: ${addresses.network.name} (chainId ${addresses.network.chainId}) — ${addresses.network.status}`,
-  `Integration address (StaticsDiamond): ${addresses.integrationAddress}`,
-  `Statics Dollar (USDstx): ${addresses.tokens.USDstx.address}`,
-  `Source commit: ${addresses.source.commit}`,
-  `Explorer: ${addresses.network.explorer}`,
-  `Machine-readable addresses: ${SITE_URL}/addresses.json`,
-  `ABIs: ${SITE_URL}/abi/index.json (diamond, hook, manager, faucet, basket token)`,
+  "Standalone STATICS Genesis is live on Robinhood mainnet.",
+  "Phase 1 source and deployment tooling are implemented; this site does not yet publish a verified Phase 1 mainnet address or matching ABI.",
+  "Baskets and credit are Phase 2; Statics Dollar is Phase 3; Morpho integration is Phase 4.",
 ];
 
 // ---- llms.txt (index) ----
@@ -133,8 +127,7 @@ const smallHeader = [
   "",
   ...facts.map((f) => `- ${f}`),
   "",
-  "This is the orientation subset. Load the full corpus at "
-    + `${SITE_URL}/llms-full.txt and machine-readable facts at ${SITE_URL}/addresses.json.`,
+  `This is the orientation subset. Load the full corpus at ${SITE_URL}/llms-full.txt.`,
   "",
   "---",
   "",
