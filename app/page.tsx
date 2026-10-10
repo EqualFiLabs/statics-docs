@@ -41,7 +41,7 @@ const capabilities = [
   },
   {
     title: "Shared PositionNFT",
-    body: "A transferable account for Phase 1 stake, claims, and managed LP ranges. Later cuts add basket, loan, and Dollar legs.",
+    body: "A transferable account for Phase 1 staking, rewards, and managed LP ranges. Later phases add baskets, credit, and Dollar features.",
     href: "/docs/core/position-nft",
   },
   {
@@ -51,7 +51,7 @@ const capabilities = [
   },
   {
     title: "Verify availability",
-    body: "Standalone Genesis is live. Check the matching deployment manifest and installed selectors before using Diamond features.",
+    body: "Standalone Genesis is live. Check launch status and verified addresses before using Phase 1 features.",
     href: "/docs/rollout",
   },
   {
@@ -115,10 +115,9 @@ export default function HomePage() {
           </div>
           <h1>Build lasting utility around onchain assets.</h1>
           <p className="lede">
-            The first Statics Diamond phase brings hooked public and permissioned markets, PositionNFTs,
-            STATICS staking, range rewards, and managed protocol liquidity. The standalone Genesis system
-            is already live. Baskets, lending, Dollar, and Morpho follow in later Diamond phases and remain
-            documented here.
+            Statics Phase 1 brings hooked public and permissioned markets, PositionNFTs, STATICS staking,
+            range rewards, and managed protocol liquidity. The standalone Genesis system is already live.
+            Later Statics phases add baskets, lending, Dollar, and Morpho; those features remain documented here.
           </p>
           <div className="landing-actions">
             <Link className="cta" href="/docs/start/phase-one-launch">

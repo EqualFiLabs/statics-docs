@@ -3,7 +3,7 @@ id: rollout
 slug: rollout
 label: Rollout and availability
 title: Rollout and availability
-description: Separate the live standalone Genesis release, the staged Statics Diamond, and the historical testnet integration deployment.
+description: Separate the live standalone Genesis release, the staged Statics protocol, and the historical testnet integration deployment.
 updated: 2026-10-10
 order: 15
 ---
@@ -13,32 +13,36 @@ Statics has three distinct contexts. Check the network and release before using 
 | Context | Status recorded in these repositories | What belongs there |
 | --- | --- | --- |
 | Standalone STATICS Genesis on Robinhood mainnet | Launched | Fixed token supply, Doppler market, Operators collection, Vault backing, treasury vesting, fee ingress, and direct Genesis rewards. |
-| Staged `StaticsDiamond` on Robinhood mainnet | Phase 1 source and deployment tooling are implemented; this site has no verified Phase 1 mainnet address yet | The [first cut](/docs/start/phase-one-launch) enables markets, positions, staking, rewards, gauges, and POL. Later cuts add baskets, Dollar, and Morpho. |
+| Statics Phase 1 protocol on Robinhood mainnet | Phase 1 source and deployment tooling are implemented; this site has no verified Phase 1 mainnet address yet | [Phase 1](/docs/start/phase-one-launch) includes markets, positions, staking, rewards, gauges, and POL. Later phases add baskets, Dollar, and Morpho. |
 | Robinhood testnet integration beta | Historical deployed snapshot | Older basket, Dollar, and faucet flows, with its own [addresses and ABI revision](/docs/reference/robinhood-testnet-deployment). It is not a Phase 1 mainnet deployment manifest. |
 
 ## Genesis is a separate launch
 
-The [Genesis launch](/docs/genesis/launch-and-vesting) established the fixed 1B STATICS supply, six-curve STATICS/WETH market, 5,555 Operators, reserve backing, treasury vesting, and launch reward books. These contracts predate the staged Diamond. Phase 1 does not redeploy or reconfigure them. The Diamond-side registration and linkage surface is scheduled for Phase 2.
+The [Genesis launch](/docs/genesis/launch-and-vesting) established the fixed 1B STATICS supply, six-curve STATICS/WETH market, 5,555 Operators, reserve backing, treasury vesting, and launch reward books. These contracts predate the staged Statics protocol. Phase 1 does not redeploy or reconfigure them. Protocol-side registration and linkage are scheduled for Phase 2.
 
-## The four Diamond phases
+## The four Statics phases
 
-The accepted [source deployment plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) assigns selectors to one Diamond address:
+The [Phase 1 launch guide](/docs/start/phase-one-launch) covers the first stage. The later stages add these features to Statics:
 
-| Phase | Main addition | Cumulative source plan |
-| --- | --- | --- |
-| 1 | Public and permissioned pools, PositionNFTs, staking, gauges, rewards, managed POL | 32 facets, 226 selectors |
-| 2 | Baskets, lending, flash composition, and Diamond-side Genesis integration | 44 facets, 318 selectors |
-| 3 | Statics Dollar periphery and separate Core | 49 facets, 376 selectors on the main Diamond |
-| 4 | Morpho integration | 54 facets, 403 selectors on the main Diamond |
+| Phase | What it adds |
+| --- | --- |
+| 1 | Public and permissioned pools, PositionNFTs, staking, range rewards, and managed protocol liquidity |
+| 2 | Baskets, lending, flash composition, and protocol-side Genesis integration |
+| 3 | Statics Dollar and its separate collateral system |
+| 4 | Morpho integration |
 
-These are **source-plan counts**, not a statement that a given deployed Diamond has all those selectors. Later phases are retained throughout this site as forward-looking technical documentation. Check the active phase and installed interfaces on the target chain.
+Later phases remain documented for planning. Their presence in source code does not mean they are available on a given network. Check the active release before using them.
 
 ## Creation access in Phase 1
 
-Public general-pool creation has its own `poolCreationFee()` switch. Zero allows only the Diamond owner to create and requires zero payment. A positive value opens exact-fee creation to any caller. Permissioned venues always use governance execution and exact creator authorization. Basket creation has a separate `creationFee()` switch and belongs to Phase 2.
+Public general-pool creation has its own `poolCreationFee()` switch. Zero allows only protocol governance to create and requires zero payment. A positive value opens exact-fee creation to any caller. Permissioned venues always use governance execution and exact creator authorization. Basket creation has a separate `creationFee()` switch and belongs to Phase 2.
 
 ## Outcomes and deployment evidence
 
 Supply, deployed bytecode, configuration, and transactions are verifiable facts. Future volume, rewards, POL growth, arbitrage, and token prices depend on market activity and funding. A source document or ABI alone does not establish deployment.
 
-Before launch instructions become actionable, publish a Phase 1 mainnet manifest with verified addresses, runtime hashes, active selector/interface inventory, governance and fee configuration, matching ABI/SDK revision, transaction provenance, and release validation. Until then, use the [historical testnet guide](/docs/start/testnet-onboarding) only for its named testnet deployment.
+Before Phase 1 deployment instructions become actionable, publish a Phase 1 mainnet manifest with verified addresses, runtime hashes, active selector/interface inventory, governance and fee configuration, matching ABI/SDK revision, transaction provenance, and release validation. Until then, use the [historical testnet guide](/docs/start/testnet-onboarding) only for its named testnet deployment.
+
+## For builders: source-plan counts
+
+The accepted [deployment plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) assigns functions to a staged contract. The current source plan is cumulative: Phase 1 has 32 facets, 226 selectors; Phase 2 has 44 facets, 318 selectors; Phase 3 has 49 facets, 376 selectors; and Phase 4 has 54 facets, 403 selectors. These counts describe source code, not a verified deployment. The main protocol contract is named `StaticsDiamond` in code.

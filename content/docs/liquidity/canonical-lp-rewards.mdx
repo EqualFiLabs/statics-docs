@@ -14,7 +14,7 @@ A public pool can hold ordinary Uniswap v4 liquidity without enrolling in Static
 ## Two separate earnings rails
 
 - **Native v4 LP fees** belong to the Uniswap position under its creator-selected static LP fee. `collectNativeFees` and `previewNativeLpFees` use the position's ordinary fee accounting.
-- **Gauge rewards** are separately funded and accounted by the Diamond. They do not replace, duplicate, or promise native LP fees.
+- **Gauge rewards** are separately funded and accounted by the Statics protocol. They do not replace, duplicate, or promise native LP fees.
 
 Each public-pool gauge has five slots. Slot 0 is reserved for protocol STATICS funded from a permissionless reserve and routed by raw-stake PoolId allocations on an anchored weekly budget. Slots 1–4 accept direct reward funding, subject to asset policy. A creator-selected share of future direct funding can go to valid PoolId allocators; funders receive the protected split in effect when they fund.
 

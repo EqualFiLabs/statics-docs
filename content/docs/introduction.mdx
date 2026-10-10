@@ -10,13 +10,13 @@ updated: 2026-10-10
 order: 10
 ---
 
-Statics is staged financial infrastructure for onchain assets. Its standalone **STATICS Genesis** release established the token, Doppler market, Operators collection, and backing system on Robinhood mainnet. The first `StaticsDiamond` phase adds public and permissioned Uniswap v4 markets, PositionNFT accounts, STATICS staking, rewards, range gauges, and managed protocol-owned liquidity.
+Statics is staged financial infrastructure for onchain assets. Its standalone **STATICS Genesis** release established the token, Doppler market, Operators collection, and backing system on Robinhood mainnet. Statics Phase 1 adds public and permissioned Uniswap v4 markets, PositionNFT accounts, STATICS staking, rewards, range gauges, and managed protocol-owned liquidity.
 
-The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what the first Diamond cut contains. The [rollout](/docs/rollout) separates source readiness from a verified deployment. This site does not yet publish a Phase 1 mainnet Diamond address; the [testnet snapshot](/docs/reference/robinhood-testnet-deployment) is an older integration deployment.
+The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what Phase 1 includes. The [rollout](/docs/rollout) separates source readiness from a verified deployment. This site does not yet publish a Phase 1 mainnet protocol address; the [testnet snapshot](/docs/reference/robinhood-testnet-deployment) is an older integration deployment.
 
 ## What Phase 1 enables
 
-- **Create and trade public pools:** two compatible ERC-20s or native ETH with an ERC-20, subject to the current [creation-fee switch](/docs/liquidity/protocol-pools). Creation starts Diamond-owner-only; a positive fee can enable public creation.
+- **Create and trade public pools:** two compatible ERC-20s or native ETH with an ERC-20, subject to the current [creation-fee switch](/docs/liquidity/protocol-pools). Initially, only protocol governance can create these pools; a positive fee can later enable public creation.
 - **Run a permissioned venue:** governance creates a pool with creator-authorized terms, a separate hook, controller, trusted routing, and approved liquidity positions. See [Permissioned pools](/docs/liquidity/permissioned-pools).
 - **Provide liquidity:** earn the creator-selected native v4 LP fee, and optionally manage a v4 NFT under a [PositionNFT range gauge](/docs/liquidity/canonical-lp-rewards) for separately funded rewards.
 - **Stake STATICS:** choose reward assets, pass the eligibility delay, claim accrued fees, and allocate raw stake to protocol-funded pool incentives. See [Global rewards](/docs/rewards/global-rewards).
@@ -26,12 +26,12 @@ A market's registration does not make its assets basket backing, Dollar collater
 
 ## What follows
 
-Phase 2 adds fixed-composition, redeemable [baskets](/docs/baskets/overview), basket pools, self-backed [credit](/docs/lending/overview), flash composition, and Diamond-side Genesis integration. Phase 3 adds the [Statics Dollar](/docs/dollar/overview) and its separate Core custody boundary. Phase 4 adds Morpho integration. These pages remain in the site so builders can study the full design, but the Phase 1 Diamond does not expose their selectors.
+Phase 2 adds fixed-composition, redeemable [baskets](/docs/baskets/overview), basket pools, self-backed [credit](/docs/lending/overview), flash composition, and protocol-side Genesis integration. Phase 3 adds the [Statics Dollar](/docs/dollar/overview) and its separate Core custody boundary. Phase 4 adds Morpho integration. These pages remain in the site so builders can study the full design, but those features are not part of Phase 1.
 
-Baskets are deliberately not ERC-4626. A BasketToken represents a fixed vector of one to sixteen assets; its mint and redemption path appears only after the Phase 2 cut. See the [glossary](/docs/glossary) for terms and the [integration guide](/docs/reference/integration) for release-aware developer steps.
+Baskets are deliberately not ERC-4626. A BasketToken represents a fixed vector of one to sixteen assets; its mint and redemption path appears only in Phase 2. See the [glossary](/docs/glossary) for terms and the [integration guide](/docs/reference/integration) for release-aware developer steps.
 
 ## Separate Genesis and testnet contexts
 
-The [Operators and Vault](/docs/genesis/overview) belong to the already launched standalone Genesis system. Genesis direct rewards and secured credit have their own contracts. Registering or linking an Operator through the Diamond is a later, Phase 2 integration step.
+The [Operators and Vault](/docs/genesis/overview) belong to the already launched standalone Genesis system. Genesis direct rewards and secured credit have their own contracts. Registering or linking an Operator through the Statics protocol is a later, Phase 2 integration step.
 
 Robinhood testnet hosts a historical basket-and-Dollar beta with its own addresses, mock fixtures, and ABI revision. Those addresses must not be combined with the current Phase 1 source examples. [Testnet onboarding](/docs/start/testnet-onboarding) is scoped to that recorded deployment.

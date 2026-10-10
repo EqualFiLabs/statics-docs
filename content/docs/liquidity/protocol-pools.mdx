@@ -12,7 +12,7 @@ badge: Phase 1
 Phase 1 general pools are Statics-hooked Uniswap v4 markets. They can pair two compatible ERC-20s or native ETH with one compatible ERC-20. They are independent of baskets: registration does not make either currency basket backing, Dollar collateral, or a borrowable asset. Basket canonical pools arrive with Phase 2.
 
 :::warning Match the deployment
-This page describes the current Phase 1 source. The [published testnet addresses](/docs/reference/robinhood-testnet-deployment) use an older pool model. This site does not yet provide a verified Phase 1 mainnet Diamond address or matching ABI.
+This page describes the current Phase 1 source. The [published testnet addresses](/docs/reference/robinhood-testnet-deployment) use an older pool model. This site does not yet provide a verified Phase 1 mainnet protocol address or matching ABI.
 :::
 
 ## Creation access and quote
@@ -21,7 +21,7 @@ This page describes the current Phase 1 source. The [published testnet addresses
 
 | Current fee | Who can call `createPool` |
 | --- | --- |
-| Zero | Diamond owner only, paying zero creation fee |
+| Zero | Protocol governance only, paying zero creation fee |
 | Positive | Any caller paying the exact quoted native fee |
 
 The Phase 1 initial setting is zero, so market creation begins owner-curated. It is **not** free public creation. Before a transaction, call `quotePool(params)` and use its sorted PoolKey, PoolId, normalized initial price, creation fee, optional managed-POL activation fee, total native fee, and creator-authorization digest. Requote if configuration or pool state changes.

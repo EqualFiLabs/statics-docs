@@ -3,13 +3,13 @@ id: position-nft
 slug: core/position-nft
 label: PositionNFT
 title: Shared PositionNFT
-description: A transferable Phase 1 account for STATICS staking, rewards, and managed LP ranges; later cuts add basket, Dollar, and Genesis integration legs.
+description: A transferable Phase 1 account for STATICS staking, rewards, and managed LP ranges; later phases add basket, Dollar, and Genesis integration features.
 updated: 2026-10-10
 order: 30
 badge: Phase 1
 ---
 
-Phase 1 installs the PositionNFT account and its STATICS staking, reward, and public-pool range-gauge legs. Basket collateral and loans, Diamond-side Genesis links, and Dollar legs are added in later cuts. Check the [rollout](/docs/rollout) and installed selectors before building against those later legs.
+Phase 1 installs the PositionNFT account and its STATICS staking, reward, and public-pool range-gauge legs. Basket collateral and loans, protocol-side Genesis links, and Dollar legs are added in later phases. Check the [rollout](/docs/rollout) and installed selectors before building against those later legs.
 
 One PositionNFT can own several independent legs at once. The ERC-721
 collection is named `Statics Position` with symbol `STXPOS`, and the contract
@@ -47,10 +47,10 @@ transfer. A position carries obligations (loans, Dollar legs) as well as assets.
 ## Creation and reuse
 
 Opening a PositionNFT requires the exact native amount returned by
-`positionCreationFee()`. The testnet fee is `0.001 ETH`. The Diamond owner may
+`positionCreationFee()`. The testnet fee is `0.001 ETH`. Protocol governance may
 change the raw amount without an artificial cap, and zero means free creation.
 Direct creation and every atomic create-and-use path enforce the same fee and
-forward it immediately, in full, to the canonical treasury — the Diamond never
+forward it immediately, in full, to the canonical treasury — the protocol never
 retains it.
 
 Adding legs, collateral, stake, liquidity, or debt to an existing position does
@@ -112,7 +112,7 @@ attributes (Field, Boundary, Shell, Interface, Mantle, Telemetry, Sigil,
 Signal). It contains no live status, achievement, yield, debt, health, or rarity
 semantics.
 
-The Diamond stores one collection-wide renderer address. The owner may replace
+The protocol stores one collection-wide renderer address. The owner may replace
 or clear it with `setPositionRenderer`; clearing it makes valid positions return
 an empty URI. The stateless renderer holds one immutable `StaticsAvatarSVG`
 helper so both contracts stay below the EIP-170 code-size limit without placing
