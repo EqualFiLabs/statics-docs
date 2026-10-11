@@ -17,7 +17,7 @@ These are current Phase 1 source defaults. Read the actual fee rates and allocat
 
 ## Rates and allocation
 
-The source launch default is **5 BPS input plus 5 BPS output**. Both legs together may not exceed 200 BPS. A general-pool creator can choose an initial rate at or above the live default for each leg. Selecting exactly the default inherits future default changes; selecting a higher leg stores a PoolId override. Governance can change the default, replace a PoolId override, or clear one back to inheritance. The creator has no post-creation fee setter.
+Hook-fee rates use **pips**, where 1 pip is one millionth of an amount. The source launch default is **500 pips (5 BPS, 0.05%) on input and 500 pips on output**. The combined configured rate cannot exceed **20,000 pips (200 BPS)**. A general-pool creator can select an initial rate as low as **10 pips (0.001%) per leg**, including rates below the live default. Selecting exactly the live default inherits future default changes; any other selection stores both legs as a fixed PoolId override. Governance can change the default, replace a PoolId override, or clear one back to inheritance. The creator has no post-creation fee setter.
 
 The current source profiles allocate collected bilateral fees as follows. Basket canonical pools are a **Phase 2** path.
 
@@ -35,7 +35,7 @@ Managed POL starts inactive in a general pool. Before the creator activates it, 
 
 ## Swap callback and settlement
 
-The hook records PoolManager claims in a compact swap path. It does not mint or rebalance POL positions during the swap. Any caller can use `settleProtocolPoolRevenue(poolId, asset)` for non-POL claims; a bounded maintenance tip comes only from Treasury's share. Eligible STATICS-staker ownership is fixed at fee generation, even if claim backing settles later. Activated POL inventory can be settled separately with `settleProtocolPoolPol(poolId, asset, maximumAmount)` and managed by the authorized operator.
+The hook records PoolManager claims in a compact swap path. It does not mint or rebalance POL positions during the swap. Any caller can use `settleProtocolPoolRevenue(poolId, asset)` for non-POL claims. The Phase 1 mainnet launch setting pays the caller a **100 BPS (1%) maintenance tip from the settled Treasury share**, not from creator or staker credits. Read the current `protocolPoolMaintenanceConfig()` before relying on that rate. Eligible STATICS-staker ownership is fixed at fee generation, even if claim backing settles later. Activated POL inventory can be settled separately with `settleProtocolPoolPol(poolId, asset, maximumAmount)` and managed by the authorized operator.
 
 For native ETH pools, principal, LP fees, and POL remain native ETH. ETH hook revenue uses WETH as the reward-accounting identity; the exact native receipt is wrapped at the reward boundary. One WETH reward opt-in covers WETH and native-ETH hook revenue. See [Managed POL](/docs/liquidity/permanent-liquidity) and [Global rewards](/docs/rewards/global-rewards).
 

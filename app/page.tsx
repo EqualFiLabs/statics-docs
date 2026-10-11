@@ -16,7 +16,7 @@ const capabilities = [
   },
   {
     title: "Phase 1 public markets",
-    body: "Curated hooked markets at launch, with ERC-20 and native ETH pairs, separate v4 LP and bilateral hook fees, and a governed path to open creation.",
+    body: "Fee-paid public markets at launch, with ERC-20 and native ETH pairs, separate v4 LP and bilateral hook fees, and creator-selected initial fee rates.",
     href: "/docs/liquidity/protocol-pools",
   },
   {

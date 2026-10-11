@@ -22,8 +22,9 @@ This site does not yet publish a verified Phase 1 mainnet address and ABI. Check
 
 1. For a public pool, read `poolCreationFee()`, call `quotePool(params)`, and
    verify the PoolKey, PoolId, native v4 LP fee, bilateral hook-fee terms,
-   creator authorization digest, and exact native fee. At the initial zero fee,
-   only the Diamond owner can create. See [Public pools](/docs/liquidity/protocol-pools).
+   creator authorization digest, and exact native fee. The source launch
+   configuration sets a positive fee, opening exact-fee creation to any caller.
+   See [Public pools](/docs/liquidity/protocol-pools).
 2. For a permissioned venue, use `quotePermissionedPool` and the exact creator
    authorization, then route external exact-input swaps through the trusted
    periphery. See [Permissioned pools](/docs/liquidity/permissioned-pools).
@@ -179,8 +180,15 @@ For the current Phase 1 source, call `quotePool(params)` immediately before
 PoolKey, PoolId, normalized price, exact creation fee, optional managed-POL
 activation fee, total native fee, and EIP-712 digest. Public pools support
 ERC-20/ERC-20 and native ETH/ERC-20 pairs and creator-selected static native v4
-LP fees. At the initial zero `poolCreationFee()`, only the Diamond owner can
-create. A positive fee opens exact-fee creation to any caller.
+LP fees. The Phase 1 mainnet launch configuration sets `poolCreationFee()` to
+0.01 ETH, opening exact-fee creation to any caller. A later zero setting would
+restrict creation to the Diamond owner. Read the current value before submitting.
+
+`PoolSwapFeeRate` uses `inputFeePips` and `outputFeePips`, not BPS fields. The
+creator-selected initial rate needs at least 10 pips per leg and no more than
+20,000 pips combined. A fee authorization uses EIP-712 domain version `5` and
+the pip-valued `CreatePool` fields; obtain a fresh digest from `quotePool(params)`
+instead of reusing a version `4` signature.
 
 Index `ProtocolPoolCreated`; resolve a known PoolId with `protocolPool`,
 `isProtocolPool`, `poolCreatorConfiguration`, and `protocolPoolFeeRate`. The

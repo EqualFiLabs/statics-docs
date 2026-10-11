@@ -34,7 +34,7 @@ Later phases remain documented for planning. Their presence in source code does 
 
 ## Creation access in Phase 1
 
-Public general-pool creation has its own `poolCreationFee()` switch. Zero allows only protocol governance to create and requires zero payment. A positive value opens exact-fee creation to any caller. Permissioned venues always use governance execution and exact creator authorization. Basket creation has a separate `creationFee()` switch and belongs to Phase 2.
+Public general-pool creation has its own `poolCreationFee()` switch. The Robinhood mainnet Phase 1 launch configuration sets **0.01 ETH**, so any caller may create a pool with exact payment. A later zero setting would restrict creation to the Diamond owner. Permissioned venues remain owner-created with exact creator authorization: the Safe can create one during launch, and the timelock owns later actions. Basket creation has a separate `creationFee()` switch and belongs to Phase 2. These are source-plan settings until a matching deployed manifest and onchain configuration are verified.
 
 ## Outcomes and deployment evidence
 

@@ -8,10 +8,13 @@ updated: 2026-10-10
 order: 610
 ---
 
-In Phase 1, `StaticsTimelock` owns `StaticsDiamond`. The separate
-`StaticsDollarCoreDiamond` arrives in Phase 3 under the intended shared
-governance. Diamond cuts, economic configuration, lifecycle release, hook-fee
-changes, and treasury or guardian changes flow through the timelock.
+The Phase 1 launch sequence configures `StaticsDiamond` under the deployment
+signer, transfers ownership to the governance Safe for initial pool creation and
+verification, then transfers ownership to `StaticsTimelock`. After that handoff,
+Diamond cuts, economic configuration, lifecycle release, hook-fee changes, and
+treasury or guardian changes flow through the timelock. Fee-paid public pool
+creation needs no governance transaction. The separate
+`StaticsDollarCoreDiamond` arrives in Phase 3 under the intended shared governance.
 
 ## Delay
 
@@ -35,7 +38,7 @@ The emergency guardian is **not** a timelock canceller. The timelock is its own 
 
 ## What the timelock controls
 
-The timelock currently controls Diamond cuts, economic configuration, lifecycle
+After the launch handoff, the timelock controls Diamond cuts, economic configuration, lifecycle
 release and decommissioning, hook fee configuration, and treasury or guardian
 changes. Reward-asset selection is a PositionNFT owner action and requires no
 governance admission or retirement.

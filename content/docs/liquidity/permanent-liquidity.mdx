@@ -13,7 +13,7 @@ Public-pool protocol-owned liquidity (POL) is managed through explicit Uniswap v
 
 ## General pools begin without POL
 
-A general pool can be created and traded without a liquidity seed. Managed POL is disabled by default. While disabled, its allocation routes to Treasury. The creator can pay the exact governed activation fee during creation or later to enable **future** POL funding. Activation is permanent; it does not move historical Treasury allocations into POL.
+A general pool can be created and traded without a liquidity seed. Managed POL is disabled by default. While disabled, its allocation routes to Treasury. The creator can pay the exact governed activation fee during creation or later to enable **future** POL funding. The Robinhood mainnet Phase 1 launch setting is **0.025 ETH**, separate from the pool creation fee; verify the deployed value before paying. Activation is permanent; it does not move historical Treasury allocations into POL.
 
 After activation, anyone may settle the pool's claim-backed POL share with `settleProtocolPoolPol(poolId, asset, maximumAmount)`. Settlement reserves the released currency for that PoolId. An authorized operator uses the typed `openProtocolPolPosition`, `increaseProtocolPolPosition`, `decreaseProtocolPolPosition`, `collectProtocolPolFees`, and `closeProtocolPolPosition` lifecycle. These are explicit transactions, not swap-callback compounding.
 
