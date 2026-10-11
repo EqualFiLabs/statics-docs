@@ -33,7 +33,7 @@ requested_i   = principal_i + quotedFee_i
 
 The receiver must implement `IStaticsFlashBorrower` and return
 `keccak256("IStaticsFlashBorrower.onStaticsFlashLoan")` from its callback. The
-Diamond uses OpenZeppelin `ReentrancyGuardTransient`: short persistent guard
+protocol uses OpenZeppelin `ReentrancyGuardTransient`: short persistent guard
 phases protect disbursement and repayment accounting, while the receiver callback
 runs outside the common persistent guard.
 
@@ -56,11 +56,11 @@ rejects nested `flashLoan` calls.
 
 ## Exact principal, measured fee
 
-Outbound disbursement debits the Diamond and credits the receiver by exactly the
+Outbound disbursement debits the protocol contract and credits the receiver by exactly the
 quoted principal. Outbound-tax and sender-extra-tax assets are incompatible and
 revert atomically.
 
-After the callback returns the required hash, the Diamond requests principal plus
+After the callback returns the required hash, the protocol requests principal plus
 quoted fee and measures its actual receipt:
 
 ```text

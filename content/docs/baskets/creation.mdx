@@ -124,8 +124,8 @@ deadline, and aggregate per-asset debit caps.
 
 ### Launch helpers are internal
 
-`launchBasketPools` and `mintBasketLaunch` are Diamond-self-only implementation
+`launchBasketPools` and `mintBasketLaunch` are internal protocol implementation
 helpers used by `createBasket`; they are not alternative public launch routes.
 `IStaticsBasketLaunchModule` is an internal composition boundary between
 `BasketFacet` and `BasketLiquidityFacet` — its selectors reject every caller
-except the Diamond itself and must not be exposed as user launch actions.
+except the protocol contract itself and must not be exposed as user launch actions.

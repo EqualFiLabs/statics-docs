@@ -46,7 +46,7 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Volatile profile** | Dollar path that mints equal USDstx + Risk Shares against assets such as WETH. |
 | **Pegged profile** | Dollar path that mints only USDstx against a pegged collateral (for example, a configured dollar-pegged asset), with separate mint/redeem fees and no Risk Shares. |
 | **Senior claim** | The USDstx side of a volatile mint — priority claim relative to Risk Shares under solvency rules. |
-| **Dollar Core** | The separate custody and solvency system for Dollar collateral (`StaticsDollarCoreDiamond` in code). |
+| **Dollar Core** | The separate custody and solvency system for Dollar collateral. |
 
 ## Lifecycle and governance
 
@@ -55,8 +55,8 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Active** | Normal basket mode: mint, redeem, borrow, and related flows allowed per facet rules. |
 | **Quarantined** | Guardian-restricted mode that blocks new exposure while preserving repay, recover, and exit paths. |
 | **ExitOnly** | Wind-down mode that disables new risk in installed facets; required before permanent liquidity can unwind to treasury. |
-| **Creation fee switch** | `creationFee() == 0` closes public basket creation (owner-only); a positive fee opens fee-gated public creation. |
-| **Public pool creation fee switch** | `poolCreationFee() == 0` limits general-pool creation to the Diamond owner; a positive fee opens exact-fee creation to anyone. Phase 1 launch configuration sets 0.01 ETH. This is separate from basket creation. |
+| **Basket creation policy** | In Phase 2, `creationFee() == 0` limits basket creation to governance; a positive fee allows paid public basket creation. This is separate from public-pool creation. |
+| **Public pool creation fee** | `poolCreationFee()` is the exact native payment to create a general pool. The Phase 1 launch configuration sets 0.01 ETH; anyone may create with exact payment. |
 | **Asset permissionless** | There is no asset allowlist: creators may name arbitrary ERC-20 addresses. This is **not** the same as open basket creation. Inclusion is not an endorsement. |
 | **Timelock** | `StaticsTimelock` delays privileged actions across the phased protocol. |
 

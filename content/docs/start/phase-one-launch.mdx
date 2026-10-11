@@ -39,7 +39,7 @@ The Robinhood mainnet Phase 1 launch scripts require these initial settings. The
 | Public hook fee default | 500 pips (5 BPS) on input and 500 pips (5 BPS) on output |
 | Revenue settlement tip | 100 BPS (1%) of the settled Treasury share |
 
-The positive pool creation fee enables public creation from launch. `quotePool(params)` returns the exact fee and any optional POL activation payment. The launch operators verify an initial public pool before governance ownership passes to the timelock. Permissioned pool creation stays owner-only, with exact creator authorization; the Safe can create an initial venue before the handoff, and later creation goes through the timelock.
+Anyone may create a public pool from launch by paying the exact creation fee. `quotePool(params)` returns that fee and any optional POL activation payment. The launch operators verify an initial public pool before governance ownership passes to the timelock. Permissioned pool creation stays owner-only, with exact creator authorization; the Safe can create an initial venue before the handoff, and later creation goes through the timelock.
 
 ## Available later, retained in these docs
 
@@ -58,4 +58,4 @@ The [Statics Genesis collection and Vault](/docs/genesis/overview) have their ow
 3. Read current onchain fees, pool state, and reward configuration immediately before preparing a transaction. Use `quotePool(params)` before public-pool creation.
 4. Treat rewards, POL growth, and trading volume as outcomes of actual funding and activity. No keeper or market activity is automatic.
 
-For builders, the phased protocol contract is named `StaticsDiamond`; the [architecture guide](/docs/core/architecture) explains its upgrade mechanism. The [integration guide](/docs/reference/integration) distinguishes Phase 1 paths from later-phase examples. The [rollout page](/docs/rollout) tracks the separate Genesis and phased-protocol releases.
+For builders, the [architecture guide](/docs/core/architecture) explains the protocol's upgrade mechanism. The [integration guide](/docs/reference/integration) distinguishes Phase 1 paths from later-phase examples. The [rollout page](/docs/rollout) tracks the separate Genesis and phased-protocol releases.

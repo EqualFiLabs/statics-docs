@@ -13,7 +13,7 @@ Phase 1 has a separate permissioned Uniswap v4 path for venues whose access and 
 
 ## Creation and control
 
-Only the Diamond owner can create a permissioned pool. During launch, the governance Safe may create an initial venue before handing ownership to the timelock; later creation is timelocked. Its creator must authorize the exact initial terms with an EIP-712 or ERC-1271 signature. `quotePermissionedPool(params)` returns the PoolKey, PoolId, normalized price, and authorization digest before `createPermissionedPool(params, creatorAuthorization)` is submitted through the current owner. Creation records the creator, controller, native LP fee, tick spacing, and venue agreement hash.
+Only the protocol owner can create a permissioned pool. During launch, the governance Safe may create an initial venue before handing ownership to the timelock; later creation is timelocked. Its creator must authorize the exact initial terms with an EIP-712 or ERC-1271 signature. `quotePermissionedPool(params)` returns the PoolKey, PoolId, normalized price, and authorization digest before `createPermissionedPool(params, creatorAuthorization)` is submitted through the current owner. Creation records the creator, controller, native LP fee, tick spacing, and venue agreement hash.
 
 The creator selects a venue controller. The default controller supports operator-managed admission, and another compatible controller may implement different venue rules. Later terms or controller replacement require creator authorization and governance execution; the replacement path installs a compatible halted controller first. A stale nonce, wrong agreement hash, or wrong controller invalidates the authorization.
 

@@ -8,25 +8,25 @@ updated: 2026-10-10
 order: 20
 ---
 
-Statics Genesis is live, while the Statics protocol follows a staged rollout. The main protocol keeps the same `StaticsDiamond` address as later selectors are added by timelocked cuts. A source file containing a facet does not mean a particular deployed Diamond exposes it.
+Statics Genesis is live, while the Statics protocol follows a staged rollout. The main protocol keeps the same address as later features are added through timelocked upgrades. A source file containing a feature does not mean a particular deployed protocol version exposes it.
 
 ## Deployment shape
 
-| Release | Main Diamond surface |
+| Release | Main protocol features |
 | --- | --- |
-| Statics Genesis | STATICS token, Doppler market, Operators, Vault, vesting, fee receiver, and direct reward contracts; no staged Diamond is required. |
+| Statics Genesis | STATICS token, Doppler market, Operators, Vault, vesting, fee receiver, and direct reward contracts; the staged protocol contract is not required. |
 | Phase 1 | Public and permissioned pools, PositionNFT, global STATICS staking, range gauges, rewards, and managed POL. **32 facets / 226 selectors** in the source plan. |
-| Phase 2 | Baskets, self-backed lending, flash composition, and Diamond-side Genesis integration. **44 facets / 318 selectors** cumulatively. |
-| Phase 3 | Statics Dollar gateway and a separate Core Diamond for collateral and solvency. **49 facets / 376 selectors** on the main Diamond; Core has 11 facets / 95 selectors in the full plan. |
-| Phase 4 | Morpho integration. **54 facets / 403 selectors** on the main Diamond. |
+| Phase 2 | Baskets, self-backed lending, flash composition, and protocol-side Genesis integration. **44 facets / 318 selectors** cumulatively. |
+| Phase 3 | Statics Dollar gateway and a separate Dollar Core contract for collateral and solvency. **49 facets / 376 selectors** on the main protocol; Core has 11 facets / 95 selectors in the full plan. |
+| Phase 4 | Morpho integration. **54 facets / 403 selectors** on the main protocol. |
 
-The accepted [phase plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) and `StaticsProtocolPlan.sol` assign the selector sets. Later cuts reuse the same main Diamond; the separate Dollar Core is added in Phase 3. A release manifest and live selector/interface checks determine what is actually installed.
+The accepted [phase plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) and `StaticsProtocolPlan.sol` assign the selector sets. Later upgrades reuse the same main protocol address; the separate Dollar Core is added in Phase 3. A release manifest and live selector/interface checks determine what is actually installed.
 
 ## Phase 1 call and custody paths
 
 ```text
 Users and integrators
-    ├── StaticsDiamond: PositionNFT, public-pool registry, staking, rewards, gauges
+    ├── Protocol contract: PositionNFT, public-pool registry, staking, rewards, gauges
     ├── ordinary Uniswap v4 periphery: external LP positions and native LP fees
     └── trusted permissioned router/position manager: venue-approved actions
 
@@ -39,9 +39,9 @@ StaticsLiquidityManager
     └── custody-constrained managed POL positions
 ```
 
-The Diamond is the shared PositionNFT and protocol action address. The public liquidity manager binds the Diamond, PoolManager, PositionManager, and Permit2. Public hook revenue and POL reservations are accounted in the Diamond, while native v4 LP fees remain Uniswap position accounting. Permissioned pools have a separate hook and no POL.
+The protocol is the shared PositionNFT and action address. The public liquidity manager binds the protocol, PoolManager, PositionManager, and Permit2. Public hook revenue and POL reservations are accounted in the protocol, while native v4 LP fees remain Uniswap position accounting. Permissioned pools have a separate hook and no POL.
 
-`StaticsTimelock` owns the main Diamond. Governance changes and facet cuts follow its delay; a guardian can stop specified ingress or swaps. Later Phase 3 Core has a separate custody and solvency boundary under the intended shared governance. This does not merge its collateral with Diamond reservations.
+After the launch handoff, `StaticsTimelock` owns the main protocol contract. Governance changes and upgrades follow its delay; a guardian can stop specified ingress or swaps. Later Phase 3 Core has a separate custody and solvency boundary under the intended shared governance. This does not merge its collateral with protocol reservations.
 
 ## Read a deployment, not a final-state diagram
 

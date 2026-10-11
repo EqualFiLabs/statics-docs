@@ -15,20 +15,13 @@ Phase 1 general pools are Statics-hooked Uniswap v4 markets. They can pair two c
 This page describes the current Phase 1 source. This site does not yet provide a verified Phase 1 mainnet protocol address or matching ABI. Confirm the release manifest before transacting.
 :::
 
-## Creation access and quote
+## Creation fee and quote
 
-`poolCreationFee()` is separate from the basket and PositionNFT creation fees.
-
-| Current fee | Who can call `createPool` |
-| --- | --- |
-| Zero | Protocol governance only, paying zero creation fee |
-| Positive | Any caller paying the exact quoted native fee |
-
-The Robinhood mainnet Phase 1 launch configuration sets the creation fee to **0.01 ETH**, opening public creation from launch. Every caller pays the exact fee, which is forwarded to Treasury. This is a source launch setting, not proof of a live deployment. Before a transaction, read `poolCreationFee()`, call `quotePool(params)`, and use its sorted PoolKey, PoolId, normalized initial price, creation fee, optional managed-POL activation fee, total native fee, and creator-authorization digest. Requote if configuration or pool state changes.
+The Robinhood mainnet Phase 1 launch configuration sets `poolCreationFee()` to **0.01 ETH**. Anyone can create a public pool by paying the exact fee, which is forwarded to Treasury. This fee is separate from basket and PositionNFT creation fees. It is a source launch setting, not proof of a live deployment. Before a transaction, read `poolCreationFee()`, call `quotePool(params)`, and use its sorted PoolKey, PoolId, normalized initial price, creation fee, optional managed-POL activation fee, total native fee, and creator-authorization digest. Requote if configuration or pool state changes.
 
 A creator chooses the pair, static native v4 LP fee from 0 through 999,999 pips, tick spacing, initial raw-unit B-per-A price, bilateral hook-fee rate, creator address, and whether to activate managed POL at creation. Each creator-selected hook-fee leg must be at least **10 pips**; the two legs together may not exceed **20,000 pips (200 BPS)**. The launch default is 500 pips per leg, but a creator may choose a lower rate. Dynamic v4 fees are not accepted. PoolId includes the currencies, native LP fee, tick spacing, and hook; another native LP fee or tick spacing makes a distinct market.
 
-Creator authorization uses EIP-712 domain version `5` with EOA or ERC-1271 signatures when required. The signed `CreatePool` fields include `inputFeePips` and `outputFeePips`; an older signature using BPS fields or domain version `4` does not match. A direct creator can create without a signature while public creation is open. Owner creation and relayed creation have their own authorization rules; use the quoted digest and current contract interface rather than reusing an old signed intent. `invalidatePoolCreationNonce` cancels an unused authorization.
+Creator authorization uses EIP-712 domain version `5` with EOA or ERC-1271 signatures when required. The signed `CreatePool` fields include `inputFeePips` and `outputFeePips`; an older signature using BPS fields or domain version `4` does not match. A direct creator can create without a signature. Relayed creation requires the creator's authorization; use the quoted digest and current contract interface rather than reusing an old signed intent. `invalidatePoolCreationNonce` cancels an unused authorization.
 
 ## Pool creation and liquidity are separate
 

@@ -34,7 +34,7 @@ greatest threshold not exceeding the action size.
 
 ## Minting
 
-The caller supplies per-asset maximums. The Diamond measures inbound receipts,
+The caller supplies per-asset maximums. The protocol measures inbound receipts,
 credits only the backing increase to the basket vault, moves the measured fee to
 the global fee account, and mints the requested BasketTokens.
 
@@ -55,7 +55,7 @@ a PositionNFT as [basket collateral](/docs/lending/overview).
 
 ## Redemption
 
-The Diamond burns BasketTokens, reduces basket backing, transfers the receiver's
+The protocol burns BasketTokens, reduces basket backing, transfers the receiver's
 net assets subject to per-asset minimums, and moves the fee to the global fee
 account. The position path is `redeemBasketCollateral`. Locked collateral cannot
 be withdrawn or redeemed.

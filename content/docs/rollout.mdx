@@ -32,9 +32,9 @@ The [Phase 1 launch guide](/docs/start/phase-one-launch) covers the first stage.
 
 Later phases remain documented for planning. Their presence in source code does not mean they are available on a given network. Check the active release before using them.
 
-## Creation access in Phase 1
+## Pool creation in Phase 1
 
-Public general-pool creation has its own `poolCreationFee()` switch. The Robinhood mainnet Phase 1 launch configuration sets **0.01 ETH**, so any caller may create a pool with exact payment. A later zero setting would restrict creation to the Diamond owner. Permissioned venues remain owner-created with exact creator authorization: the Safe can create one during launch, and the timelock owns later actions. Basket creation has a separate `creationFee()` switch and belongs to Phase 2. These are source-plan settings until a matching deployed manifest and onchain configuration are verified.
+The Robinhood mainnet Phase 1 launch configuration sets the public `poolCreationFee()` to **0.01 ETH**. Anyone may create a general pool with exact payment. Permissioned venues remain owner-created with exact creator authorization: the Safe can create one during launch, and the timelock owns later actions. Basket creation has a separate fee and belongs to Phase 2. These are source-plan settings until a matching deployed manifest and onchain configuration are verified.
 
 ## Outcomes and deployment evidence
 
@@ -44,4 +44,4 @@ Before Phase 1 deployment instructions become actionable, publish a Phase 1 main
 
 ## For builders: source-plan counts
 
-The accepted [deployment plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) assigns functions to a staged contract. The current source plan is cumulative: Phase 1 has 32 facets, 226 selectors; Phase 2 has 44 facets, 318 selectors; Phase 3 has 49 facets, 376 selectors; and Phase 4 has 54 facets, 403 selectors. These counts describe source code, not a verified deployment. The main protocol contract is named `StaticsDiamond` in code.
+The accepted [deployment plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) assigns functions to the protocol contract. The current source plan is cumulative: Phase 1 has 32 facets, 226 selectors; Phase 2 has 44 facets, 318 selectors; Phase 3 has 49 facets, 376 selectors; and Phase 4 has 54 facets, 403 selectors. These counts describe source code, not a verified deployment.

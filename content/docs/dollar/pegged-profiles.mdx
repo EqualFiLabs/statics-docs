@@ -52,7 +52,7 @@ Before allowance-backed execution:
 3. call `mintPeggedAndRecombine` with a fresh maximum pegged input, minimum
    volatile output, and receiver.
 
-The gateway mints the exact Dollar amount directly to the Diamond, pulls the
+The gateway mints the exact Dollar amount directly to the protocol, pulls the
 caller's matching Risk Shares, and burns both claims through ordinary Core
 recombination in the same transaction. The caller never receives the temporary
 Dollar. `mintPeggedAndRecombineWithPermit` replaces only the pegged-token
