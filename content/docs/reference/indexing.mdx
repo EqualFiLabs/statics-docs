@@ -21,9 +21,10 @@ unstake, dollar mint/recombine/pegged mint/redeem, Risk liquidity and incentive
 funding, governance lifecycle transitions, and swap-fee hook settlement.
 
 :::note
-Use the generated ABIs in [`@statics-protocol/sdk`](/docs/reference/sdk) to
-decode event topics and payloads exactly. Event signatures must match the
-deployed facet bytecode; do not hand-encode them.
+Compile the interfaces from the [deployed Phase 1 source commit](/docs/reference/phase-one-deployment)
+and check event signatures against installed facets before decoding. The SDK
+has generated ABIs, but this docs release does not certify an SDK build against
+the deployment. Do not hand-encode event topics or payloads.
 :::
 
 ## Suggested read models

@@ -95,7 +95,8 @@ const revenueTip = requireMatch(
   "Phase 1 revenue settlement tip",
 )?.[1];
 if (revenueTip) requireText(launchGuide, `${revenueTip.replaceAll("_", ",")} BPS`, "Phase 1 revenue settlement tip");
-requireText(phaseOneConfig, "poolCreationFee != LAUNCH_POOL_CREATION_FEE", "mainnet pool fee guard");
+requireText(phaseOneConfig, "poolCreationFee != INITIAL_POOL_CREATION_FEE", "initial mainnet pool fee guard");
+requireText(phaseOneConfig, "config.poolCreationFeeAmount = LAUNCH_POOL_CREATION_FEE", "post-pool public creation fee handoff");
 
 const mainnetManifest = read(staticsRoot, "deployments/robinhood-chain-4663.json");
 const hookFeeGuide = read(ROOT, "content/docs/liquidity/swap-fee-hook.mdx");

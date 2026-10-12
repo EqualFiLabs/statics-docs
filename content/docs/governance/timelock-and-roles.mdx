@@ -4,21 +4,22 @@ slug: governance/timelock-and-roles
 label: Timelock & roles
 title: Timelock and roles
 description: Timelocked governance of Statics Phase 1 and the later Dollar Core, with guardian and treasury roles.
-updated: 2026-10-10
+updated: 2026-10-11
 order: 610
 ---
 
-The Phase 1 launch sequence configures the protocol contract under the deployment
-signer, transfers ownership to the governance Safe for initial pool creation and
-verification, then transfers ownership to `StaticsTimelock`. After that handoff,
-Protocol upgrades, economic configuration, lifecycle release, hook-fee changes, and
-treasury or guardian changes flow through the timelock. Fee-paid public pool
-creation needs no governance transaction. The separate Dollar Core contract
-arrives in Phase 3 under the intended shared governance.
+The Phase 1 deployment configured the protocol contract under the deployment
+signer, created four public pools, and transferred ownership to the governance
+Safe. At the [verification block](/docs/reference/phase-one-deployment), the Safe
+still owned the protocol. `StaticsTimelock` was deployed, but the final ownership
+handoff had not occurred. After that handoff, protocol upgrades, economic
+configuration, lifecycle release, hook-fee changes, and treasury or guardian
+changes flow through the timelock. Fee-paid public pool creation needs no
+governance transaction. The separate Dollar Core contract arrives in Phase 3.
 
 ## Delay
 
-The timelock constructor sets a **24-hour** minimum delay on production chains. Local development uses a two-minute delay. Verify the deployed timelock delay before treating a governance operation as executable.
+The Robinhood mainnet timelock had a **24-hour** minimum delay at verification. Local development uses a two-minute delay. Verify the current deployed delay and protocol owner before treating a governance operation as executable.
 
 :::warning
 A local development delay is not a production governance setting. Check the deployed contract and scheduled operation before acting.
@@ -29,16 +30,16 @@ A local development delay is not a production governance setting. Check the depl
 | Role | Held by | Power |
 | --- | --- | --- |
 | Proposer | Configured multisig | Schedule timelocked operations |
-| Canceller | Configured multisig | Cancel scheduled operations |
+| Canceller | Governance Safe at Phase 1 verification | Cancel scheduled operations |
 | Executor | Open (`address(0)`) | Execute once delay elapses |
-| Guardian | Emergency role | Pause exposure-increasing actions and quarantine baskets |
+| Guardian | Governance Safe at Phase 1 verification | Pause exposure-increasing actions; basket quarantine arrives in Phase 2 |
 | Treasury | Configured | Receives terminal fee distributions |
 
-The emergency guardian is **not** a timelock canceller. The timelock is its own admin.
+At this deployment, the governance Safe also holds the guardian and timelock canceller roles. These are separate permissions even though one address holds them. The timelock is its own admin.
 
 ## What the timelock controls
 
-After the launch handoff, the timelock controls protocol upgrades, economic configuration, lifecycle
+After the Safe-to-timelock handoff, the timelock controls protocol upgrades, economic configuration, lifecycle
 release and decommissioning, hook fee configuration, and treasury or guardian
 changes. Reward-asset selection is a PositionNFT owner action and requires no
 governance admission or retirement.

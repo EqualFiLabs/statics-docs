@@ -4,7 +4,7 @@ slug: rollout
 label: Rollout and availability
 title: Rollout and availability
 description: Track Statics Genesis and each stage of the Statics protocol.
-updated: 2026-10-10
+updated: 2026-10-11
 order: 15
 ---
 
@@ -13,7 +13,7 @@ Statics Genesis is live, and the Statics protocol has its own staged rollout. Ch
 | Context | Status recorded in these repositories | What belongs there |
 | --- | --- | --- |
 | Statics Genesis on Robinhood mainnet | Launched | Fixed token supply, Doppler market, Operators collection, Vault backing, treasury vesting, fee ingress, and direct Genesis rewards. |
-| Statics Phase 1 protocol on Robinhood mainnet | Phase 1 source and deployment tooling are implemented; this site has no verified Phase 1 mainnet address yet | [Phase 1](/docs/start/phase-one-launch) includes markets, positions, staking, rewards, gauges, and POL. Later phases add baskets, Dollar, and Morpho. |
+| Statics Phase 1 protocol on Robinhood mainnet | Deployed and verified at block 86,352,823; market liquidity and gauge activation were still pending in that snapshot | [Phase 1](/docs/start/phase-one-launch) includes markets, positions, staking, rewards, gauges, and POL. The [deployment snapshot](/docs/reference/phase-one-deployment) lists addresses and four public pools. Later phases add baskets, Dollar, and Morpho. |
 
 ## Genesis is a separate launch
 
@@ -34,13 +34,13 @@ Later phases remain documented for planning. Their presence in source code does 
 
 ## Pool creation in Phase 1
 
-The Robinhood mainnet Phase 1 launch configuration sets the public `poolCreationFee()` to **0.01 ETH**. Anyone may create a general pool with exact payment. Permissioned venues remain owner-created with exact creator authorization: the Safe can create one during launch, and the timelock owns later actions. Basket creation has a separate fee and belongs to Phase 2. These are source-plan settings until a matching deployed manifest and onchain configuration are verified.
+The Robinhood mainnet Phase 1 deployment verified `poolCreationFee()` at **0.01 ETH**. Anyone may create a general pool with exact payment. Permissioned venues remain owner-created with exact creator authorization. At verification, the Safe owned the protocol; a later handoff to the timelock remains separate. Basket creation has a separate fee and belongs to Phase 2. Read current onchain values before submitting a transaction.
 
 ## Outcomes and deployment evidence
 
 Supply, deployed bytecode, configuration, and transactions are verifiable facts. Future volume, rewards, POL growth, arbitrage, and token prices depend on market activity and funding. A source document or ABI alone does not establish deployment.
 
-Before Phase 1 deployment instructions become actionable, publish a Phase 1 mainnet manifest with verified addresses, runtime hashes, active selector/interface inventory, governance and fee configuration, matching ABI/SDK revision, transaction provenance, and release validation.
+The [Phase 1 mainnet snapshot](/docs/reference/phase-one-deployment) publishes verified addresses, runtime hashes, governance and fee configuration, pool IDs, and transaction provenance. It does not bundle a compiled ABI or certify an SDK build, and explorer source verification was not performed. Check installed selectors, current ownership, liquidity, and gauges before use.
 
 ## For builders: source-plan counts
 

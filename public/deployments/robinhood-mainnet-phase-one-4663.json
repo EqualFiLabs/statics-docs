@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "network": "Robinhood Chain mainnet",
+  "chainId": 4663,
+  "sourceCommit": "03c6d23cd8207c6f69b6b9a53b56f103c30ee52c",
+  "verificationArtifactSha256": "0xe0619ea9c35d778e43e628e47c36c391c9fa615f46dab0c6bfb1fe309a52ca8b",
+  "verifiedAt": "2026-10-12T03:19:27.144953+00:00",
+  "verifiedAtBlock": 86352823,
+  "deploymentFirstBlock": 86344857,
+  "deploymentLastBlock": 86350098,
+  "roles": {
+    "owner": "0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff",
+    "guardian": "0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff",
+    "treasury": "0x0Ce4140f3Ab03024623a75F248D467912C7E1725"
+  },
+  "contracts": {
+    "protocol": {
+      "address": "0x612aC07E3A60e16F1CC7B2c1Fd3DbEB474515DAa",
+      "runtimeCodeHash": "0xcce698f01bc8c4d45f5cf6ec59676102913be834fd5624f4debe4f594c26b416"
+    },
+    "positionNFT": {
+      "address": "0x612aC07E3A60e16F1CC7B2c1Fd3DbEB474515DAa"
+    },
+    "timelock": {
+      "address": "0x7D20D3854aF5Cd018d07Ed9765e42150b96cDEcd",
+      "runtimeCodeHash": "0x659df20848aa51c0bafc960781566298a5479bd786ca210c6dbfe4cc9f113331"
+    },
+    "publicHook": {
+      "address": "0x2a8dfC6608Dd8cC8DcB385F8876947F181c1D0ec",
+      "runtimeCodeHash": "0x0d8936534fc529c3dea8271e526b8a9eeff4db92b6997d51c77198b8060d0ec3"
+    },
+    "permissionedHook": {
+      "address": "0x8A41Ef05E5C3939c0f37429621964E911b7618E4",
+      "runtimeCodeHash": "0x4fb45b034e74567ae4712b5b1f09a94ee2404bc2addc6af1a20f83d49ca78814"
+    },
+    "liquidityManager": {
+      "address": "0xF1e44655d22cA4BdDB0EC3B8cB6d8373d5339250",
+      "runtimeCodeHash": "0xfa3debfbaeed79ad617040a906a3edc5eed7c3455784f6619fc99ac2c0dc6fa5"
+    },
+    "defaultVenueControllerFactory": {
+      "address": "0x814a20bf22D50A622545945ac21e2A8218276873",
+      "runtimeCodeHash": "0x4307827181085e2a14036b3a7e04babd25e977e96b0364eb5c8a293530ab4d9d"
+    },
+    "permissionedRouter": {
+      "address": "0x1E616e4ddc38EC2959069FeEAfFBAb1e5d3e4994",
+      "runtimeCodeHash": "0x37eaace68e1278315213624c1bd68a8f1c559115a60dec912dfdbb3907443da9"
+    },
+    "permissionedPositionManager": {
+      "address": "0x29d2467f7C43CD28Ae7ee16CB4acaF72Fc0BfFD9",
+      "runtimeCodeHash": "0x1508833872d1a3d20a0d20de040b90bcc1c1edccbe85e45e8117950fce84d385"
+    },
+    "permissionedPositionClaims": {
+      "address": "0x29DAA81584987f13233856045E1350e0A13CCCb0",
+      "runtimeCodeHash": "0xb396114145c902aa03a4af08694bbd59c848b59e560e92615670cd7408ef9d5f"
+    }
+  },
+  "fees": {
+    "positionCreationFeeWei": "1000000000000000",
+    "poolCreationFeeWei": "10000000000000000",
+    "polActivationFeeWei": "25000000000000000",
+    "revenueMaintenanceTipBps": 100,
+    "defaultHookInputFeePips": 500,
+    "defaultHookOutputFeePips": 500
+  },
+  "gauge": {
+    "activated": false,
+    "weeklyReleaseBps": 400
+  },
+  "polOperator": "0x0000000000000000000000000000000000000000",
+  "pools": [
+    {
+      "pair": "Native ETH/USDG",
+      "poolId": "0x13f24e6c80fc085440ae3a8f757b7b1b0dcaf414793dfe6dba9177a3023f325b",
+      "currency0": "0x0000000000000000000000000000000000000000",
+      "currency1": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "lpFeePips": 50,
+      "hookInputFeePips": 25,
+      "hookOutputFeePips": 25,
+      "nominalCombinedFeePips": 100,
+      "tickSpacing": 1,
+      "creator": "0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff",
+      "hook": "0x2a8dfC6608Dd8cC8DcB385F8876947F181c1D0ec",
+      "polActivated": false,
+      "activeLiquidity": "0",
+      "creationTransaction": "0x5aae9a006ff554905cd53c4355529c3e1e0579ff20666a3c0d00a5994f2ed0b3",
+      "creationBlock": 86350063,
+      "hookFeeOverridden": true
+    },
+    {
+      "pair": "STATICS/USDG",
+      "poolId": "0x20aa17212cfab902b3ac5ac7954058808a370cb6e3d8bb9f0b08a161838df19c",
+      "currency0": "0x2d8d6f4a93acd7a916a5a654ec8b690ba3b3eadd",
+      "currency1": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "lpFeePips": 200,
+      "hookInputFeePips": 1400,
+      "hookOutputFeePips": 1400,
+      "nominalCombinedFeePips": 3000,
+      "tickSpacing": 10,
+      "creator": "0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff",
+      "hook": "0x2a8dfC6608Dd8cC8DcB385F8876947F181c1D0ec",
+      "polActivated": false,
+      "activeLiquidity": "0",
+      "creationTransaction": "0x4f064f1d8a48e2e546f0c867ae4ef54c98c15a1dbab7e2867108082fc1adb930",
+      "creationBlock": 86350067,
+      "hookFeeOverridden": true
+    },
+    {
+      "pair": "STATICS/NVDA",
+      "poolId": "0x21bad15821a79029edd044f6f3c4f5ba6d0e39e2107a9656639617fc45bebabd",
+      "currency0": "0x2d8d6f4a93acd7a916a5a654ec8b690ba3b3eadd",
+      "currency1": "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+      "lpFeePips": 10000,
+      "hookInputFeePips": 2500,
+      "hookOutputFeePips": 2500,
+      "nominalCombinedFeePips": 15000,
+      "tickSpacing": 200,
+      "creator": "0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff",
+      "hook": "0x2a8dfC6608Dd8cC8DcB385F8876947F181c1D0ec",
+      "polActivated": false,
+      "activeLiquidity": "0",
+      "creationTransaction": "0x8b5f23dbf0046f286b26e22bf5e238e5a538777182f95ddeadfa58fbcd1a3cc7",
+      "creationBlock": 86350071,
+      "hookFeeOverridden": true
+    },
+    {
+      "pair": "NVDA/USDG",
+      "poolId": "0x6f0e4a348c87bd4289c9059a6ec4e3af63cba2958e1629665cb1a863892ace89",
+      "currency0": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "currency1": "0xd0601ce157db5bdc3162bbac2a2c8af5320d9eec",
+      "lpFeePips": 50,
+      "hookInputFeePips": 25,
+      "hookOutputFeePips": 25,
+      "nominalCombinedFeePips": 100,
+      "tickSpacing": 1,
+      "creator": "0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff",
+      "hook": "0x2a8dfC6608Dd8cC8DcB385F8876947F181c1D0ec",
+      "polActivated": false,
+      "activeLiquidity": "0",
+      "creationTransaction": "0x4c9cf421d3293da9100ad2dd18c7f446066d0c6de8bda1f38f67ab8f1b427e59",
+      "creationBlock": 86350091,
+      "hookFeeOverridden": true
+    }
+  ],
+  "publicCreationFeeEnabledAfterAllPoolCreations": true,
+  "ownershipTransferAfterCreationFeeEnablement": true,
+  "ownershipTransferTransaction": "0x4b5dfc8a62bb7218b6b0c9e730df0cd0f9ee210ef9445825522e3eb35c7204ca",
+  "successfulTransactionCount": 56,
+  "evidence": {
+    "coreAddressesAndInputsMatchReviewedDryRun": true,
+    "coreRuntimeHashesVerified": true,
+    "peripheryRuntimeHashesVerified": true,
+    "launchConfigurationVerified": true,
+    "poolSettingsAndCreationEventsVerified": true,
+    "explorerSourceVerificationPerformed": false
+  }
+}

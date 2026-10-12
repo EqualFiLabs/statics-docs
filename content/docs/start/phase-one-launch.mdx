@@ -4,15 +4,15 @@ slug: start/phase-one-launch
 label: Phase 1 launch
 title: Phase 1 launch guide
 description: What Statics Phase 1 includes, what follows later, and how to identify a matching deployment.
-updated: 2026-10-10
+updated: 2026-10-11
 order: 5
 badge: Phase 1
 ---
 
-**Statics Genesis is already live on Robinhood mainnet.** Phase 1 is the first stage of the separate Statics protocol; it does not redeploy Genesis. The source implements four stages. Availability on a particular chain depends on a verified deployment and its enabled features, not on code being present in `master`.
+**Statics Genesis is already live on Robinhood mainnet.** The separate Statics Phase 1 protocol is now deployed there. Phase 1 does not redeploy Genesis. The source implements four stages; only the installed features and their current configuration are available on a particular chain.
 
-:::warning Deployment status
-This site does not yet publish a verified Robinhood mainnet Phase 1 protocol address or matching ABI. Wait for the release manifest before sending Phase 1 transactions.
+:::warning Check market readiness
+The [Phase 1 deployment snapshot](/docs/reference/phase-one-deployment) publishes the verified protocol address and four pool IDs. At verification, those pools had no active liquidity, gauges were not activated, and the Safe still owned the protocol. This site does not bundle a matching compiled ABI. Confirm current onchain state and installed selectors before submitting a transaction.
 :::
 
 ## In Phase 1
@@ -25,21 +25,21 @@ This site does not yet publish a verified Robinhood mainnet Phase 1 protocol add
 | [Range gauges](/docs/liquidity/canonical-lp-rewards) | PositionNFT-managed v4 liquidity, native LP fees, protocol STATICS incentives, four direct-funded reward slots, allocator rewards, and claims. |
 | [Managed POL](/docs/liquidity/permanent-liquidity) | Claim-backed inventory and explicit custody-constrained position management outside the swap callback. |
 
-Phase 1 also includes timelocked configuration, guardian stops, treasury accounting, creator revenue, reward restrictions, bounded market views, and atomic reward batches. See the [protocol's accepted launch plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) for the exact selector and audit boundary.
+Phase 1 also includes a deployed timelock awaiting ownership handoff, guardian stops, treasury accounting, creator revenue, reward restrictions, bounded market views, and atomic reward batches. See the [protocol's accepted launch plan](https://github.com/EqualFiLabs/statics/blob/master/docs/adr/staged-phase-one-launch.md) for the exact selector and audit boundary.
 
 ## Phase 1 launch fees
 
-The Robinhood mainnet Phase 1 launch scripts require these initial settings. They are **source configuration, not a verified live quote**; read the matching deployment and current onchain values before transacting.
+The [deployment snapshot](/docs/reference/phase-one-deployment) verified these Robinhood mainnet values at block **86,352,823**. They can change through governance; read current onchain values before transacting.
 
 | Action or rate | Phase 1 mainnet launch setting |
 | --- | ---: |
-| Create a public pool | 0.01 ETH, paid exactly by every caller |
+| Create a public pool after fee activation | 0.01 ETH, paid exactly by each caller |
 | Create a PositionNFT | 0.001 ETH |
 | Activate managed POL for a public pool | 0.025 ETH, only if activated |
 | Public hook fee default | 500 pips (5 BPS) on input and 500 pips (5 BPS) on output |
 | Revenue settlement tip | 100 BPS (1%) of the settled Treasury share |
 
-Anyone may create a public pool from launch by paying the exact creation fee. `quotePool(params)` returns that fee and any optional POL activation payment. The launch operators verify an initial public pool before governance ownership passes to the timelock. Permissioned pool creation stays owner-only, with exact creator authorization; the Safe can create an initial venue before the handoff, and later creation goes through the timelock.
+Anyone may create a public pool by paying the exact creation fee. `quotePool(params)` returns that fee and any optional POL activation payment. Four public pools were created before ownership passed to the Safe. Permissioned pool creation stays owner-only, with exact creator authorization. The planned handoff from the Safe to the timelock had not occurred at verification.
 
 ## Available later, retained in these docs
 
@@ -53,8 +53,8 @@ The [Statics Genesis collection and Vault](/docs/genesis/overview) have their ow
 
 ## Before using a deployment
 
-1. Obtain the network-specific deployment manifest and ABI for the exact release.
-2. Verify the protocol address, available functions, connected pool contracts, and governance configuration against that manifest.
+1. Read the [network-specific Phase 1 deployment snapshot](/docs/reference/phase-one-deployment) and compile the matching ABI from the pinned source commit.
+2. Verify the protocol address, installed functions, connected pool contracts, and governance configuration against that snapshot and current onchain state.
 3. Read current onchain fees, pool state, and reward configuration immediately before preparing a transaction. Use `quotePool(params)` before public-pool creation.
 4. Treat rewards, POL growth, and trading volume as outcomes of actual funding and activity. No keeper or market activity is automatic.
 

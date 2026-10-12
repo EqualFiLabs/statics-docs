@@ -14,19 +14,23 @@ about the chain (liveness).
 
 ## Authority
 
-- One `StaticsTimelock` owns both protocol contracts. All implementation upgrades, economic
-  configuration, lifecycle release, hook fee configuration, and treasury or
-  guardian changes flow through it after delay.
+- At [Phase 1 verification](/docs/reference/phase-one-deployment), the governance Safe owned the
+  protocol; the deployed `StaticsTimelock` had a 24-hour delay, but ownership
+  had not yet passed to it. After that handoff, implementation upgrades,
+  economic configuration, lifecycle release, hook fee configuration, and
+  treasury or guardian changes flow through the timelock after delay. The
+  separate Dollar Core contract is a later Phase 3 deployment.
 - Basket creation is owner-only while `creationFee()` is zero, and open to any
   caller paying the exact fee while it is positive. Neither state constitutes
   token certification. Current deployment status is on [Rollout](/docs/rollout).
 - Changes to facet routing are the sole implementation upgrade mechanism. The intended final
-  release removes upgrade authority from both protocol contracts; until then,
-  timelocked upgradeability can change protocol behavior after delay.
+  release removes upgrade authority from both protocol contracts. Until the
+  ownership handoff, check the Safe's current authority rather than assuming
+  timelock delay applies to a protocol upgrade.
 - Reward-asset selection is a PositionNFT owner action and requires no governance
   admission.
 - Phase 1 public pools are open to any caller paying the exact configured
-  `poolCreationFee()` (0.01 ETH in the mainnet launch configuration). Creators
+  `poolCreationFee()` (0.01 ETH at mainnet verification). Creators
   receive the fixed fee share but no decommissioning or configuration authority.
 
 ## Custody

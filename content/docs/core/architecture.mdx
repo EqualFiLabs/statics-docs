@@ -41,8 +41,8 @@ StaticsLiquidityManager
 
 The protocol is the shared PositionNFT and action address. The public liquidity manager binds the protocol, PoolManager, PositionManager, and Permit2. Public hook revenue and POL reservations are accounted in the protocol, while native v4 LP fees remain Uniswap position accounting. Permissioned pools have a separate hook and no POL.
 
-After the launch handoff, `StaticsTimelock` owns the main protocol contract. Governance changes and upgrades follow its delay; a guardian can stop specified ingress or swaps. Later Phase 3 Core has a separate custody and solvency boundary under the intended shared governance. This does not merge its collateral with protocol reservations.
+At [Phase 1 deployment verification](/docs/reference/phase-one-deployment), the governance Safe owned the main protocol contract. `StaticsTimelock` was deployed, but the Safe-to-timelock ownership handoff was still pending. After that handoff, governance changes and upgrades follow the timelock delay; a guardian can stop specified ingress or swaps. Later Phase 3 Core has a separate custody and solvency boundary under the intended shared governance. This does not merge its collateral with protocol reservations.
 
 ## Read a deployment, not a final-state diagram
 
-The Statics Genesis mainnet manifest and eventual Phase 1 mainnet manifest are different artifacts. Match every address and ABI to its own release. See [Phase 1 launch](/docs/start/phase-one-launch) and [Rollout](/docs/rollout).
+The Statics Genesis mainnet manifest and the [Phase 1 mainnet snapshot](/docs/reference/phase-one-deployment) are different artifacts. Match every address and ABI to its own release. See [Phase 1 launch](/docs/start/phase-one-launch) and [Rollout](/docs/rollout).

@@ -12,12 +12,12 @@ badge: Phase 1
 `StaticsSwapFeeHook` charges a configured fee on both realized swap legs of a registered public pool. This **hook fee is separate from the creator-selected native Uniswap v4 LP fee**. A user LP earns the native fee through PositionManager accounting; Statics routes the bilateral hook fee through its own reservations.
 
 :::warning Source and deployment
-These are current Phase 1 source defaults. Read the actual fee rates and allocation on the target release before quoting a trade.
+The [Phase 1 deployment snapshot](/docs/reference/phase-one-deployment) verified the protocol default and four pool-specific fee overrides. Read the current rate and allocation for the target PoolId before quoting a trade.
 :::
 
 ## Rates and allocation
 
-Hook-fee rates use **pips**, where 1 pip is one millionth of an amount. The source launch default is **500 pips (5 BPS, 0.05%) on input and 500 pips on output**. The combined configured rate cannot exceed **20,000 pips (200 BPS)**. A general-pool creator can select an initial rate as low as **10 pips (0.001%) per leg**, including rates below the live default. Selecting exactly the live default inherits future default changes; any other selection stores both legs as a fixed PoolId override. Governance can change the default, replace a PoolId override, or clear one back to inheritance. The creator has no post-creation fee setter.
+Hook-fee rates use **pips**, where 1 pip is one millionth of an amount. The verified protocol default was **500 pips (5 BPS, 0.05%) on input and 500 pips on output**. All four launch pools used their own overrides, ranging from 25 to 2,500 pips per leg; see the [pool table](/docs/reference/phase-one-deployment). The combined configured rate cannot exceed **20,000 pips (200 BPS)**. A general-pool creator can select an initial rate as low as **10 pips (0.001%) per leg**, including rates below the default. Selecting exactly the live default inherits future default changes; any other selection stores both legs as a fixed PoolId override. Governance can change the default, replace a PoolId override, or clear one back to inheritance. The creator has no post-creation fee setter.
 
 The current source profiles allocate collected bilateral fees as follows. Basket canonical pools are a **Phase 2** path.
 

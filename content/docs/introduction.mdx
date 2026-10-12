@@ -6,17 +6,17 @@ eyebrow: Protocol docs
 title: Statics Protocol
 description: Statics Genesis, the Phase 1 market and reward launch, and the later basket, credit, Dollar, and Morpho phases.
 status: Protocol docs
-updated: 2026-10-10
+updated: 2026-10-11
 order: 10
 ---
 
 Statics is staged financial infrastructure for onchain assets. **Statics Genesis** established the STATICS token, Doppler market, Operators collection, and backing system on Robinhood mainnet. Statics Phase 1 adds public and permissioned Uniswap v4 markets, PositionNFT accounts, STATICS staking, rewards, range gauges, and managed protocol-owned liquidity.
 
-The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what Phase 1 includes. The [rollout](/docs/rollout) separates source readiness from a verified deployment. This site does not yet publish a verified Phase 1 mainnet protocol address.
+The [Phase 1 launch guide](/docs/start/phase-one-launch) shows what Phase 1 includes. The [deployment snapshot](/docs/reference/phase-one-deployment) publishes the Robinhood mainnet protocol address and four public pools. Check live liquidity, gauges, and governance before use.
 
 ## What Phase 1 enables
 
-- **Create and trade public pools:** two compatible ERC-20s or native ETH with an ERC-20. The Phase 1 launch configuration sets a 0.01 ETH [creation fee](/docs/liquidity/protocol-pools), allowing anyone to create a pool with exact payment and the required creator authorization. Confirm the deployed fee before submitting a transaction.
+- **Create and trade public pools:** two compatible ERC-20s or native ETH with an ERC-20. The verified launch [creation fee](/docs/liquidity/protocol-pools) was 0.01 ETH, allowing anyone to create a pool with exact payment and the required creator authorization. Confirm the current fee and pool liquidity before submitting a transaction.
 - **Run a permissioned venue:** governance creates a pool with creator-authorized terms, a separate hook, controller, trusted routing, and approved liquidity positions. See [Permissioned pools](/docs/liquidity/permissioned-pools).
 - **Provide liquidity:** earn the creator-selected native v4 LP fee, and optionally manage a v4 NFT under a [PositionNFT range gauge](/docs/liquidity/canonical-lp-rewards) for separately funded rewards.
 - **Stake STATICS:** choose reward assets, pass the eligibility delay, claim accrued fees, and allocate raw stake to protocol-funded pool incentives. See [Global rewards](/docs/rewards/global-rewards).
