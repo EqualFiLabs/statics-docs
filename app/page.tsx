@@ -16,7 +16,7 @@ const capabilities = [
   },
   {
     title: "Phase 1 public markets",
-    body: "Curated hooked markets at launch, with ERC-20 and native ETH pairs, separate v4 LP and bilateral hook fees, and a governed path to open creation.",
+    body: "Fee-paid public markets at launch, with ERC-20 and native ETH pairs, separate v4 LP and bilateral hook fees, and creator-selected initial fee rates.",
     href: "/docs/liquidity/protocol-pools",
   },
   {
@@ -50,13 +50,13 @@ const capabilities = [
     href: "/docs/start/phase-one-launch",
   },
   {
-    title: "Verify availability",
-    body: "Statics Genesis is live. Check launch status and verified addresses before using Phase 1 features.",
-    href: "/docs/rollout",
+    title: "Phase 1 deployment",
+    body: "See verified Robinhood mainnet addresses and four launch pools. Check current liquidity, gauge activation, and governance before use.",
+    href: "/docs/reference/phase-one-deployment",
   },
   {
     title: "Governed lifecycle",
-    body: "Timelocked configuration and guardian stops bound the launch markets and staking paths.",
+    body: "The governance Safe currently owns Phase 1; a deployed timelock and guardian controls define the next governance stage.",
     href: "/docs/governance/timelock-and-roles",
   },
 ];
@@ -77,7 +77,7 @@ const personas = [
     links: [
       { label: "Public pools", href: "/docs/liquidity/protocol-pools" },
       { label: "Permissioned venues", href: "/docs/liquidity/permissioned-pools" },
-      { label: "Launch status", href: "/docs/rollout" },
+      { label: "Deployment", href: "/docs/reference/phase-one-deployment" },
     ],
   },
   {
@@ -94,6 +94,7 @@ const personas = [
     body: "Match the ABI and manifest to the target deployment, then feature-detect the installed phase and use current onchain quotes.",
     links: [
       { label: "Integration", href: "/docs/reference/integration" },
+      { label: "Deployment", href: "/docs/reference/phase-one-deployment" },
       { label: "SDK", href: "/docs/reference/sdk" },
       { label: "Protocol code", href: PROTOCOL_SOURCE_URL },
     ],
@@ -116,7 +117,7 @@ export default function HomePage() {
           <h1>Build lasting utility around onchain assets.</h1>
           <p className="lede">
             Statics Phase 1 brings hooked public and permissioned markets, PositionNFTs, STATICS staking,
-            range rewards, and managed protocol liquidity. Statics Genesis is already live.
+            range rewards, and managed protocol liquidity. Phase 1 and Statics Genesis are deployed on Robinhood mainnet; check the Phase 1 snapshot for current readiness limits.
             Later Statics phases add baskets, lending, Dollar, and Morpho; those features remain documented here.
           </p>
           <div className="landing-actions">

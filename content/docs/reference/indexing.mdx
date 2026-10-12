@@ -21,23 +21,24 @@ unstake, dollar mint/recombine/pegged mint/redeem, Risk liquidity and incentive
 funding, governance lifecycle transitions, and swap-fee hook settlement.
 
 :::note
-Use the generated ABIs in [`@statics-protocol/sdk`](/docs/reference/sdk) to
-decode event topics and payloads exactly. Event signatures must match the
-deployed facet bytecode; do not hand-encode them.
+Compile the interfaces from the [deployed Phase 1 source commit](/docs/reference/phase-one-deployment)
+and check event signatures against installed facets before decoding. The SDK
+has generated ABIs, but this docs release does not certify an SDK build against
+the deployment. Do not hand-encode event topics or payloads.
 :::
 
 ## Suggested read models
 
 | Model | Keyed by | Backed by |
 | --- | --- | --- |
-| Position | `(chainId, StaticsDiamond, positionId)` | `positionState`, `isLegActive`, `IPositionOwnerIndex` enumeration |
+| Position | `(chainId, protocolAddress, positionId)` | `positionState`, `isLegActive`, `IPositionOwnerIndex` enumeration |
 | Basket | `basketId` | basket config, supply, backing, reward state |
 | Loan tranche | `loanId` | stored principal vector, maturity, lock state |
 | Dollar series | `(profileId, seriesId)` | series state, Risk liquidity, incentive reserves |
 | Custody | `token` | `globalReservedByToken`, per-account reservations |
 | Genesis | `(chainId, StaticsGenesis, genesisId)` | ownership/lock state, registration, activation, direct reward views, and `genesisOwnerClaimable` |
-| Protocol pool | `(chainId, StaticsDiamond, poolId)` | `protocolPool`, creator, PoolId-local fee rate, class allocation, hook POL, and v4 state |
-| Creator credit | `(chainId, StaticsDiamond, creator, asset)` | creator revenue accrual/claim events and current credit views |
+| Protocol pool | `(chainId, protocolAddress, poolId)` | `protocolPool`, creator, PoolId-local fee rate, class allocation, hook POL, and v4 state |
+| Creator credit | `(chainId, protocolAddress, creator, asset)` | creator revenue accrual/claim events and current credit views |
 | Treasury vesting | `(chainId, vesting contract)` | native token schedule, released Operator range, recipient, and releasable amounts |
 
 The PositionNFT owner index (`positionCount`, `positionsOfOwner`) lets an indexer

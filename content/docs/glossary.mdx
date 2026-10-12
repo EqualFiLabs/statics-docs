@@ -20,7 +20,7 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Bundle amount** | How many units of a constituent back one full BasketToken (scaled to 18 decimals in accounting). |
 | **Genesis basket** | A basket created by protocol governance while public creation is closed (`creationFee = 0`). |
 | **Canonical pool** | The single Uniswap v4 BasketToken/constituent pool registered for each constituent at basket creation. |
-| **General pool** | A Phase 1 public-hook Uniswap v4 pool between two compatible ERC-20s or native ETH and an ERC-20, with no basket association. Creation is initially owner-curated and can become fee-gated open creation. |
+| **General pool** | A Phase 1 public-hook Uniswap v4 pool between two compatible ERC-20s or native ETH and an ERC-20, with no basket association. Launch configuration opens creation to anyone paying the exact fee. |
 | **Protocol pool** | A normalized registered market: either one basket canonical pool or one general pool. |
 | **Managed POL** | PoolId-reserved, claim-backed protocol inventory placed into explicit custody-constrained v4 positions by an authorized operator. General pools start with POL disabled. |
 | **Bilateral hook fee** | Public-pool swap fee charged on realized input and output by `StaticsSwapFeeHook`, separate from each pool's creator-selected static native v4 LP fee. |
@@ -46,7 +46,7 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Volatile profile** | Dollar path that mints equal USDstx + Risk Shares against assets such as WETH. |
 | **Pegged profile** | Dollar path that mints only USDstx against a pegged collateral (for example, a configured dollar-pegged asset), with separate mint/redeem fees and no Risk Shares. |
 | **Senior claim** | The USDstx side of a volatile mint — priority claim relative to Risk Shares under solvency rules. |
-| **Dollar Core** | The separate custody and solvency system for Dollar collateral (`StaticsDollarCoreDiamond` in code). |
+| **Dollar Core** | The separate custody and solvency system for Dollar collateral. |
 
 ## Lifecycle and governance
 
@@ -55,7 +55,8 @@ Short definitions for terms that appear throughout the docs. Linked pages carry 
 | **Active** | Normal basket mode: mint, redeem, borrow, and related flows allowed per facet rules. |
 | **Quarantined** | Guardian-restricted mode that blocks new exposure while preserving repay, recover, and exit paths. |
 | **ExitOnly** | Wind-down mode that disables new risk in installed facets; required before permanent liquidity can unwind to treasury. |
-| **Creation fee switch** | `creationFee() == 0` closes public basket creation (owner-only); a positive fee opens fee-gated public creation. |
+| **Basket creation policy** | In Phase 2, `creationFee() == 0` limits basket creation to governance; a positive fee allows paid public basket creation. This is separate from public-pool creation. |
+| **Public pool creation fee** | `poolCreationFee()` is the exact native payment to create a general pool. The Phase 1 launch configuration sets 0.01 ETH; anyone may create with exact payment. |
 | **Asset permissionless** | There is no asset allowlist: creators may name arbitrary ERC-20 addresses. This is **not** the same as open basket creation. Inclusion is not an endorsement. |
 | **Timelock** | `StaticsTimelock` delays privileged actions across the phased protocol. |
 

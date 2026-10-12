@@ -21,8 +21,8 @@ free-floating unbacked stablecoin.
 The Statics Dollar is a collateralized dollar system with a fungible senior
 token (`USDstx`), series-scoped junior Risk Shares (`ethLEV`), and two families
 of collateral profiles. The Dollar's collateral, issuance, health, insurance,
-and recovery live in the separate `StaticsDollarCoreDiamond`; users reach them
-through typed gateway functions on `StaticsDiamond`.
+and recovery live in the separate Dollar Core contract; users reach them
+through typed gateway functions on the protocol contract.
 
 ## Tokens
 
@@ -49,7 +49,7 @@ burns Dollar and returns proportional collateral less its fee.
 
 ## The gateway
 
-Users never call the Core diamond directly for ordinary actions. `StaticsDiamond`
+Users never call the Dollar Core contract directly for ordinary actions. The protocol contract
 exposes a typed gateway: `depositETH`/`depositWETH`, `recombineToWETH`/
 `recombineToETH`, pegged mint and redeem, pairing vault redemption, and the
 atomic mint-and-recompose helpers. Each typed entrypoint carries its own permit

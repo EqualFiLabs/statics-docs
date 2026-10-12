@@ -13,7 +13,7 @@ Phase 1 installs the PositionNFT account and its STATICS staking, reward, and pu
 
 One PositionNFT can own several independent legs at once. The ERC-721
 collection is named `Statics Position` with symbol `STXPOS`, and the contract
-lives at the `StaticsDiamond` address.
+lives at the protocol address.
 
 ## What a position owns
 
@@ -62,7 +62,7 @@ Dollar legs, custodied LP NFTs, and LP claims are empty.
 
 ## Modular reporting interface
 
-`StaticsDiamond` implements the pre-ERC Modular Position NFT reporting interface
+The protocol implements the pre-ERC Modular Position NFT reporting interface
 (`0x212b8e93`):
 
 - `positionState` reports current existence, a structural nonce, active-leg

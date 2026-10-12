@@ -80,6 +80,31 @@ for (const phrase of ["native ETH/ERC-20", "Permissioned venues", "Range gauges"
   requireText(launchGuide, phrase, `Phase 1 launch guide ${phrase}`);
 }
 
+const phaseOneConfig = read(staticsRoot, "script/ConfigureStaticsPhaseOneLiquidity.s.sol");
+for (const [constant, label] of [
+  ["LAUNCH_POSITION_CREATION_FEE", "PositionNFT creation fee"],
+  ["LAUNCH_POOL_CREATION_FEE", "public pool creation fee"],
+  ["LAUNCH_POL_ACTIVATION_FEE", "managed POL activation fee"],
+]) {
+  const value = requireMatch(phaseOneConfig, new RegExp(`\\b${constant}\\s*=\\s*([\\d.]+) ether;`), label)?.[1];
+  if (value) requireText(launchGuide, `${value} ETH`, label);
+}
+const revenueTip = requireMatch(
+  phaseOneConfig,
+  /LAUNCH_REVENUE_TIP_BPS\s*=\s*([\d_]+);/,
+  "Phase 1 revenue settlement tip",
+)?.[1];
+if (revenueTip) requireText(launchGuide, `${revenueTip.replaceAll("_", ",")} BPS`, "Phase 1 revenue settlement tip");
+requireText(phaseOneConfig, "poolCreationFee != INITIAL_POOL_CREATION_FEE", "initial mainnet pool fee guard");
+requireText(phaseOneConfig, "config.poolCreationFeeAmount = LAUNCH_POOL_CREATION_FEE", "post-pool public creation fee handoff");
+
+const mainnetManifest = read(staticsRoot, "deployments/robinhood-chain-4663.json");
+const hookFeeGuide = read(ROOT, "content/docs/liquidity/swap-fee-hook.mdx");
+for (const [leg, label] of [["inputFeePips", "input hook fee"], ["outputFeePips", "output hook fee"]]) {
+  const value = requireMatch(mainnetManifest, new RegExp(`"${leg}"\\s*:\\s*([\\d_]+)`), label)?.[1];
+  if (value) requireText(hookFeeGuide, `${value.replaceAll("_", ",")} pips`, label);
+}
+
 const launcher = read(staticsRoot, "script/DeployStaticsGenesis.s.sol");
 for (const [constant, label] of [
   ["STATICS_SUPPLY", "fixed STATICS supply"],
@@ -142,6 +167,13 @@ for (const signature of [
 }
 
 const feePolicy = read(staticsRoot, "src/libraries/LibProtocolPoolFee.sol");
+for (const [constant, label] of [
+  ["MIN_CREATOR_FEE_PIPS", "minimum initial creator fee"],
+  ["MAX_COMBINED_FEE_PIPS", "maximum combined hook fee"],
+]) {
+  const value = requireMatch(feePolicy, new RegExp(`\\b${constant}\\s*=\\s*([\\d_]+);`), label)?.[1];
+  if (value) requireText(hookFeeGuide, `${value.replaceAll("_", ",")} pips`, label);
+}
 const creatorShare = requireMatch(feePolicy, /CREATOR_SHARE_BPS\s*=\s*([\d_]+);/, "creator share")?.[1];
 const configurableShare = requireMatch(
   feePolicy,
@@ -154,6 +186,17 @@ if (configurableShare) {
 }
 
 const pools = read(staticsRoot, "src/interfaces/IStaticsProtocolPools.sol");
+const integrationGuide = read(ROOT, "content/docs/reference/integration.mdx");
+for (const field of ["inputFeePips", "outputFeePips"]) {
+  requireText(pools, `uint16 ${field};`, `${field} in current source`);
+  requireText(integrationGuide, `\`${field}\``, `${field} in integration guide`);
+}
+const poolCreation = read(staticsRoot, "src/facets/ProtocolPoolCreationFacet.sol");
+const signatureVersion = requireMatch(poolCreation, /DOMAIN_VERSION_HASH\s*=\s*keccak256\(bytes\("(\d+)"\)\)/, "pool authorization version")?.[1];
+if (signatureVersion) requireText(integrationGuide, `domain version \`${signatureVersion}\``, "pool authorization version in integration guide");
+for (const field of ["inputFeePips", "outputFeePips"]) {
+  requireText(poolCreation, field, `${field} in pool authorization source`);
+}
 for (const signature of [
   "createPool(CreatePoolParams calldata params, bytes calldata creatorAuthorization)",
   "setProtocolPoolFeeRate(PoolId poolId, PoolSwapFeeRate calldata feeRate)",

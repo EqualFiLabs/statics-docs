@@ -1,0 +1,49 @@
+---
+id: phase-one-deployment
+slug: reference/phase-one-deployment
+label: Phase 1 deployment
+title: Robinhood mainnet Phase 1 deployment
+description: Verified deployment addresses, launch pools, configuration, and the limits of the deployment snapshot.
+updated: 2026-10-11
+order: 705
+badge: Phase 1
+---
+
+The Statics Phase 1 protocol was deployed on Robinhood Chain mainnet (chain ID `4663`). The [machine-readable deployment snapshot](/deployments/robinhood-mainnet-phase-one-4663.json) records the addresses, runtime hashes, four created pools, launch settings, and transaction evidence verified at block **86,352,823** on **2026-10-12 03:19 UTC**. It was built from [Statics source commit `03c6d23`](https://github.com/EqualFiLabs/statics/tree/03c6d23cd8207c6f69b6b9a53b56f103c30ee52c).
+
+:::warning Snapshot, not a live quote
+At verification, all four pools had **zero active liquidity**, the protocol gauge was **not activated**, no pool had activated managed POL, and the POL operator was unset. Pool existence alone does not establish tradeable depth or funded rewards. Check current onchain state before transacting.
+:::
+
+## Contracts and governance
+
+| Contract or role | Robinhood mainnet address |
+| --- | --- |
+| Statics protocol and PositionNFT | `0x612aC07E3A60e16F1CC7B2c1Fd3DbEB474515DAa` |
+| Governance Safe and guardian | `0x603A8A2f22ac1d61E9c932A4F6Fa23170CEcb9Ff` |
+| Timelock | `0x7D20D3854aF5Cd018d07Ed9765e42150b96cDEcd` |
+| Treasury | `0x0Ce4140f3Ab03024623a75F248D467912C7E1725` |
+| Public swap-fee hook | `0x2a8dfC6608Dd8cC8DcB385F8876947F181c1D0ec` |
+| Permissioned swap-fee hook | `0x8A41Ef05E5C3939c0f37429621964E911b7618E4` |
+| Liquidity manager | `0xF1e44655d22cA4BdDB0EC3B8cB6d8373d5339250` |
+| Permissioned router | `0x1E616e4ddc38EC2959069FeEAfFBAb1e5d3e4994` |
+| Permissioned position manager | `0x29d2467f7C43CD28Ae7ee16CB4acaF72Fc0BfFD9` |
+
+The snapshot also lists the permissioned venue controller factory and claims contract, with runtime hashes for the deployed contracts. The protocol and PositionNFT share one address. At verification, the **Safe owned the protocol**; the timelock was deployed with a 24-hour minimum delay, but the final ownership handoff had not occurred. Recheck `owner()` before preparing a governance action.
+
+## Created public pools
+
+| Pair | PoolId | Native v4 LP fee | Hook fee per leg | Active liquidity at verification |
+| --- | --- | ---: | ---: | ---: |
+| Native ETH/USDG | `0x13f24e6c80fc085440ae3a8f757b7b1b0dcaf414793dfe6dba9177a3023f325b` | 50 pips | 25 / 25 pips | 0 |
+| STATICS/USDG | `0x20aa17212cfab902b3ac5ac7954058808a370cb6e3d8bb9f0b08a161838df19c` | 200 pips | 1,400 / 1,400 pips | 0 |
+| STATICS/NVDA | `0x21bad15821a79029edd044f6f3c4f5ba6d0e39e2107a9656639617fc45bebabd` | 10,000 pips | 2,500 / 2,500 pips | 0 |
+| NVDA/USDG | `0x6f0e4a348c87bd4289c9059a6ec4e3af63cba2958e1629665cb1a863892ace89` | 50 pips | 25 / 25 pips | 0 |
+
+The hook fees above are pool-specific launch overrides, separate from each pool's native v4 LP fee. The protocol-wide default was 500 pips on input and 500 pips on output. Read `protocolPoolFeeRate(poolId)` and pool liquidity at the time of use.
+
+## Verified launch settings and remaining checks
+
+At the verification block, public pool creation cost **0.01 ETH**, PositionNFT creation cost **0.001 ETH**, optional managed-POL activation cost **0.025 ETH**, and the revenue settlement tip was **100 BPS** of Treasury's settled share. The launch sequence enabled the public creation fee before transferring ownership to the Safe. The [pool guide](/docs/liquidity/protocol-pools) explains how to obtain a fresh `quotePool(params)` before creation.
+
+The deployment verifier matched core and periphery runtime hashes, launch configuration, and pool creation events. **Explorer source verification was not performed**, and this docs release does not bundle a compiled Phase 1 ABI or certify an SDK build against the deployment. Builders should compile the matching interfaces from source commit `03c6d23`, check installed selectors and current dependencies, and confirm the relevant onchain values. The [integration guide](/docs/reference/integration) covers those checks. Statics Genesis has a [separate mainnet manifest](https://github.com/EqualFiLabs/statics/blob/03c6d23cd8207c6f69b6b9a53b56f103c30ee52c/deployments/robinhood-mainnet-genesis.json).

@@ -4,7 +4,7 @@ slug: liquidity/protocol-pools
 label: Public pools
 title: Public protocol pools
 description: Phase 1 public Uniswap v4 markets, creation access, native ETH pairs, creator fees, and activation of managed POL.
-updated: 2026-10-10
+updated: 2026-10-11
 order: 415
 badge: Phase 1
 ---
@@ -12,23 +12,16 @@ badge: Phase 1
 Phase 1 general pools are Statics-hooked Uniswap v4 markets. They can pair two compatible ERC-20s or native ETH with one compatible ERC-20. They are independent of baskets: registration does not make either currency basket backing, Dollar collateral, or a borrowable asset. Basket canonical pools arrive with Phase 2.
 
 :::warning Match the deployment
-This page describes the current Phase 1 source. This site does not yet provide a verified Phase 1 mainnet protocol address or matching ABI. Confirm the release manifest before transacting.
+The [Phase 1 deployment snapshot](/docs/reference/phase-one-deployment) lists the verified protocol address and four public pools. Each had zero active liquidity at verification. This site does not bundle a matching compiled ABI; confirm current pool state, installed selectors, and fee terms before transacting.
 :::
 
-## Creation access and quote
+## Creation fee and quote
 
-`poolCreationFee()` is separate from the basket and PositionNFT creation fees.
+The Robinhood mainnet Phase 1 deployment verified `poolCreationFee()` at **0.01 ETH**. Anyone can create a public pool by paying the exact fee, which is forwarded to Treasury. This fee is separate from basket and PositionNFT creation fees. Before a transaction, read `poolCreationFee()`, call `quotePool(params)`, and use its sorted PoolKey, PoolId, normalized initial price, creation fee, optional managed-POL activation fee, total native fee, and creator-authorization digest. Requote if configuration or pool state changes.
 
-| Current fee | Who can call `createPool` |
-| --- | --- |
-| Zero | Protocol governance only, paying zero creation fee |
-| Positive | Any caller paying the exact quoted native fee |
+A creator chooses the pair, static native v4 LP fee from 0 through 999,999 pips, tick spacing, initial raw-unit B-per-A price, bilateral hook-fee rate, creator address, and whether to activate managed POL at creation. Each creator-selected hook-fee leg must be at least **10 pips**; the two legs together may not exceed **20,000 pips (200 BPS)**. The launch default is 500 pips per leg, but a creator may choose a lower rate. Dynamic v4 fees are not accepted. PoolId includes the currencies, native LP fee, tick spacing, and hook; another native LP fee or tick spacing makes a distinct market.
 
-The Phase 1 initial setting is zero, so market creation begins owner-curated. It is **not** free public creation. Before a transaction, call `quotePool(params)` and use its sorted PoolKey, PoolId, normalized initial price, creation fee, optional managed-POL activation fee, total native fee, and creator-authorization digest. Requote if configuration or pool state changes.
-
-A creator chooses the pair, static native v4 LP fee from 0 through 999,999 pips, tick spacing, initial raw-unit B-per-A price, bilateral hook-fee rate, creator address, and whether to activate managed POL at creation. Dynamic v4 fees are not accepted. PoolId includes the currencies, native LP fee, tick spacing, and hook; another fee or tick spacing makes a distinct market.
-
-Creator authorization uses EIP-712 with EOA or ERC-1271 signatures when required. A direct creator can create without a signature once public creation is open. Governance-owner creation and relayed creation have their own authorization rules; use the quoted digest and current contract interface rather than reusing an old signed intent. `invalidatePoolCreationNonce` cancels an unused authorization.
+Creator authorization uses EIP-712 domain version `5` with EOA or ERC-1271 signatures when required. The signed `CreatePool` fields include `inputFeePips` and `outputFeePips`; an older signature using BPS fields or domain version `4` does not match. A direct creator can create without a signature. Relayed creation requires the creator's authorization; use the quoted digest and current contract interface rather than reusing an old signed intent. `invalidatePoolCreationNonce` cancels an unused authorization.
 
 ## Pool creation and liquidity are separate
 

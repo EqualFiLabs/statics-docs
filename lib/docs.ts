@@ -65,7 +65,7 @@ const NAVIGATION_GROUPS: { title: string; pageIds: string[] }[] = [
   },
   {
     title: "Build",
-    pageIds: ["integration", "sdk", "indexing"],
+    pageIds: ["phase-one-deployment", "integration", "sdk", "indexing"],
   },
   {
     title: "Security",

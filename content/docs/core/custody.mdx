@@ -8,13 +8,13 @@ updated: 2026-08-04
 order: 40
 ---
 
-Shared custody is the backbone of `StaticsDiamond`. Every module keeps its own
+Shared custody is the backbone of the protocol. Every module keeps its own
 logical reservations, while a single library — `LibCustody` — enforces that the
-sum of those reservations never exceeds the Diamond's real token balance.
+sum of those reservations never exceeds the protocol contract's real token balance.
 
 ## The reservation equation
 
-For each ERC-20 held at `StaticsDiamond`:
+For each ERC-20 held by the protocol contract:
 
 ```text Global reservation
 globalReserved(token)
@@ -33,8 +33,8 @@ the global total — it only changes which sub-account claims it.
 
 ## Measured transfers
 
-Every inbound transfer measures the Diamond's actual balance increase rather
-than trusting the requested amount. Every outbound transfer caps the Diamond's
+Every inbound transfer measures the protocol contract's actual balance increase rather
+than trusting the requested amount. Every outbound transfer caps the protocol contract's
 debit and, where the public function offers a minimum, separately checks the
 receiver's observed increase.
 
@@ -49,11 +49,11 @@ revert atomically where they would break exact accounting.
 
 ## What is outside the equation
 
-Several physical locations are intentionally outside the Diamond reservation:
+Several physical locations are intentionally outside the protocol reservation:
 
 | Location | Held under |
 | --- | --- |
-| `StaticsDollarCoreDiamond` | Core collateral and insurance |
+| Dollar Core contract | Core collateral and insurance |
 | `StaticsSwapFeeHook` | Pending and locked permanent-liquidity assets |
 | `StaticsLiquidityManager` | Transaction-scoped user LP inputs only |
 | Uniswap v4 `PoolManager` | Canonical pool liquidity under v4 accounting |

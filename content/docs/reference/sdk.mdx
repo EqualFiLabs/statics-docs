@@ -4,7 +4,7 @@ slug: reference/sdk
 label: SDK
 title: SDK
 description: TypeScript ABIs, math and quote helpers, decoders, permit and swap builders, and chain bindings for integrating against Statics.
-updated: 2026-10-10
+updated: 2026-10-11
 order: 720
 ---
 
@@ -13,7 +13,7 @@ onchain ABIs, chain bindings, math helpers, quote functions, decoders, and
 calldata builders needed to integrate without recomputing protocol math.
 
 :::warning Match the target release
-This docs site does not yet publish a verified Phase 1 mainnet address or matching deployment ABI. Pin an SDK and ABI to the exact release manifest and installed functions before sending transactions.
+The [Phase 1 deployment snapshot](/docs/reference/phase-one-deployment) publishes the mainnet address. This site does not bundle a compiled deployment ABI or certify an SDK build against it. Pin the SDK and compiled ABI to the deployed source commit and installed functions before sending transactions.
 :::
 
 ## Package
@@ -41,7 +41,7 @@ Source, issues, and local build live in that repository (`npm run build`, `npm t
 
 ## Match the SDK to the target
 
-Resolve the `sdk` submodule gitlink from the exact `statics` source commit. For a live Phase 1 deployment, use the SDK revision and ABI published with its verified manifest. This site has not yet listed that release pair. Source APIs alone do not prove a feature is deployed.
+The deployed `statics` source commit `03c6d23` pins the `sdk` submodule to `749f9d5`. That gitlink is a source revision, not proof that a published SDK build has been validated against the live selector set. Compile the required interfaces from the same source commit and confirm the installed functions before using an SDK binding.
 
 ## Chain bindings
 

@@ -79,7 +79,7 @@ const pages = findMdxFiles(contentDir)
 // ---- release facts ----
 const facts = [
   "Statics Genesis is live on Robinhood mainnet.",
-  "Phase 1 source and deployment tooling are implemented; this site does not yet publish a verified Phase 1 mainnet address or matching ABI.",
+  "Phase 1 is deployed on Robinhood mainnet; the verified address and four launch pools are in /docs/reference/phase-one-deployment. At verification, pools had zero active liquidity and gauges were inactive. This site does not bundle a compiled deployment ABI.",
   "Baskets and credit are Phase 2; Statics Dollar is Phase 3; Morpho integration is Phase 4.",
 ];
 
